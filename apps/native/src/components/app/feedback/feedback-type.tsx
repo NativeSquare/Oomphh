@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { OptionButton } from "@/components/shared/option-button";
 import { Text } from "@/components/ui/text";
 import { View } from "react-native";
 
@@ -19,17 +19,15 @@ export function FeedbackTypeField({
 
   return (
     <View className="gap-2">
-      <Text className="text-sm font-medium">{label}</Text>
+      <Text className="text-sm text-muted-foreground">{label}</Text>
       <View className="flex-row flex-wrap gap-2">
         {FEEDBACK_TYPES.map((option, index) => (
-          <Button
+          <OptionButton
             key={index}
-            variant={isSelected(option) ? "default" : "outline"}
-            size="sm"
+            option={option}
             onPress={() => onSelect(option)}
-          >
-            <Text>{option}</Text>
-          </Button>
+            isSelected={isSelected(option)}
+          />
         ))}
       </View>
       {error && <Text className="text-xs text-destructive mt-1">{error}</Text>}

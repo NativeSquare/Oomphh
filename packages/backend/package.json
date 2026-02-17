@@ -17,12 +17,15 @@
   "dependencies": {
     "@auth/core": "0.37.0",
     "@convex-dev/auth": "^0.0.90",
+    "@convex-dev/geospatial": "^0.2.1",
     "@convex-dev/migrations": "^0.3.1",
+    "@convex-dev/presence": "^0.3.0",
     "@convex-dev/resend": "^0.2.3",
     "@packages/transactional": "workspace:*",
     "@packages/shared": "workspace:*",
     "@react-email/render": "^2.0.4",
     "convex": "^1.29.3",
+    "convex-helpers": "^0.1.108",
     "oslo": "^1.2.1",
     "resend": "3.2.0"
   },

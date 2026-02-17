@@ -20,7 +20,7 @@ export function DescribeFeedbackField({
   return (
     <View className="gap-2">
       <View className="flex-row items-center justify-between">
-        <Text className="text-sm font-medium">{label}</Text>
+        <Text className="text-sm text-muted-foreground">{label}</Text>
         <Text className="text-xs text-muted-foreground self-end">
           {value?.length || 0}/{maxLength}
         </Text>

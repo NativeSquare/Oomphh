@@ -1,7 +1,6 @@
 import "@/lib/nativewind-interop";
-import { ThemeStatusBar } from "@/lib/theme-status-bar";
-import { checkForUpdates } from "@/utils/expo/check-for-updates";
-import { ConvexAuthProvider, useAuthActions } from "@convex-dev/auth/react";
+import { fetchUpdatesAsync } from "@/utils/fetch-updates-async";
+import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { api } from "@packages/backend/convex/_generated/api";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { PortalHost } from "@rn-primitives/portal";
@@ -9,11 +8,11 @@ import { ConvexReactClient, useConvexAuth, useQuery } from "convex/react";
 import { Stack } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useColorScheme } from "nativewind";
+import * as React from "react";
 import { useEffect } from "react";
-import { ActivityIndicator, Alert, Platform, View } from "react-native";
+import { ActivityIndicator, Platform, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import "./global.css";
 
 const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
@@ -27,9 +26,13 @@ const secureStorage = {
 };
 
 export default function RootLayout() {
+  const { setColorScheme } = useColorScheme();
+  useEffect(() => {
+    setColorScheme("dark");
+  }, []);
   useEffect(() => {
     if (!__DEV__) {
-      checkForUpdates();
+      fetchUpdatesAsync();
     }
   }, []);
   return (
@@ -44,11 +47,8 @@ export default function RootLayout() {
       >
         <GestureHandlerRootView>
           <BottomSheetModalProvider>
-            <SafeAreaProvider>
-              <ThemeStatusBar />
-              <RootStack />
-              <PortalHost />
-            </SafeAreaProvider>
+            <RootStack />
+            <PortalHost />
           </BottomSheetModalProvider>
         </GestureHandlerRootView>
       </ConvexAuthProvider>
@@ -57,56 +57,36 @@ export default function RootLayout() {
 }
 
 function RootStack() {
-  const { colorScheme } = useColorScheme();
   const { isAuthenticated, isLoading } = useConvexAuth();
-  const { signOut } = useAuthActions();
   const user = useQuery(api.table.users.currentUser);
   const hasCompletedOnboarding = user?.hasCompletedOnboarding ?? false;
 
-  // Detect banned users and show alert before signing them out
-  const isBanned =
-    user?.banned && (!user.banExpires || user.banExpires > Date.now());
-
-  useEffect(() => {
-    if (isAuthenticated && isBanned) {
-      Alert.alert(
-        "Account Suspended",
-        user?.banReason
-          ? `Your account has been suspended: ${user.banReason}. Contact support if you believe this is an error.`
-          : "Your account has been suspended. Contact support if you believe this is an error.",
-        [{ text: "OK", onPress: () => signOut() }]
-      );
-    }
-  }, [isAuthenticated, isBanned]);
-
   if (isLoading) {
     return (
-      <View className="flex-1 justify-center items-center bg-background">
-        <ActivityIndicator color={colorScheme === "dark" ? "white" : "black"} />
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator />
       </View>
     );
   }
   return (
-    <View className="flex-1 bg-background">
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          animation: "fade_from_bottom",
-          contentStyle: { backgroundColor: "transparent" },
-        }}
+    <Stack
+      screenOptions={{ headerShown: false, animation: "fade_from_bottom" }}
+    >
+      <Stack.Protected guard={!user || !isAuthenticated}>
+        <Stack.Screen name="(auth)" />
+      </Stack.Protected>
+
+      <Stack.Protected
+        guard={!!user && isAuthenticated && !hasCompletedOnboarding}
       >
-        <Stack.Protected guard={!isAuthenticated}>
-          <Stack.Screen name="(auth)" />
-        </Stack.Protected>
+        <Stack.Screen name="(onboarding)" />
+      </Stack.Protected>
 
-        <Stack.Protected guard={isAuthenticated && !hasCompletedOnboarding}>
-          <Stack.Screen name="(onboarding)" />
-        </Stack.Protected>
-
-        <Stack.Protected guard={isAuthenticated && hasCompletedOnboarding}>
-          <Stack.Screen name="(app)" />
-        </Stack.Protected>
-      </Stack>
-    </View>
+      <Stack.Protected
+        guard={!!user && isAuthenticated && hasCompletedOnboarding}
+      >
+        <Stack.Screen name="(app)" />
+      </Stack.Protected>
+    </Stack>
   );
 }

@@ -4,7 +4,6 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,14 +13,14 @@ import { ForgotPasswordSchema } from "@/validation/auth";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useConvex } from "convex/react";
 import { useRouter } from "expo-router";
-import { useColorScheme } from "nativewind";
+import { ChevronLeft } from "lucide-react-native";
 import * as React from "react";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, Pressable, View } from "react-native";
 import z from "zod";
 import { api } from "@packages/backend/convex/_generated/api";
+import { Icon } from "../ui/icon";
 
 export function ForgotPasswordForm() {
-  const { colorScheme } = useColorScheme();
   const [email, setEmail] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const [fieldErrors, setFieldErrors] = React.useState<{
@@ -78,11 +77,17 @@ export function ForgotPasswordForm() {
 
   return (
     <View className="gap-6">
-      <Card className="border-border/0 sm:border-border shadow-none sm:shadow-sm sm:shadow-black/5">
-        <CardHeader>
-          <CardTitle className="text-center text-xl sm:text-left">
-            Forgot password?
-          </CardTitle>
+      <Card className="bg-background border-border/0 sm:border-border shadow-none sm:shadow-sm sm:shadow-black/5">
+        <CardHeader className="gap-4">
+          <View className="w-full flex flex-row items-center justify-between">
+            <Pressable onPress={() => router.back()} className="size-6">
+              <Icon as={ChevronLeft} size={24} className="text-white" />
+            </Pressable>
+            <Text className="text-xl font-medium text-white">
+              Forgot password?
+            </Text>
+            <View className="size-6" />
+          </View>
           <CardDescription className="text-center sm:text-left">
             Enter your email to reset your password
           </CardDescription>
@@ -114,7 +119,7 @@ export function ForgotPasswordForm() {
             </View>
             <Button className="w-full" onPress={onSubmit} disabled={isLoading}>
               {isLoading ? (
-                <ActivityIndicator color={colorScheme === "dark" ? "black" : "white"} />
+                <ActivityIndicator color="white" />
               ) : (
                 <Text>Reset your password</Text>
               )}

@@ -1,4 +1,4 @@
-export const APP_NAME = "Test Monorepo";
-export const APP_ADDRESS = "60 rue François 1er, 75008 Paris, France";
-export const APP_DOMAIN = "dev.nativesquare.fr";
-export const APP_SLUG = "testmonorepo";
+export const APP_NAME = "Oomphh";
+export const APP_ADDRESS = "100 Smith Street, Melbourne VIC 3000";
+export const APP_DOMAIN = "oomphh.cz";
+export const APP_SLUG = "oomphh";

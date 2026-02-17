@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 import { ResetPasswordSchema } from "@/validation/auth";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { useColorScheme } from "nativewind";
 import * as React from "react";
 import { ActivityIndicator, TextInput, View } from "react-native";
 import z from "zod";
@@ -18,7 +17,6 @@ import { OTPInput } from "../custom/otp-input";
 import { PasswordInput } from "../custom/password-input";
 
 export function ResetPasswordForm({ email }: { email: string }) {
-  const { colorScheme } = useColorScheme();
   const [newPassword, setNewPassword] = React.useState("");
   const [code, setCode] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
@@ -69,7 +67,7 @@ export function ResetPasswordForm({ email }: { email: string }) {
 
   return (
     <View className="gap-6">
-      <Card className="border-border/0 sm:border-border shadow-none sm:shadow-sm sm:shadow-black/5">
+      <Card className="bg-background border-border/0 sm:border-border shadow-none sm:shadow-sm sm:shadow-black/5">
         <CardHeader>
           <CardTitle className="text-center text-xl sm:text-left">
             Reset password
@@ -123,7 +121,7 @@ export function ResetPasswordForm({ email }: { email: string }) {
               disabled={isLoading}
             >
               {isLoading ? (
-                <ActivityIndicator color={colorScheme === "dark" ? "black" : "white"} />
+                <ActivityIndicator color="white" />
               ) : (
                 <Text>Reset Password</Text>
               )}

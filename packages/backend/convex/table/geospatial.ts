@@ -1,0 +1,375 @@
+import { GeospatialIndex } from "@convex-dev/geospatial";
+import { v } from "convex/values";
+import { components } from "../_generated/api";
+import { Id } from "../_generated/dataModel";
+import { mutation, query } from "../_generated/server";
+
+type GeospatialFilterKeys = {
+  // Body Types
+  bodyTypesSlim?: string;
+  bodyTypesAverage?: string;
+  bodyTypesAthletic?: string;
+  bodyTypesMuscular?: string;
+  bodyTypesStocky?: string;
+  // Ethnicity
+  ethnicityAsian?: string;
+  ethnicityBlack?: string;
+  ethnicityLatinoHispanic?: string;
+  ethnicityMiddleEastern?: string;
+  ethnicityMixed?: string;
+  ethnicityNativeAmerican?: string;
+  ethnicityPacificIslander?: string;
+  ethnicitySouthAsian?: string;
+  ethnicityWhite?: string;
+  ethnicityOther?: string;
+  // Looking For
+  lookingForConnections?: string;
+  lookingForFriends?: string;
+  lookingForDating?: string;
+  // Position
+  positionTop?: string;
+  positionBottom?: string;
+  positionVersatile?: string;
+  positionSide?: string;
+  positionAskMe?: string;
+  // Orientation
+  orientation?: string;
+};
+
+const geospatial = new GeospatialIndex<Id<"users">>(components.geospatial);
+
+export const updateUserLocation = mutation({
+  args: { id: v.id("users"), latitude: v.number(), longitude: v.number() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.id);
+    if (!user) throw new Error("User not found");
+
+    return await geospatial.insert(
+      ctx,
+      args.id,
+      { latitude: args.latitude, longitude: args.longitude },
+      {}
+    );
+  },
+});
+
+function intersects(
+  userVals: string[] | undefined,
+  filterVals: string[] | undefined
+) {
+  if (!filterVals?.length) return true; // no filter => pass
+  if (!userVals?.length) return false; // filter set but user has none => fail
+  const set = new Set(userVals);
+  return filterVals.some((v) => set.has(v));
+}
+
+function calculateAge(birthDate?: string | null): number | null {
+  if (!birthDate) return null;
+  try {
+    const birth = new Date(birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birth.getDate())
+    ) {
+      age--;
+    }
+    return age;
+  } catch {
+    return null;
+  }
+}
+
+function matchesFilters(
+  user: {
+    birthDate?: string | null;
+    height?: { value: number; unit: string } | null;
+    weight?: { value: number; unit: string } | null;
+    bodyTypes?: string | null;
+    ethnicity?: string | null;
+    lookingFor?: string[] | null;
+    position?: string | null;
+    orientation?: string | null;
+    relationshipStatus?: string | null;
+  },
+  filters?: {
+    minAge?: number;
+    maxAge?: number;
+    minHeight?: number;
+    maxHeight?: number;
+    minWeight?: number;
+    maxWeight?: number;
+    bodyType?: string;
+    ethnicity?: string;
+    lookingFor?: string[];
+    position?: string;
+    orientation?: string;
+    relationshipStatus?: string;
+  }
+) {
+  if (!filters) return true;
+
+  // Age filter
+  if (filters.minAge !== undefined || filters.maxAge !== undefined) {
+    const userAge = calculateAge(user.birthDate);
+    if (userAge === null) return false; // No birth date = exclude
+    if (filters.minAge !== undefined && userAge < filters.minAge) return false;
+    if (filters.maxAge !== undefined && userAge > filters.maxAge) return false;
+  }
+
+  // Height filter (in cm)
+  if (filters.minHeight !== undefined || filters.maxHeight !== undefined) {
+    const userHeight = user.height?.value;
+    if (userHeight === undefined) return false; // No height = exclude when filter is set
+    if (filters.minHeight !== undefined && userHeight < filters.minHeight)
+      return false;
+    if (filters.maxHeight !== undefined && userHeight > filters.maxHeight)
+      return false;
+  }
+
+  // Weight filter (in kg)
+  if (filters.minWeight !== undefined || filters.maxWeight !== undefined) {
+    const userWeight = user.weight?.value;
+    if (userWeight === undefined) return false; // No weight = exclude when filter is set
+    if (filters.minWeight !== undefined && userWeight < filters.minWeight)
+      return false;
+    if (filters.maxWeight !== undefined && userWeight > filters.maxWeight)
+      return false;
+  }
+
+  if (filters.orientation && user.orientation !== filters.orientation)
+    return false;
+
+  if (filters.bodyType && user.bodyTypes !== filters.bodyType) return false;
+  if (filters.ethnicity && user.ethnicity !== filters.ethnicity) return false;
+  if (!intersects(user.lookingFor ?? undefined, filters.lookingFor))
+    return false;
+  if (filters.position && user.position !== filters.position) return false;
+  if (
+    filters.relationshipStatus &&
+    user.relationshipStatus !== filters.relationshipStatus
+  )
+    return false;
+
+  return true;
+}
+
+// Calculate distance between two points using Haversine formula
+// Returns distance in meters
+function calculateDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const R = 6371000; // Earth's radius in meters
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+export const getDistanceBetweenUsers = query({
+  args: {
+    currentUserId: v.id("users"),
+    targetUserId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    // Get both users' geospatial data
+    const currentUserGeo = await geospatial.get(ctx, args.currentUserId);
+    const targetUserGeo = await geospatial.get(ctx, args.targetUserId);
+
+    // If either user doesn't have location data, return null
+    if (!currentUserGeo || !targetUserGeo) {
+      return null;
+    }
+
+    // Calculate distance using Haversine formula
+    const distance = calculateDistance(
+      currentUserGeo.coordinates.latitude,
+      currentUserGeo.coordinates.longitude,
+      targetUserGeo.coordinates.latitude,
+      targetUserGeo.coordinates.longitude
+    );
+
+    return distance;
+  },
+});
+
+export const getNearestUsers = query({
+  args: {
+    id: v.id("users"),
+    filters: v.optional(
+      v.object({
+        minAge: v.optional(v.number()),
+        maxAge: v.optional(v.number()),
+        minHeight: v.optional(v.number()),
+        maxHeight: v.optional(v.number()),
+        minWeight: v.optional(v.number()),
+        maxWeight: v.optional(v.number()),
+        bodyType: v.optional(v.string()),
+        ethnicity: v.optional(v.string()),
+        lookingFor: v.optional(v.array(v.string())),
+        position: v.optional(v.string()),
+        orientation: v.optional(v.string()),
+        relationshipStatus: v.optional(v.string()),
+      })
+    ),
+    // Optional custom location coordinates (for location search feature)
+    customLocation: v.optional(
+      v.object({
+        latitude: v.number(),
+        longitude: v.number(),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    const maxResults = 10000;
+    const FIXED_MAX_DISTANCE = 5000000; // Fixed 5000km limit (not shown in UI, but used to limit data fetching)
+
+    // Use custom location if provided, otherwise use user's stored location
+    let searchPoint: { latitude: number; longitude: number };
+
+    if (args.customLocation) {
+      searchPoint = args.customLocation;
+    } else {
+      const geo = await geospatial.get(ctx, args.id);
+      if (!geo) return [];
+      searchPoint = geo.coordinates;
+    }
+
+    const result = await geospatial.nearest(ctx, {
+      point: searchPoint,
+      limit: maxResults + 1, // +1 so we can exclude self and still return maxResults
+      maxDistance: FIXED_MAX_DISTANCE, // Fixed 50km limit to reduce data fetching
+      // We tried the filterKeys method, but it doesn't allow multiple in() statements as we speak (12/2025). We needed them for making filters like : "position IN […] and ethnicity IN […] and lookingFor IN […]". Sequencing eq() statements is not possible either because doing so results in AND statements instead of OR statements. For example : q.eq("position", "top").eq("position", "bottom") means getting users with : "position is top AND position is bottom", which is not what we want.
+    });
+
+    const resolvedUsers = await Promise.all(
+      result
+        // Exclude self
+        .filter((item) => item.key !== args.id)
+        .map(async (item) => {
+          const user = await ctx.db.get(item.key);
+          if (!user) return null;
+          // Exclude users who have hidden their profile from discovery
+          if (user.privacy?.hideProfileFromDiscovery === true) return null;
+          if (!matchesFilters(user, args.filters)) return null;
+          return {
+            ...user,
+            distance: item.distance,
+          };
+        })
+    );
+
+    return resolvedUsers.filter((user) => user !== null);
+  },
+});
+
+/**
+ * Get nearby stories grouped by author.
+ * Uses the geospatial index to find nearby users, then fetches their active stories.
+ */
+export const getNearbyStories = query({
+  args: {
+    userId: v.id("users"),
+    customLocation: v.optional(
+      v.object({
+        latitude: v.number(),
+        longitude: v.number(),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+
+    // Determine search location
+    let searchPoint: { latitude: number; longitude: number };
+
+    if (args.customLocation) {
+      searchPoint = args.customLocation;
+    } else {
+      const geo = await geospatial.get(ctx, args.userId);
+      if (!geo) return [];
+      searchPoint = geo.coordinates;
+    }
+
+    // Get nearby users from the geospatial index
+    const nearbyResults = await geospatial.nearest(ctx, {
+      point: searchPoint,
+      limit: 500,
+      maxDistance: 5000000, // 5000km
+    });
+
+    // Include self + nearby users
+    const nearbyUserIds = nearbyResults.map((item) => item.key);
+
+    // Fetch active stories for all nearby users (including self)
+    const storyGroups: {
+      authorId: Id<"users">;
+      authorName: string;
+      authorAvatarUrl: string | null;
+      stories: {
+        _id: Id<"stories">;
+        imageUrl: string | null;
+        expiresAt: number;
+        _creationTime: number;
+      }[];
+    }[] = [];
+
+    for (const userId of nearbyUserIds) {
+      const userStories = await ctx.db
+        .query("stories")
+        .withIndex("by_authorId", (q) => q.eq("authorId", userId))
+        .filter((q) => q.gt(q.field("expiresAt"), now))
+        .collect();
+
+      if (userStories.length === 0) continue;
+
+      const author = await ctx.db.get(userId);
+      if (!author) continue;
+
+      // Get author avatar URL
+      const avatarUrl = author.profilePictures?.length
+        ? await ctx.storage.getUrl(author.profilePictures[0])
+        : null;
+
+      // Get image URLs for each story
+      const enrichedStories = await Promise.all(
+        userStories.map(async (story) => ({
+          _id: story._id,
+          imageUrl: await ctx.storage.getUrl(story.imageStorageId),
+          expiresAt: story.expiresAt,
+          _creationTime: story._creationTime,
+        }))
+      );
+
+      // Sort stories by creation time (oldest first)
+      enrichedStories.sort((a, b) => a._creationTime - b._creationTime);
+
+      storyGroups.push({
+        authorId: userId,
+        authorName: author.name ?? "Unknown",
+        authorAvatarUrl: avatarUrl,
+        stories: enrichedStories,
+      });
+    }
+
+    // Put the current user's stories first if they have any
+    storyGroups.sort((a, b) => {
+      if (a.authorId === args.userId) return -1;
+      if (b.authorId === args.userId) return 1;
+      return 0;
+    });
+
+    return storyGroups;
+  },
+});

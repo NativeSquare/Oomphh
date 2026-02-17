@@ -1,5 +1,3 @@
-import { SocialConnections } from "@/components/blocks/social-connections";
-import { PasswordInput } from "@/components/custom/password-input";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,22 +6,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Text } from "@/components/ui/text";
 import { getConvexErrorMessage } from "@/utils/getConvexErrorMessage";
 import { SignUpSchema } from "@/validation/auth";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter } from "expo-router";
-import { useColorScheme } from "nativewind";
 import * as React from "react";
 import { ActivityIndicator, type TextInput, View } from "react-native";
 import z from "zod";
+import { PasswordInput } from "../custom/password-input";
+import { Checkbox } from "../ui/checkbox";
 
 export function SignUpForm() {
-  const { colorScheme } = useColorScheme();
   const passwordInputRef = React.useRef<TextInput>(null);
   const confirmPasswordInputRef = React.useRef<TextInput>(null);
   const [email, setEmail] = React.useState("");
@@ -96,7 +92,7 @@ export function SignUpForm() {
 
   return (
     <View className="gap-6">
-      <Card className="border-border/0 sm:border-border shadow-none sm:shadow-sm sm:shadow-black/5">
+      <Card className="bg-background border-border/0 sm:border-border shadow-none sm:shadow-sm sm:shadow-black/5">
         <CardHeader>
           <CardTitle className="text-center text-xl sm:text-left">
             Create your account
@@ -136,8 +132,8 @@ export function SignUpForm() {
               </View>
               <PasswordInput
                 ref={passwordInputRef}
-                id="password"
                 placeholder="Set a password"
+                id="password"
                 returnKeyType="next"
                 submitBehavior="submit"
                 onSubmitEditing={onPasswordSubmitEditing}
@@ -191,7 +187,7 @@ export function SignUpForm() {
             </View>
             <Button className="w-full" onPress={onSubmit} disabled={isLoading}>
               {isLoading ? (
-                <ActivityIndicator color={colorScheme === "dark" ? "black" : "white"} />
+                <ActivityIndicator color="white" />
               ) : (
                 <Text>Continue</Text>
               )}
@@ -214,12 +210,12 @@ export function SignUpForm() {
               </Text>
             </Button>
           </View>
-          <View className="flex-row items-center">
+          {/* <View className="flex-row items-center">
             <Separator className="flex-1" />
             <Text className="text-muted-foreground px-4 text-sm">or</Text>
             <Separator className="flex-1" />
           </View>
-          <SocialConnections setError={setFormError} />
+          <SocialConnections setError={setFormError} /> */}
         </CardContent>
       </Card>
     </View>

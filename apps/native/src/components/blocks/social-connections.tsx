@@ -38,7 +38,7 @@ export function SocialConnections({
   const [isLoading, setIsLoading] = React.useState(false);
 
   async function handleSocialSignIn(
-    strategy: (typeof SOCIAL_CONNECTION_STRATEGIES)[number]
+    strategy: (typeof SOCIAL_CONNECTION_STRATEGIES)[number],
   ) {
     setIsLoading(true);
     setError(null);
@@ -49,7 +49,7 @@ export function SocialConnections({
       }
       const result = await openAuthSessionAsync(
         redirect!.toString(),
-        redirectTo
+        redirectTo,
       );
       if (result.type === "success") {
         const { url } = result;
@@ -64,26 +64,26 @@ export function SocialConnections({
   }
 
   return (
-    <View className="flex-row justify-center gap-6">
+    <View className="gap-2 sm:flex-row sm:gap-3">
       {SOCIAL_CONNECTION_STRATEGIES.map((strategy) => {
         return (
           <Button
             key={strategy.provider}
             variant="outline"
-            size="icon"
-            className="h-14 w-14 rounded-xl border-border/50"
+            size="sm"
+            className="sm:flex-1"
             onPress={async () => {
               await handleSocialSignIn(strategy);
             }}
             disabled={isLoading}
           >
             {isLoading ? (
-              <ActivityIndicator color={colorScheme === "dark" ? "black" : "white"} />
+              <ActivityIndicator color="white" />
             ) : (
               <Image
                 className={cn(
-                  "size-6",
-                  strategy.useTint && Platform.select({ web: "dark:invert" })
+                  "size-4",
+                  strategy.useTint && Platform.select({ web: "dark:invert" }),
                 )}
                 tintColor={Platform.select({
                   native: strategy.useTint

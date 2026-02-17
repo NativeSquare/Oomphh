@@ -1,43 +1,33 @@
 import { OnboardingFormData } from "@/app/(onboarding)";
-import { Input } from "@/components/ui/input";
-import { Text } from "@/components/ui/text";
-import { Textarea } from "@/components/ui/textarea";
 import * as React from "react";
 import { View } from "react-native";
+import { BioField } from "../profile/bio-field";
+import { NameField } from "../profile/name-field";
 
 export function BasicInfoStep({
   formData,
   setFormData,
+  showErrors = false,
 }: {
   formData: OnboardingFormData;
   setFormData: (data: OnboardingFormData) => void;
+  showErrors?: boolean;
 }) {
-  const BIO_LIMIT = 500;
+  const isNameInvalid = showErrors && !formData.name?.trim();
+
   return (
     <View className="gap-5">
-      <View className="gap-2">
-        <Text className="text-sm text-muted-foreground">Name</Text>
-        <Input
-          placeholder="John"
-          value={formData.name}
-          onChangeText={(value) => setFormData({ ...formData, name: value })}
-          autoCapitalize="words"
-          returnKeyType="next"
-        />
-      </View>
-      <View className="gap-2">
-        <Text className="text-sm text-muted-foreground">Bio</Text>
-        <Textarea
-          placeholder="Share a little about yourself"
-          placeholderClassName="text-primary"
-          value={formData.bio}
-          onChangeText={(value) => setFormData({ ...formData, bio: value })}
-          className="min-h-32"
-        />
-        <Text className="text-xs text-muted-foreground self-end">
-          {formData.bio?.length}/{BIO_LIMIT}
-        </Text>
-      </View>
+      <NameField
+        value={formData.name}
+        onChange={(value) => setFormData({ ...formData, name: value })}
+        error={isNameInvalid}
+        errorMessage={isNameInvalid ? "Name is required" : undefined}
+        required
+      />
+      <BioField
+        value={formData.bio}
+        onChange={(value) => setFormData({ ...formData, bio: value })}
+      />
     </View>
   );
 }

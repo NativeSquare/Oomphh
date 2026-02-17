@@ -6,14 +6,14 @@ const IS_PREVIEW = process.env.APP_VARIANT === "preview";
 
 const getUniqueIdentifier = () => {
   if (IS_DEV) {
-    return `com.${APP_SLUG}.dev`;
+    return `com.${APP_SLUG}.mobile.dev`;
   }
 
   if (IS_PREVIEW) {
-    return `com.${APP_SLUG}.preview`;
+    return `com.${APP_SLUG}.mobile.preview`;
   }
 
-  return `com.${APP_SLUG}`;
+  return `com.${APP_SLUG}.mobile`;
 };
 
 const getAppName = () => {
@@ -47,13 +47,18 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: "portrait",
   icon: "./assets/images/icon.png",
   scheme: APP_SLUG,
-  userInterfaceStyle: "automatic",
+  userInterfaceStyle: "dark",
   newArchEnabled: true,
   ios: {
     supportsTablet: true,
+    userInterfaceStyle: "dark",
     bundleIdentifier: getUniqueIdentifier(),
+    icon: "./assets/images/oomphh-ios.png",
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
+    },
+    config: {
+      googleMapsApiKey: process.env.GOOGLE_MAPS_IOS_API_KEY,
     },
   },
   android: {
@@ -66,6 +71,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
     edgeToEdgeEnabled: true,
     predictiveBackGestureEnabled: false,
+    config: {
+      googleMaps: {
+        apiKey: process.env.GOOGLE_MAPS_ANDROID_API_KEY,
+      },
+    },
     // googleServicesFile: getGoogleServicesJson(),
   },
   web: {
@@ -77,6 +87,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-camera",
     "expo-image-picker",
     "expo-media-library",
+    "expo-navigation-bar",
     "expo-notifications",
     "expo-router",
     "expo-secure-store",
@@ -97,17 +108,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     typedRoutes: true,
     reactCompiler: true,
   },
-  owner: "nativesquare-expo",
+  owner: "oomphh",
   extra: {
     router: {},
     eas: {
-      projectId: "7fe40ff2-2a08-4552-bff9-456b82e87956",
+      projectId: "2b7baddb-1ffe-4fb8-ad20-71c7c6257c88",
     },
   },
   runtimeVersion: {
     policy: "appVersion",
   },
   updates: {
-    url: "https://u.expo.dev/7fe40ff2-2a08-4552-bff9-456b82e87956",
+    url: "https://u.expo.dev/2b7baddb-1ffe-4fb8-ad20-71c7c6257c88",
   },
 });

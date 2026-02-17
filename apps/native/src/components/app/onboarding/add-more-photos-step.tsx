@@ -1,0 +1,93 @@
+import { OnboardingFormData } from "@/app/(onboarding)";
+import { PhotoGrid } from "@/components/shared/photo-grid";
+import { Icon } from "@/components/ui/icon";
+import { Text } from "@/components/ui/text";
+import { Id } from "@packages/backend/convex/_generated/dataModel";
+import { BottomSheetModal as GorhomBottomSheetModal } from "@gorhom/bottom-sheet";
+import { Rocket } from "lucide-react-native";
+import React from "react";
+import { View } from "react-native";
+
+export function AddMorePhotosStep({
+  formData,
+  setFormData,
+  showErrors,
+}: {
+  formData: OnboardingFormData;
+  setFormData: (data: OnboardingFormData) => void;
+  showErrors?: boolean;
+}) {
+  const bottomSheetModalRef = React.useRef<GorhomBottomSheetModal>(null);
+  const MAX_PHOTOS = 6;
+
+  const profilePictures = formData.profilePictures ?? [];
+
+  const handleOtherPhotosChange = (photos: Id<"_storage">[]) => {
+    setFormData({ ...formData, profilePictures: photos });
+  };
+
+  return (
+    <View className="gap-5">
+      <View className="gap-1">
+        <Text className="text-lg font-semibold text-foreground">
+          Add More Photos
+        </Text>
+        <Text className="text-sm text-muted-foreground">
+          Show different sides of your personality
+        </Text>
+      </View>
+
+      <View className="flex-row items-center gap-3 rounded-xl border border-border/70 bg-card px-4 py-4">
+        <View className="size-12 items-center justify-center rounded-full bg-primary">
+          <Icon as={Rocket} size={22} className="text-primary-foreground" />
+        </View>
+        <Text className="flex-1 text-base text-foreground">
+          Profiles with 3+ photos get 5× more interactions
+        </Text>
+      </View>
+
+      <View className="gap-2">
+        <Text className="text-sm font-medium text-foreground">
+          Your photos {profilePictures.length}/{MAX_PHOTOS}
+        </Text>
+        <View className="gap-3">
+          {/* {photoRows.map((row, rowIndex) => (
+            <View key={rowIndex} className="flex-row gap-3">
+              {row.map((uri, colIndex) => {
+                const photoIndex = rowIndex * 3 + colIndex;
+                return (
+                  <PhotoGridItem
+                    key={photoIndex}
+                    uri={uri}
+                    onPress={() => handleOpenBottomSheetModal(photoIndex)}
+                    onRemove={() => handleRemovePhoto(photoIndex)}
+                  />
+                );
+              })}
+            </View>
+          ))} */}
+          <PhotoGrid
+            photos={formData.profilePictures ?? []}
+            onPhotosChange={handleOtherPhotosChange}
+            maxPhotos={6}
+            columnsPerRow={3}
+            label="Profile Pictures"
+            bottomSheetModalRef={bottomSheetModalRef}
+            uploadOptions={["camera", "gallery"]}
+          />
+        </View>
+      </View>
+
+      {/* <UploadMediaBottomSheetModal
+        bottomSheetModalRef={bottomSheetModalRef}
+        onImageSelected={(image) =>
+          setFormData({
+            ...formData,
+            profilePictures: [...(formData.profilePictures ?? []), image],
+          })
+        }
+        options={["camera", "gallery"]}
+      /> */}
+    </View>
+  );
+}

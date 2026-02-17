@@ -13,17 +13,23 @@ export type UploadImageOptions = {
   format?: ImageManipulator.SaveFormat;
 };
 
+export type UploadResult = {
+  storageId: Id<"_storage">;
+  url: string;
+};
+
 export function useUploadImage() {
   const convex = useConvex();
   const generateUploadUrl = useMutation(api.storage.generateUploadUrl);
   const [isUploading, setIsUploading] = React.useState(false);
 
   /**
-   * Uploads an image and returns the public URL.
-   * Use this for user-facing images (profile pictures, etc.)
+   * Uploads an image and returns both the storage ID and URL.
+   * Use storageId when you need to store the reference in the database.
+   * Use url when you need to display the image immediately.
    */
-  const uploadImage = React.useCallback(
-    async (uri: string, options?: UploadImageOptions): Promise<string> => {
+  const uploadImageWithId = React.useCallback(
+    async (uri: string, options?: UploadImageOptions): Promise<UploadResult> => {
       const {
         width = 1024,
         compress = 0.8,
@@ -60,20 +66,32 @@ export function useUploadImage() {
         };
 
         // Get the public URL from the storage ID
-        const imageUrl = await convex.query(api.storage.getImageUrl, {
+        const url = await convex.query(api.storage.getImageUrl, {
           storageId,
         });
 
-        if (!imageUrl) {
+        if (!url) {
           throw new Error("Failed to get image URL from storage");
         }
 
-        return imageUrl;
+        return { storageId, url };
       } finally {
         setIsUploading(false);
       }
     },
     [convex, generateUploadUrl]
+  );
+
+  /**
+   * Uploads an image and returns the public URL.
+   * Use this for user-facing images (profile pictures, etc.)
+   */
+  const uploadImage = React.useCallback(
+    async (uri: string, options?: UploadImageOptions): Promise<string> => {
+      const result = await uploadImageWithId(uri, options);
+      return result.url;
+    },
+    [uploadImageWithId]
   );
 
   const uploadImages = React.useCallback(
@@ -88,9 +106,27 @@ export function useUploadImage() {
     [uploadImage]
   );
 
+  /**
+   * Uploads multiple images and returns both storage IDs and URLs.
+   * Use this when you need to store references in the database.
+   */
+  const uploadImagesWithIds = React.useCallback(
+    async (uris: string[], options?: UploadImageOptions): Promise<UploadResult[]> => {
+      setIsUploading(true);
+      try {
+        return await Promise.all(uris.map((uri) => uploadImageWithId(uri, options)));
+      } finally {
+        setIsUploading(false);
+      }
+    },
+    [uploadImageWithId]
+  );
+
   return {
     uploadImage,
     uploadImages,
+    uploadImageWithId,
+    uploadImagesWithIds,
     isUploading,
   };
 }

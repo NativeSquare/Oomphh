@@ -11,14 +11,12 @@ import { Text } from "@/components/ui/text";
 import { VerifyEmailSchema } from "@/validation/auth";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter } from "expo-router";
-import { useColorScheme } from "nativewind";
 import * as React from "react";
 import { ActivityIndicator, View } from "react-native";
 import z from "zod";
 import { OTPInput } from "../custom/otp-input";
 
 export function VerifyEmailForm({ email }: { email: string }) {
-  const { colorScheme } = useColorScheme();
   const [code, setCode] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const [fieldErrors, setFieldErrors] = React.useState<{
@@ -61,7 +59,7 @@ export function VerifyEmailForm({ email }: { email: string }) {
 
   return (
     <View className="gap-6">
-      <Card className="border-border/0 sm:border-border pb-4 shadow-none sm:shadow-sm sm:shadow-black/5">
+      <Card className="bg-background border-border/0 sm:border-border pb-4 shadow-none sm:shadow-sm sm:shadow-black/5">
         <CardHeader>
           <CardTitle className="text-center text-xl sm:text-left">
             Verify your email
@@ -96,7 +94,7 @@ export function VerifyEmailForm({ email }: { email: string }) {
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <ActivityIndicator color={colorScheme === "dark" ? "black" : "white"} />
+                  <ActivityIndicator color="white" />
                 ) : (
                   <Text>Continue</Text>
                 )}

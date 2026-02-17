@@ -1,8 +1,31 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
-import { mutation, query } from "../_generated/server";
-import { generateFunctions } from "../utils/generateFunctions";
+import { query } from "../_generated/server";
+import { mutation, triggers } from "../utils/customMutations";
+import { generateFunctions, makePartialSchema } from "../utils/generateFunctions";
+
+// Cascade deletion
+triggers.register("users", async (ctx, change) => {
+  if (change.operation === "delete") {
+    // authAccounts
+    for await (const account of ctx.db
+      .query("authAccounts")
+      .filter((q) => q.eq(q.field("userId"), change.id))) {
+      await ctx.db.delete(account._id);
+    }
+    // authSessions
+    for await (const session of ctx.db
+      .query("authSessions")
+      .withIndex("userId", (q) => q.eq("userId", change.id))) {
+      await ctx.db.delete(session._id);
+    }
+  }
+});
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Schema Definition ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
 
 const documentSchema = {
   // DO NOT REMOVE THESE FIELDS : https://labs.convex.dev/auth/setup/schema#customizing-the-users-table
@@ -16,47 +39,59 @@ const documentSchema = {
 
   // other "users" fields...
   bio: v.optional(v.string()),
-  birthDate: v.optional(v.string()),
+  birthDate: v.optional(v.string()), // ISO8601 string (e.g., "2000-01-15T00:00:00Z")
+  birthLocation: v.optional(v.string()), // City/Place name (e.g., "Paris, France")
+  height: v.optional(
+    v.object({
+      value: v.number(),
+      unit: v.string(),
+    })
+  ),
+  weight: v.optional(
+    v.object({
+      value: v.number(),
+      unit: v.string(),
+    })
+  ),
+  bodyTypes: v.optional(v.string()),
+  orientation: v.optional(v.string()),
+  lookingFor: v.optional(v.array(v.string())),
+  privacy: v.optional(
+    v.object({
+      hideDistance: v.optional(v.boolean()),
+      hideAge: v.optional(v.boolean()),
+      hideOnlineStatus: v.optional(v.boolean()),
+      hideProfileFromDiscovery: v.optional(v.boolean()),
+    })
+  ),
+  measurementSystem: v.optional(v.union(v.literal("metric"), v.literal("imperial"))),
+  profilePictures: v.optional(v.array(v.id("_storage"))),
+  position: v.optional(v.string()),
+  ethnicity: v.optional(v.string()),
+  relationshipStatus: v.optional(v.string()),
   hasCompletedOnboarding: v.optional(v.boolean()),
-  role: v.optional(v.union(v.literal("user"), v.literal("admin"))),
-
-  // Ban fields
-  banned: v.optional(v.boolean()),
-  banReason: v.optional(v.string()),
-  banExpires: v.optional(v.number()), // timestamp in ms, undefined = permanent
-};
-
-const partialSchema = {
-  // DO NOT REMOVE THESE FIELDS : https://labs.convex.dev/auth/setup/schema#customizing-the-users-table
-  name: v.optional(v.string()),
-  image: v.optional(v.string()),
-  email: v.optional(v.string()),
-  emailVerificationTime: v.optional(v.number()),
-  phone: v.optional(v.string()),
-  phoneVerificationTime: v.optional(v.number()),
-  isAnonymous: v.optional(v.boolean()),
-
-  // other "users" fields...
-  bio: v.optional(v.string()),
-  birthDate: v.optional(v.string()),
-  hasCompletedOnboarding: v.optional(v.boolean()),
-  role: v.optional(v.union(v.literal("user"), v.literal("admin"))),
-
-  // Ban fields
-  banned: v.optional(v.boolean()),
-  banReason: v.optional(v.string()),
-  banExpires: v.optional(v.number()),
+  favorites: v.optional(v.array(v.id("users"))),
+  firstSentences: v.optional(v.array(v.string())),
 };
 
 export const users = defineTable(documentSchema).index("email", ["email"]);
 
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Mutations Definition ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
+
 export const {
-  get,
+  delete: del,
   insert,
   patch,
   replace,
-  delete: del,
-} = generateFunctions("users", documentSchema, partialSchema);
+} = generateFunctions("users", documentSchema, makePartialSchema(documentSchema), {
+  mutation,
+});
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Queries Definition ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
 
 export const currentUser = query({
   args: {},
@@ -79,35 +114,101 @@ export const getUserByEmail = query({
   },
 });
 
-export const deleteAccount = mutation({
-  args: {},
-  handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (userId === null) {
+export const get = query({
+  args: { id: v.id("users") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
+export const toggleFavorite = mutation({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) {
       throw new Error("Not authenticated");
     }
 
-    // Delete all auth sessions for this user
-    const sessions = await ctx.db
-      .query("authSessions")
-      .withIndex("userId", (q) => q.eq("userId", userId))
-      .collect();
-    for (const session of sessions) {
-      await ctx.db.delete(session._id);
+    if (currentUserId === args.userId) {
+      throw new Error("Cannot favorite yourself");
     }
 
-    // Delete all auth accounts for this user
-    const accounts = await ctx.db
-      .query("authAccounts")
-      .withIndex("userIdAndProvider", (q) => q.eq("userId", userId))
-      .collect();
-    for (const account of accounts) {
-      await ctx.db.delete(account._id);
+    const currentUser = await ctx.db.get(currentUserId);
+    if (!currentUser) {
+      throw new Error("User not found");
     }
 
-    // Delete the user document
-    await ctx.db.delete(userId);
+    const favorites = currentUser.favorites ?? [];
+    const isFavorite = favorites.includes(args.userId);
 
-    return { success: true };
+    if (isFavorite) {
+      // Remove from favorites
+      await ctx.db.patch(currentUserId, {
+        favorites: favorites.filter((id) => id !== args.userId),
+      });
+    } else {
+      // Add to favorites
+      await ctx.db.patch(currentUserId, {
+        favorites: [...favorites, args.userId],
+      });
+    }
+
+    return !isFavorite;
+  },
+});
+
+export const isFavorite = query({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) return false;
+
+    const currentUser = await ctx.db.get(currentUserId);
+    if (!currentUser) return false;
+
+    const favorites = currentUser.favorites ?? [];
+    return favorites.includes(args.userId);
+  },
+});
+
+export const getFavorites = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+
+    const currentUser = await ctx.db.get(userId);
+    if (!currentUser) return [];
+
+    const favoriteIds = currentUser.favorites ?? [];
+    if (favoriteIds.length === 0) return [];
+
+    // Get user info for each favorite
+    const favoritesWithUsers = await Promise.all(
+      favoriteIds.map(async (favoriteId) => {
+        const favoriteUser = await ctx.db.get(favoriteId);
+        if (!favoriteUser) return null;
+
+        const firstProfilePictureId = favoriteUser.profilePictures?.[0];
+        const imageUrl = firstProfilePictureId
+          ? await ctx.storage.getUrl(firstProfilePictureId)
+          : null;
+
+        return {
+          _id: favoriteUser._id,
+          name: favoriteUser.name,
+          image: imageUrl,
+        };
+      })
+    );
+
+    // Filter out nulls (in case a favorite user was deleted)
+    return favoritesWithUsers.filter(
+      (user): user is NonNullable<typeof user> => user !== null
+    );
   },
 });

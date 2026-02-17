@@ -1,0 +1,95 @@
+import { EditProfileFormData } from "@/app/(app)/edit-profile";
+import type { MeasurementSystem } from "@/utils/measurements";
+import { api } from "@packages/backend/convex/_generated/api";
+import { useQuery } from "convex/react";
+import React from "react";
+import { View } from "react-native";
+import { BioField } from "../profile/bio-field";
+import { BirthDateField } from "../profile/birth-date-field";
+import { BirthLocationField } from "../profile/birth-location-field";
+import { HeightField } from "../profile/height-field";
+import { NameField } from "../profile/name-field";
+import { WeightField } from "../profile/weight-field";
+
+export function PersonalInfoTab({
+  formData,
+  setFormData,
+}: {
+  formData: EditProfileFormData;
+  setFormData: (data: EditProfileFormData) => void;
+}) {
+  const user = useQuery(api.table.users.currentUser);
+  const measurementSystem: MeasurementSystem =
+    user?.measurementSystem ?? "metric";
+  return (
+    <View className="gap-5">
+      <NameField
+        value={formData.name}
+        onChange={(value) => setFormData({ ...formData, name: value })}
+      />
+
+      <BioField
+        value={formData.bio}
+        onChange={(value) => setFormData({ ...formData, bio: value })}
+      />
+
+      <BirthDateField
+        value={formData.birthDate}
+        onChange={(value) => setFormData({ ...formData, birthDate: value })}
+      />
+
+      <BirthLocationField
+        value={formData.birthLocation}
+        onChange={(value) => setFormData({ ...formData, birthLocation: value })}
+      />
+
+      <HeightField
+        value={formData.height?.value ? formData.height?.value.toString() : ""}
+        unit={formData.height?.unit || "cm"}
+        measurementSystem={measurementSystem}
+        onChangeHeight={(value) =>
+          setFormData({
+            ...formData,
+            height: {
+              value: Number(value),
+              unit: "cm", // Always store in cm
+            },
+          })
+        }
+        onChangeUnit={(option) =>
+          setFormData({
+            ...formData,
+            height: {
+              value: formData.height?.value ?? 0,
+              unit: option?.value ?? "cm",
+            },
+          })
+        }
+      />
+
+      <WeightField
+        value={formData.weight?.value ? formData.weight?.value.toString() : ""}
+        unit={formData.weight?.unit || "kg"}
+        measurementSystem={measurementSystem}
+        onChangeWeight={(value) =>
+          setFormData({
+            ...formData,
+            weight: {
+              value: Number(value),
+              unit: "kg", // Always store in kg
+            },
+          })
+        }
+        onChangeUnit={(option) =>
+          setFormData({
+            ...formData,
+            weight: {
+              value: formData.weight?.value ?? 0,
+              unit: option?.value ?? "kg",
+            },
+          })
+        }
+      />
+    </View>
+  );
+}
