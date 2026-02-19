@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Oomphh — Find your people, where it matters",
+  title: "Oomphh — Date people around you",
   description:
-    "Events, stories, and the right filters. Real connections and real moments. Join Oomphh.",
+    "Meet compatible people nearby in real-time. Personality-first matching, so you skip the small talk and meet people who actually get you.",
 };
 
 export default function RootLayout({
