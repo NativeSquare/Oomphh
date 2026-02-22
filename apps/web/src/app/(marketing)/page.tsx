@@ -1752,7 +1752,11 @@ export default function OomphLanding() {
               }}
             >
               <PhoneMockup rotate={isMobile ? 0 : -5} scale={isMobile ? 1 : 0.88}>
-                <ProfileScreen />
+                <img
+                  src="/Other User Profile.png"
+                  alt="Oomphh profile screen"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
               </PhoneMockup>
             </div>
             {!isMobile && (
@@ -1765,7 +1769,11 @@ export default function OomphLanding() {
                 }}
               >
                 <PhoneMockup rotate={7} scale={0.82} style={{ opacity: 0.92 }}>
-                  <ChatScreen />
+                  <img
+                    src="/Group Chat.png"
+                    alt="Oomphh chat screen"
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
                 </PhoneMockup>
               </div>
             )}
@@ -2098,7 +2106,11 @@ export default function OomphLanding() {
             />
             <div style={{ animation: "phoneDrift 7s ease-in-out infinite" }}>
               <PhoneMockup rotate={-2} scale={1}>
-                <ProfileScreen />
+                <img
+                  src="/Home.png"
+                  alt="Oomphh home screen"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
               </PhoneMockup>
             </div>
           </div>
