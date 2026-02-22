@@ -2,47 +2,53 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { LOGO_SRC } from "./logo";
 
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/features", label: "Features" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export function SiteHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-border/50 bg-background/70 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link
-          href="/"
-          className="text-xl font-bold tracking-tight text-foreground transition-opacity hover:opacity-90"
-        >
-          Oomphh
+    <header className="fixed top-0 z-[100] w-full border-b border-white/[0.04] bg-[rgba(7,7,9,0.7)] backdrop-blur-[24px] backdrop-saturate-[1.3]">
+      <div className="flex h-14 items-center justify-between px-4 sm:px-12">
+        <Link href="/" className="flex items-center gap-1.5">
+          <img
+            src={LOGO_SRC}
+            alt="oomphh"
+            className="h-7 object-contain sm:h-8"
+            style={{ mixBlendMode: "lighten" }}
+          />
         </Link>
-        <nav className="flex items-center gap-1 sm:gap-2">
+        <nav className="hidden items-center gap-8 sm:flex">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               className={cn(
-                "rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                "text-sm font-medium transition-colors duration-300",
                 pathname === link.href
-                  ? "bg-accent text-accent-foreground"
-                  : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                  ? "text-[#FF9A56]"
+                  : "text-white/55 hover:text-[#FF9A56]",
               )}
             >
               {link.label}
             </Link>
           ))}
-          <Button size="sm" className="ml-2" asChild>
-            <Link href="/download">Download app</Link>
-          </Button>
         </nav>
+        <Link
+          href="/download"
+          className="rounded-[14px] bg-gradient-to-br from-[#FF6B2C] to-[#FF9A56] px-4 py-2 text-xs font-semibold text-white shadow-[0_4px_16px_rgba(255,107,44,0.3)] sm:px-6 sm:py-2.5 sm:text-sm"
+        >
+          Download app
+        </Link>
       </div>
     </header>
   );

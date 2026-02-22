@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { SiteHeader } from "@/components/marketing/site-header";
-import { SiteFooter } from "@/components/marketing/site-footer";
 import {
   MapPin,
   Calendar,
@@ -64,8 +62,7 @@ export const metadata: Metadata = {
 
 export default function FeaturesPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
+    <>
       <div
         className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_120%_80%_at_50%_0%,oklch(0.65_0.12_47_/_0.06),transparent_50%)]"
         aria-hidden
@@ -134,8 +131,6 @@ export default function FeaturesPage() {
           </div>
         </div>
       </main>
-
-      <SiteFooter />
-    </div>
+    </>
   );
 }

@@ -45,7 +45,6 @@ const AVS = [
 ];
 
 const GRAIN_BG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.09'/%3E%3C/svg%3E")`;
-const DOT_BG = "radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px)";
 
 // ─── SVG filter definitions for text grain ───
 function GrainFilters() {
@@ -1257,27 +1256,6 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   );
 }
 
-function NavLink({ children }: { children: React.ReactNode }) {
-  const [h, setH] = useState(false);
-  return (
-    <a
-      href="#"
-      onMouseEnter={() => setH(true)}
-      onMouseLeave={() => setH(false)}
-      style={{
-        color: h ? "#FF9A56" : "rgba(255,255,255,0.55)",
-        textDecoration: "none",
-        fontSize: 14,
-        fontWeight: 500,
-        fontFamily: FF_B,
-        transition: "color 0.3s",
-      }}
-    >
-      {children}
-    </a>
-  );
-}
-
 // Shared heading style — applies SVG grain filter
 const HEADING_FILTER = { filter: "url(#textGrain)" };
 
@@ -1295,7 +1273,6 @@ export default function OomphLanding() {
   // Responsive values
   const sectionPadding = isMobile ? "60px 20px" : isTablet ? "80px 32px" : "110px 48px";
   const gridColumns = isMobile ? "1fr" : isTablet ? "repeat(2, 1fr)" : "repeat(3, 1fr)";
-  const navPadding = isMobile ? "12px 16px" : "14px 48px";
   const heroTitleSize = isMobile ? 38 : isTablet ? 52 : 72;
   const heroSubtitleSize = isMobile ? 16 : 20;
   const sectionTitleSize = isMobile ? 28 : isTablet ? 36 : 46;
@@ -1303,14 +1280,11 @@ export default function OomphLanding() {
   return (
     <div
       style={{
-        minHeight: "100vh",
-        background: "#070709",
         color: "#fff",
         fontFamily: FF_B,
         overflowX: "hidden",
       }}
     >
-      {/* SVG filter defs — rendered once, used everywhere via filter: url(#textGrain) */}
       <GrainFilters />
 
       <style>{`
@@ -1326,94 +1300,8 @@ export default function OomphLanding() {
         @keyframes avatarPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0.35}}
         @keyframes driftSlow{0%,100%{transform:translate(0,0)}33%{transform:translate(15px,-10px)}66%{transform:translate(-10px,8px)}}
-        *{margin:0;padding:0;box-sizing:border-box}
-        html{scroll-behavior:smooth}
         ::selection{background:rgba(255,107,44,0.3);color:#fff}
       `}</style>
-
-      {/* Global textures */}
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          pointerEvents: "none",
-          zIndex: 0,
-          opacity: 0.55,
-          backgroundImage: GRAIN_BG,
-          backgroundSize: "200px 200px",
-        }}
-      />
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          pointerEvents: "none",
-          zIndex: 0,
-          opacity: 0.35,
-          backgroundImage: DOT_BG,
-          backgroundSize: "28px 28px",
-        }}
-      />
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          pointerEvents: "none",
-          zIndex: 0,
-          background:
-            "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.5) 100%)",
-        }}
-      />
-
-      {/* ═══ NAVBAR ═══ */}
-      <nav
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 100,
-          padding: navPadding,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          background: "rgba(7,7,9,0.7)",
-          backdropFilter: "blur(24px) saturate(1.3)",
-          borderBottom: "1px solid rgba(255,255,255,0.04)",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <img
-            src={LOGO_SRC}
-            alt="oomphh"
-            style={{ height: isMobile ? 26 : 32, objectFit: "contain", mixBlendMode: "lighten" }}
-          />
-        </div>
-        {!isMobile && (
-          <div style={{ display: "flex", gap: 32 }}>
-            <NavLink>Features</NavLink>
-            <NavLink>Pricing</NavLink>
-            <NavLink>Reviews</NavLink>
-            <NavLink>FAQ</NavLink>
-          </div>
-        )}
-        <button
-          style={{
-            background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
-            border: "none",
-            borderRadius: isMobile ? 12 : 14,
-            padding: isMobile ? "8px 16px" : "10px 26px",
-            color: "#fff",
-            fontSize: isMobile ? 12 : 14,
-            fontWeight: 600,
-            fontFamily: FF_B,
-            cursor: "pointer",
-            boxShadow: "0 4px 16px rgba(255,107,44,0.3)",
-          }}
-        >
-          {isMobile ? "Waitlist" : "Join the waitlist"}
-        </button>
-      </nav>
 
       {/* ═══ HERO ═══ */}
       <section
@@ -2584,129 +2472,6 @@ export default function OomphLanding() {
         </div>
       </SectionTexture>
 
-      {/* ═══ FOOTER ═══ */}
-      <footer
-        style={{
-          padding: isMobile ? "40px 20px 24px" : "56px 48px 28px",
-          borderTop: "1px solid rgba(255,255,255,0.04)",
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            display: "flex",
-            flexDirection: isMobile ? "column" : "row",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: isMobile ? 32 : 36,
-          }}
-        >
-          <div style={{ maxWidth: isMobile ? "100%" : 250 }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                marginBottom: 14,
-              }}
-            >
-              <img
-                src={LOGO_SRC}
-                alt="oomphh"
-                style={{ height: 24, objectFit: "contain", mixBlendMode: "lighten" }}
-              />
-            </div>
-            <p
-              style={{
-                color: "rgba(255,255,255,0.3)",
-                fontSize: 12.5,
-                lineHeight: 1.7,
-                fontWeight: 300,
-              }}
-            >
-              Date people around you. Personality-first matching designed for
-              real-life connections.
-            </p>
-            <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
-              {["𝕏", "IG", "TT"].map((s) => (
-                <div
-                  key={s}
-                  style={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: 10,
-                    background: "rgba(255,255,255,0.03)",
-                    border: "1px solid rgba(255,255,255,0.05)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "rgba(255,255,255,0.35)",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  {s}
-                </div>
-              ))}
-            </div>
-          </div>
-          {[
-            { t: "Company", l: ["About", "Blog", "Careers", "Press"] },
-            {
-              t: "Support",
-              l: ["Help center", "Contact", "Community", "Status"],
-            },
-            { t: "Legal", l: ["Privacy", "Terms", "Cookies", "Safety"] },
-          ].map((c) => (
-            <div key={c.t}>
-              <div
-                style={{
-                  color: "#fff",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  marginBottom: 14,
-                }}
-              >
-                {c.t}
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-                {c.l.map((l) => (
-                  <a
-                    key={l}
-                    href="#"
-                    style={{
-                      color: "rgba(255,255,255,0.3)",
-                      fontSize: 12.5,
-                      textDecoration: "none",
-                      fontWeight: 300,
-                    }}
-                  >
-                    {l}
-                  </a>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: "36px auto 0",
-            paddingTop: 20,
-            borderTop: "1px solid rgba(255,255,255,0.04)",
-            textAlign: "center",
-            color: "rgba(255,255,255,0.18)",
-            fontSize: 11.5,
-            fontWeight: 300,
-          }}
-        >
-          © 2025 oomphh, Inc. All rights reserved.
-        </div>
-      </footer>
     </div>
   );
 }
