@@ -49,13 +49,20 @@ export function SiteFooter() {
             real-life connections.
           </p>
           <div className="mt-4 flex gap-2.5">
-            {["𝕏", "IG", "TT"].map((s) => (
-              <div
-                key={s}
-                className="flex h-[34px] w-[34px] cursor-pointer items-center justify-center rounded-[10px] border border-white/5 bg-white/[0.03] text-xs font-semibold text-white/35"
+            {[
+              { label: "𝕏", href: "https://x.com/oomphh_app" },
+              { label: "IG", href: "https://instagram.com/oomphh_app" },
+              { label: "TT", href: "https://tiktok.com/@oomphh_app" },
+            ].map((s) => (
+              <a
+                key={s.label}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] border border-white/5 bg-white/[0.03] text-xs font-semibold text-white/35 no-underline transition-colors hover:border-white/10 hover:text-white/55"
               >
-                {s}
-              </div>
+                {s.label}
+              </a>
             ))}
           </div>
         </div>

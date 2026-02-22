@@ -1,12 +1,10 @@
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Contact Us — OOmphh",
-  description:
-    "Get in touch with the OOmphh team. We'd love to hear from you.",
-};
+import { useState } from "react";
 
 export default function ContactPage() {
+  const [submitted, setSubmitted] = useState(false);
+
   return (
     <>
       <div
@@ -74,69 +72,97 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <form
-              action="https://formspree.io/f/placeholder"
-              method="POST"
-              className="space-y-5"
-            >
-              <div>
-                <label
-                  htmlFor="name"
-                  className="mb-1.5 block text-sm font-medium text-foreground"
+            {submitted ? (
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-[#FF9A56]/20 bg-[#FF6B2C]/[0.06] p-8 text-center">
+                <div className="mb-3 text-3xl">✓</div>
+                <h3 className="text-lg font-semibold text-foreground">
+                  Message sent!
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Thanks for reaching out. We&rsquo;ll get back to you soon.
+                </p>
+                <button
+                  onClick={() => setSubmitted(false)}
+                  className="mt-6 text-sm font-medium text-[#FF9A56] transition-opacity hover:opacity-80"
                 >
-                  Name
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-foreground placeholder:text-white/30 focus:border-[#FF9A56]/50 focus:outline-none focus:ring-1 focus:ring-[#FF9A56]/50"
-                  placeholder="Your name"
-                />
+                  Send another message
+                </button>
               </div>
+            ) : (
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const form = e.currentTarget;
+                  const data = new FormData(form);
+                  const name = data.get("name") as string;
+                  const email = data.get("email") as string;
+                  const message = data.get("message") as string;
 
-              <div>
-                <label
-                  htmlFor="email"
-                  className="mb-1.5 block text-sm font-medium text-foreground"
-                >
-                  Email
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-foreground placeholder:text-white/30 focus:border-[#FF9A56]/50 focus:outline-none focus:ring-1 focus:ring-[#FF9A56]/50"
-                  placeholder="you@example.com"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="message"
-                  className="mb-1.5 block text-sm font-medium text-foreground"
-                >
-                  Message
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={5}
-                  required
-                  className="w-full resize-none rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-foreground placeholder:text-white/30 focus:border-[#FF9A56]/50 focus:outline-none focus:ring-1 focus:ring-[#FF9A56]/50"
-                  placeholder="How can we help?"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full rounded-[14px] bg-gradient-to-br from-[#FF6B2C] to-[#FF9A56] px-6 py-3 text-sm font-semibold text-white shadow-[0_4px_16px_rgba(255,107,44,0.3)] transition-opacity hover:opacity-90"
+                  const mailtoLink = `mailto:hello@oomphh.com?subject=${encodeURIComponent(`Contact from ${name}`)}&body=${encodeURIComponent(`From: ${name} (${email})\n\n${message}`)}`;
+                  window.open(mailtoLink, "_blank");
+                  setSubmitted(true);
+                }}
+                className="space-y-5"
               >
-                Send message
-              </button>
-            </form>
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="mb-1.5 block text-sm font-medium text-foreground"
+                  >
+                    Name
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    required
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-foreground placeholder:text-white/30 focus:border-[#FF9A56]/50 focus:outline-none focus:ring-1 focus:ring-[#FF9A56]/50"
+                    placeholder="Your name"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="mb-1.5 block text-sm font-medium text-foreground"
+                  >
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-foreground placeholder:text-white/30 focus:border-[#FF9A56]/50 focus:outline-none focus:ring-1 focus:ring-[#FF9A56]/50"
+                    placeholder="you@example.com"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="message"
+                    className="mb-1.5 block text-sm font-medium text-foreground"
+                  >
+                    Message
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows={5}
+                    required
+                    className="w-full resize-none rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-foreground placeholder:text-white/30 focus:border-[#FF9A56]/50 focus:outline-none focus:ring-1 focus:ring-[#FF9A56]/50"
+                    placeholder="How can we help?"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full rounded-[14px] bg-gradient-to-br from-[#FF6B2C] to-[#FF9A56] px-6 py-3 text-sm font-semibold text-white shadow-[0_4px_16px_rgba(255,107,44,0.3)] transition-opacity hover:opacity-90"
+                >
+                  Send message
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </main>

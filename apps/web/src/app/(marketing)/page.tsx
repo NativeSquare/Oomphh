@@ -1011,6 +1011,7 @@ function PricingCard({
   popular = false,
   delay = 0,
   subtitle,
+  onCtaClick,
 }: {
   plan: string;
   price: string;
@@ -1018,6 +1019,7 @@ function PricingCard({
   popular?: boolean;
   delay?: number;
   subtitle?: string;
+  onCtaClick?: () => void;
 }) {
   const [h, setH] = useState(false);
   return (
@@ -1178,6 +1180,7 @@ function PricingCard({
           ))}
         </div>
         <button
+          onClick={onCtaClick}
           style={{
             width: "100%",
             padding: "14px 0",
@@ -1280,6 +1283,10 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 
 // Shared heading style — applies SVG grain filter
 const HEADING_FILTER = { filter: "url(#textGrain)" };
+
+function scrollToWaitlist() {
+  document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" });
+}
 
 export default function OomphLanding() {
   const isMobile = useIsMobile();
@@ -1671,6 +1678,7 @@ export default function OomphLanding() {
             }}
           >
             <button
+              onClick={scrollToWaitlist}
               style={{
                 background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
                 border: "none",
@@ -2165,6 +2173,7 @@ export default function OomphLanding() {
                 "RSVP to 3 events",
               ]}
               delay={0.1}
+              onCtaClick={scrollToWaitlist}
             />
             <PricingCard
               plan="Premium"
@@ -2181,6 +2190,7 @@ export default function OomphLanding() {
               ]}
               popular
               delay={0.2}
+              onCtaClick={scrollToWaitlist}
             />
             <PricingCard
               plan="Unlimited"
@@ -2194,6 +2204,7 @@ export default function OomphLanding() {
                 "1 free boost per week",
               ]}
               delay={0.3}
+              onCtaClick={scrollToWaitlist}
             />
           </div>
         </div>
@@ -2404,6 +2415,7 @@ export default function OomphLanding() {
 
       {/* ═══ CTA ═══ */}
       <SectionTexture
+        id="waitlist"
         glowColor="rgba(255,107,44,0.06)"
         glowPos="50% 50%"
         style={{ position: "relative", zIndex: 1 }}
@@ -2447,7 +2459,16 @@ export default function OomphLanding() {
               Join the waitlist and be among the first to try oomphh when we
               launch in your area.
             </p>
-            <div
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const form = e.currentTarget;
+                const email = new FormData(form).get("email") as string;
+                if (email) {
+                  alert(`Thanks! We'll notify ${email} when oomphh launches near you.`);
+                  form.reset();
+                }
+              }}
               style={{
                 display: "flex",
                 gap: 10,
@@ -2456,21 +2477,25 @@ export default function OomphLanding() {
                 margin: "0 auto",
               }}
             >
-              <div
+              <input
+                type="email"
+                name="email"
+                required
+                placeholder="your@email.com"
                 style={{
                   flex: 1,
                   background: "rgba(255,255,255,0.04)",
                   border: "1px solid rgba(255,255,255,0.1)",
                   borderRadius: 16,
                   padding: "14px 20px",
-                  color: "rgba(255,255,255,0.3)",
+                  color: "#fff",
                   fontSize: 15,
                   fontFamily: FF_B,
+                  outline: "none",
                 }}
-              >
-                your@email.com
-              </div>
+              />
               <button
+                type="submit"
                 style={{
                   background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
                   border: "none",
@@ -2487,7 +2512,7 @@ export default function OomphLanding() {
               >
                 Join waitlist →
               </button>
-            </div>
+            </form>
             <p
               style={{
                 color: "rgba(255,255,255,0.25)",
