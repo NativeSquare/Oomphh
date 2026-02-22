@@ -1010,12 +1010,14 @@ function PricingCard({
   features,
   popular = false,
   delay = 0,
+  subtitle,
 }: {
   plan: string;
   price: string;
   features: string[];
   popular?: boolean;
   delay?: number;
+  subtitle?: string;
 }) {
   const [h, setH] = useState(false);
   return (
@@ -1087,31 +1089,51 @@ function PricingCard({
         </div>
         <div
           style={{
-            display: "flex",
-            alignItems: "baseline",
-            gap: 2,
             marginBottom: 24,
           }}
         >
-          <span
+          <div
             style={{
-              fontSize: 44,
-              fontWeight: 800,
-              fontFamily: FF_D,
-              color: "#fff",
+              display: "flex",
+              alignItems: "baseline",
+              gap: 2,
             }}
           >
-            ${price}
-          </span>
-          <span
-            style={{
-              color: "rgba(255,255,255,0.35)",
-              fontSize: 15,
-              fontFamily: FF_B,
-            }}
-          >
-            /mo
-          </span>
+            <span
+              style={{
+                fontSize: 44,
+                fontWeight: 800,
+                fontFamily: FF_D,
+                color: "#fff",
+              }}
+            >
+              {price === "0" ? "Free" : `€${price}`}
+            </span>
+            {price !== "0" && (
+              <span
+                style={{
+                  color: "rgba(255,255,255,0.35)",
+                  fontSize: 15,
+                  fontFamily: FF_B,
+                }}
+              >
+                /mo
+              </span>
+            )}
+          </div>
+          {subtitle && (
+            <div
+              style={{
+                color: "rgba(255,255,255,0.35)",
+                fontSize: 12.5,
+                fontFamily: FF_B,
+                fontWeight: 300,
+                marginTop: 4,
+              }}
+            >
+              {subtitle}
+            </div>
+          )}
         </div>
         <div
           style={{
@@ -1633,9 +1655,9 @@ export default function OomphLanding() {
               animation: "fadeInUp 0.8s ease 0.35s both",
             }}
           >
-            oomphh shows you compatible people nearby in real-time.
-            Personality-first matching, so you skip the small talk and meet
-            people who actually get you.
+            oomphh shows you people nearby in real-time.
+            Zodiac-based compatibility from your birth chart, proximity,
+            and your own filters — no algorithms deciding for you.
           </p>
 
           <div
@@ -1806,9 +1828,9 @@ export default function OomphLanding() {
         >
           {[
             { n: "Early access", l: "Now open — limited spots" },
-            { n: "Personality-first", l: "AI-powered matching" },
+            { n: "Cosmic compatibility", l: "Zodiac-based matching" },
             { n: "Real-time", l: "Proximity radar" },
-            { n: "100% free", l: "During beta" },
+            { n: "Free to start", l: "Upgrade anytime" },
           ].map((s, i) => (
             <div
               key={i}
@@ -1891,9 +1913,9 @@ export default function OomphLanding() {
               delay={0.1}
             />
             <FeatureCard
-              icon="🧠"
-              title="Personality Matching"
-              desc="A quick test reveals what makes you tick. Our algorithm pairs you with people you'll actually click with."
+              icon="♈"
+              title="Zodiac Compatibility"
+              desc="Enter your date and place of birth. We use your birth chart to surface cosmic compatibility — no AI, no hidden algorithms deciding who you see."
               delay={0.2}
             />
             <FeatureCard
@@ -1985,8 +2007,8 @@ export default function OomphLanding() {
                 },
                 {
                   n: "2",
-                  t: "Take the vibe check",
-                  d: "A 2-minute personality quiz. No right answers — just be yourself. This is how we find your people.",
+                  t: "Enter your birth details",
+                  d: "Add your date and place of birth. We'll generate your birth chart and use it to show zodiac compatibility with others.",
                 },
                 {
                   n: "3",
@@ -2107,7 +2129,7 @@ export default function OomphLanding() {
                 ...HEADING_FILTER,
               }}
             >
-              Free during beta.
+              Simple, transparent pricing.
             </h2>
             <p
               style={{
@@ -2119,8 +2141,8 @@ export default function OomphLanding() {
                 lineHeight: 1.6,
               }}
             >
-              Early adopters get full access for free. Here's what the plans
-              will look like at launch.
+              Start free, upgrade when you're ready. Boosts are available
+              separately on all plans.
             </p>
           </div>
           <div
@@ -2132,36 +2154,44 @@ export default function OomphLanding() {
             }}
           >
             <PricingCard
-              plan="Starter"
-              price="4.99"
+              plan="Freemium"
+              price="0"
               features={[
-                "1 daily boost",
-                "Icon customization",
-                "50 likes per day",
-                "Basic filters",
+                "60 views per refresh",
+                "Unlimited taps",
+                "6 photos in cache",
+                "3 disappearing photos",
+                "1 album (3 photos)",
+                "RSVP to 3 events",
               ]}
               delay={0.1}
             />
             <PricingCard
-              plan="Advanced"
-              price="19.99"
+              plan="Premium"
+              price="7"
+              subtitle="1 week free trial"
               features={[
-                "Unlimited likes",
-                "2 boosts per day",
-                "Priority matching",
-                "See who liked you",
+                "500 views per refresh",
+                "Unlimited taps & messaging",
+                "Remote browsing (100 users)",
+                "20 stories & 20 photos in cache",
+                "3 albums (5 photos each)",
+                "Travel to 3 cities at once",
+                "2 free boosts per month",
               ]}
               popular
               delay={0.2}
             />
             <PricingCard
-              plan="Gold"
-              price="29.99"
+              plan="Unlimited"
+              price="20"
               features={[
-                "Everything in Advanced",
-                "Unlimited boosts",
-                "Write to anyone",
-                "Read receipts",
+                "Everything unlimited",
+                "Unlimited remote browsing",
+                "10 albums (10 photos each)",
+                "Unlimited travel & events",
+                "Chat translation",
+                "1 free boost per week",
               ]}
               delay={0.3}
             />
@@ -2354,19 +2384,19 @@ export default function OomphLanding() {
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <FAQItem
               question="How does the proximity feature work?"
-              answer="oomphh uses your approximate location to show compatible people nearby. You choose your radius (500m to 10km) and can go invisible anytime. We never share your exact position."
+              answer="oomphh uses your approximate location to show people who are nearby. We don't filter by distance — if someone is in your area, they'll appear. You can go invisible anytime, and we never share your exact position."
             />
             <FAQItem
               question="When does oomphh launch?"
               answer="We're in closed beta right now. Join the waitlist to get early access — spots are limited and early adopters get premium features for free."
             />
             <FAQItem
-              question="Is oomphh really free during beta?"
-              answer="Yes, 100%. We want early users to experience the full app. Premium plans will kick in at launch, but beta users keep their perks."
+              question="Is oomphh free to use?"
+              answer="Yes — the Freemium plan is completely free with 60 views, unlimited taps, and core features. Premium (€7/mo) and Unlimited (€20/mo) plans unlock more views, remote browsing, travel, and boosts."
             />
             <FAQItem
               question="How is oomphh different from Happn or Tinder?"
-              answer="Happn shows you people you crossed paths with. Tinder is swiping. oomphh combines real-time proximity with personality-based AI matching — so you find people nearby who you'll actually vibe with."
+              answer="Happn shows you people you crossed paths with. Tinder is swiping. oomphh shows you everyone nearby and lets you filter on your own terms — plus zodiac-based compatibility from your birth chart so you can see who you're cosmically aligned with."
             />
           </div>
         </div>
