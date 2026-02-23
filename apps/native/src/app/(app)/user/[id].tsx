@@ -78,7 +78,7 @@ export default function UserProfile() {
       : "skip",
   );
   const presenceState = usePresence(
-    api.table.presence,
+    api.presence,
     "public",
     currentUser?._id ?? "",
   );

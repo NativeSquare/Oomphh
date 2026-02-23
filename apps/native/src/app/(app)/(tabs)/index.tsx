@@ -238,7 +238,7 @@ export default function Home() {
   }, [filters]);
 
   if (!user?._id) return null;
-  const presenceState = usePresence(api.table.presence, "public", user._id);
+  const presenceState = usePresence(api.presence, "public", user._id);
   const nearestUsers = useQuery(api.table.geospatial.getNearestUsers, {
     id: user._id,
     filters: activeFiltersForQuery,

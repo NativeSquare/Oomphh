@@ -2,9 +2,9 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { Presence } from "@convex-dev/presence";
 import { PresenceState } from "@convex-dev/presence/react-native";
 import { v } from "convex/values";
-import { components } from "../_generated/api";
-import { Id } from "../_generated/dataModel";
-import { mutation, query } from "../_generated/server";
+import { components } from "./_generated/api";
+import { Id } from "./_generated/dataModel";
+import { mutation, query } from "./_generated/server";
 
 export const presence = new Presence(components.presence);
 

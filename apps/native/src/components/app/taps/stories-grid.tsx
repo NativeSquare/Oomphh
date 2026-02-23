@@ -29,7 +29,7 @@ export function StoriesGrid({ user }: StoriesGridProps) {
   const uploadMediaRef = React.useRef<GorhomBottomSheetModal>(null);
   const { uploadImageWithId, isUploading } = useUploadImage();
   const createStory = useMutation(api.table.stories.createStory);
-  const presenceState = usePresence(api.table.presence, "public", user._id);
+  const presenceState = usePresence(api.presence, "public", user._id);
 
   const storyGroups = useQuery(
     api.table.geospatial.getNearbyStories,

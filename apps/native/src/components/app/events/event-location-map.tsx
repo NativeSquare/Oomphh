@@ -1,4 +1,5 @@
 import { Text } from "@/components/ui/text";
+import { LITE_MAP_STYLE } from "@/lib/map-style";
 import { Ionicons } from "@expo/vector-icons";
 import { MapPin } from "lucide-react-native";
 import React from "react";
@@ -61,6 +62,9 @@ export function EventLocationMap({
         toolbarEnabled={false}
         mapType="standard"
         pointerEvents="none"
+        liteMode={Platform.OS === "android"}
+        loadingEnabled
+        customMapStyle={LITE_MAP_STYLE}
       >
         <Marker coordinate={{ latitude, longitude }}>
           <View className="items-center">

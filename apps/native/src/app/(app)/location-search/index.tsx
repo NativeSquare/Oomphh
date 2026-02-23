@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
+import { LITE_MAP_STYLE } from "@/lib/map-style";
 import { api } from "@packages/backend/convex/_generated/api";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -331,6 +332,8 @@ export default function LocationSearch() {
             showsUserLocation={false}
             showsMyLocationButton={false}
             mapType="standard"
+            loadingEnabled
+            customMapStyle={LITE_MAP_STYLE}
             onLongPress={handleMapLongPress}
           >
             {selectedLocation && (
