@@ -104,10 +104,10 @@ export default function TermsPage() {
           <p>
             For questions about these Terms of Service, contact us at:{" "}
             <a
-              href="mailto:legal@oomphh.com"
+              href="mailto:info@oomphh.cz"
               className="text-[#FF9A56] transition-opacity hover:opacity-80"
             >
-              legal@oomphh.com
+              info@oomphh.cz
             </a>
           </p>
         </LegalSection>

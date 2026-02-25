@@ -136,10 +136,10 @@ export default function PrivacyPage() {
             For data-related requests or questions about this policy, contact
             us at:{" "}
             <a
-              href="mailto:privacy@oomphh.com"
+              href="mailto:info@oomphh.cz"
               className="text-[#FF9A56] transition-opacity hover:opacity-80"
             >
-              privacy@oomphh.com
+              info@oomphh.cz
             </a>
           </p>
         </LegalSection>

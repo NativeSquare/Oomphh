@@ -31,10 +31,10 @@ export default function ContactPage() {
                   General inquiries
                 </h2>
                 <a
-                  href="mailto:hello@oomphh.com"
+                  href="mailto:info@oomphh.cz"
                   className="mt-2 block text-lg text-foreground transition-colors hover:text-[#FF9A56]"
                 >
-                  hello@oomphh.com
+                  info@oomphh.cz
                 </a>
               </div>
 
@@ -43,10 +43,10 @@ export default function ContactPage() {
                   Support
                 </h2>
                 <a
-                  href="mailto:support@oomphh.com"
+                  href="mailto:info@oomphh.cz"
                   className="mt-2 block text-lg text-foreground transition-colors hover:text-[#FF9A56]"
                 >
-                  support@oomphh.com
+                  info@oomphh.cz
                 </a>
               </div>
 
@@ -55,10 +55,10 @@ export default function ContactPage() {
                   Press &amp; media
                 </h2>
                 <a
-                  href="mailto:press@oomphh.com"
+                  href="mailto:info@oomphh.cz"
                   className="mt-2 block text-lg text-foreground transition-colors hover:text-[#FF9A56]"
                 >
-                  press@oomphh.com
+                  info@oomphh.cz
                 </a>
               </div>
 
@@ -98,7 +98,7 @@ export default function ContactPage() {
                   const email = data.get("email") as string;
                   const message = data.get("message") as string;
 
-                  const mailtoLink = `mailto:hello@oomphh.com?subject=${encodeURIComponent(`Contact from ${name}`)}&body=${encodeURIComponent(`From: ${name} (${email})\n\n${message}`)}`;
+                  const mailtoLink = `mailto:info@oomphh.cz?subject=${encodeURIComponent(`Contact from ${name}`)}&body=${encodeURIComponent(`From: ${name} (${email})\n\n${message}`)}`;
                   window.open(mailtoLink, "_blank");
                   setSubmitted(true);
                 }}
