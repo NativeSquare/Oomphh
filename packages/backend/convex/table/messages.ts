@@ -2,6 +2,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { Triggers } from "convex-helpers/server/triggers";
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
+import { internal } from "../_generated/api";
 import { DataModel } from "../_generated/dataModel";
 import { mutation, query } from "../_generated/server";
 import { generateFunctions, makePartialSchema } from "../utils/generateFunctions";
@@ -167,6 +168,27 @@ export const sendMessage = mutation({
       viewOnceOpened: false,
     });
 
+    // Send push notification to the recipient
+    const currentUser = await ctx.db.get(currentUserId);
+    const senderName = currentUser?.name ?? "Someone";
+    const preview = args.viewOnce
+      ? "Sent you a photo"
+      : trimmedText
+        ? trimmedText.slice(0, 100)
+        : "Sent you a photo";
+
+    await ctx.scheduler.runAfter(
+      0,
+      internal.notifications.sendPushNotification,
+      {
+        recipientUserId: args.otherUserId,
+        title: senderName,
+        body: preview,
+        data: { type: "message", conversationId: conversation._id },
+        category: "messages" as const,
+      }
+    );
+
     // The trigger will update the conversation's lastMessageId and lastMessageTime
     return messageId;
   },
@@ -224,6 +246,32 @@ export const sendMessageByConversationId = mutation({
       viewOnce: args.viewOnce ?? false,
       viewOnceOpened: false,
     });
+
+    // Send push notification to the other participant
+    const recipientUserId =
+      conversation.participant1Id === currentUserId
+        ? conversation.participant2Id
+        : conversation.participant1Id;
+
+    const currentUser = await ctx.db.get(currentUserId);
+    const senderName = currentUser?.name ?? "Someone";
+    const preview = args.viewOnce
+      ? "Sent you a photo"
+      : trimmedText
+        ? trimmedText.slice(0, 100)
+        : "Sent you a photo";
+
+    await ctx.scheduler.runAfter(
+      0,
+      internal.notifications.sendPushNotification,
+      {
+        recipientUserId,
+        title: senderName,
+        body: preview,
+        data: { type: "message", conversationId: args.conversationId },
+        category: "messages" as const,
+      }
+    );
 
     // The trigger will update the conversation's lastMessageId and lastMessageTime
     return messageId;

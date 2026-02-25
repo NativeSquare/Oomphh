@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
+import { internal } from "../_generated/api";
 import { mutation, query } from "../_generated/server";
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
@@ -62,6 +63,22 @@ export const toggleStoryLike = mutation({
       toUserId: story.authorId,
       storyId: args.storyId,
     });
+
+    // Send push notification to the story author
+    const fromUser = await ctx.db.get(fromUserId);
+    const senderName = fromUser?.name ?? "Someone";
+
+    await ctx.scheduler.runAfter(
+      0,
+      internal.notifications.sendPushNotification,
+      {
+        recipientUserId: story.authorId,
+        title: "Story Liked",
+        body: `${senderName} liked your story`,
+        data: { type: "storyLike", storyId: args.storyId, fromUserId },
+        category: "storyLikes" as const,
+      }
+    );
 
     return { liked: true };
   },
