@@ -97,7 +97,10 @@ export default function EventFilters() {
         <View className="w-full max-w-md self-center flex-1">
           {/* Header */}
           <View className="flex-row items-center justify-between px-1 py-6">
-            <Pressable onPress={() => router.back()} className="size-6">
+            <Pressable
+              onPress={() => router.replace("/(app)/(tabs)/events")}
+              className="size-6"
+            >
               <Icon as={ChevronLeft} size={24} className="text-white" />
             </Pressable>
             <Text className="text-xl font-medium text-white">

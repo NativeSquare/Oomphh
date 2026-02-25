@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
+import { EVENT_SEARCH_LOCATION_STORAGE_KEY } from "@/constants/events";
 import { LITE_MAP_STYLE } from "@/lib/map-style";
 import { api } from "@packages/backend/convex/_generated/api";
 import { Ionicons } from "@expo/vector-icons";
@@ -146,7 +147,11 @@ export default function LocationSearch() {
     } catch (error) {
       console.error("Error saving location:", error);
     }
-    router.back();
+    if (effectiveStorageKey === EVENT_SEARCH_LOCATION_STORAGE_KEY) {
+      router.replace("/(app)/(tabs)/events");
+    } else {
+      router.back();
+    }
   };
 
   const handleCurrentLocation = async () => {
@@ -288,7 +293,11 @@ export default function LocationSearch() {
           <Button
             variant="ghost"
             size="icon"
-            onPress={() => router.back()}
+            onPress={() =>
+              effectiveStorageKey === EVENT_SEARCH_LOCATION_STORAGE_KEY
+                ? router.replace("/(app)/(tabs)/events")
+                : router.back()
+            }
             className="rounded-full"
           >
             <Icon as={ArrowLeft} size={20} />
