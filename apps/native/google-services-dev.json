@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "110790576478",
+    "project_id": "findr-480620",
+    "storage_bucket": "findr-480620.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:110790576478:android:2d1695b5d70d9dbe1ea7cf",
+        "android_client_info": {
+          "package_name": "com.oomphh.mobile.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1oKVz-F6VYuaOD8YXYf7vQa0CM04ShMA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

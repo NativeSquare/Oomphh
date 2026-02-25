@@ -76,7 +76,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         apiKey: process.env.GOOGLE_MAPS_ANDROID_API_KEY,
       },
     },
-    // googleServicesFile: getGoogleServicesJson(),
+    googleServicesFile: getGoogleServicesJson(),
   },
   web: {
     output: "static",
