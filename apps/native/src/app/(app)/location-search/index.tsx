@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { EVENT_SEARCH_LOCATION_STORAGE_KEY } from "@/constants/events";
 import { LITE_MAP_STYLE } from "@/lib/map-style";
+import { logLocationMapTiming } from "@/lib/logrocket";
 import { api } from "@packages/backend/convex/_generated/api";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -89,17 +90,32 @@ export default function LocationSearch() {
 
   useEffect(() => {
     const getCurrentLocation = async () => {
+      const t0 = Date.now();
+      let permissionMs = 0;
+      let getPositionMs = 0;
+      let positionStart = t0;
+
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
+        permissionMs = Date.now() - t0;
+
         if (status !== "granted") {
+          logLocationMapTiming({
+            permissionMs,
+            getPositionMs: 0,
+            totalMs: Date.now() - t0,
+            status: "denied",
+          });
           console.warn("Location permission not granted");
           setIsLoading(false);
           return;
         }
 
+        positionStart = Date.now();
         const location = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.High,
         });
+        getPositionMs = Date.now() - positionStart;
 
         const coords = {
           latitude: location.coords.latitude,
@@ -115,8 +131,25 @@ export default function LocationSearch() {
             longitudeDelta: 0.01,
           });
         }
+
+        logLocationMapTiming({
+          permissionMs,
+          getPositionMs,
+          totalMs: Date.now() - t0,
+          status: "granted",
+        });
         setIsLoading(false);
       } catch (error) {
+        if (permissionMs > 0) {
+          getPositionMs = Date.now() - positionStart;
+        }
+        logLocationMapTiming({
+          permissionMs,
+          getPositionMs,
+          totalMs: Date.now() - t0,
+          status: "error",
+          errorMessage: error instanceof Error ? error.message : String(error),
+        });
         console.error("Error getting location:", error);
         setIsLoading(false);
       }

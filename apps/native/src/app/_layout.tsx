@@ -1,4 +1,5 @@
 import "@/lib/nativewind-interop";
+import { initLogRocket } from "@/lib/logrocket";
 import { fetchUpdatesAsync } from "@/utils/fetch-updates-async";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { api } from "@packages/backend/convex/_generated/api";
@@ -34,6 +35,7 @@ export default function RootLayout() {
     if (!__DEV__) {
       fetchUpdatesAsync();
     }
+    initLogRocket();
   }, []);
   return (
     <KeyboardProvider>
