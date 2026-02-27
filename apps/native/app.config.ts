@@ -104,6 +104,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         },
       },
     ],
+    [
+      "expo-build-properties",
+      {
+        "android": {
+          "minSdkVersion": 25
+        }
+      }
+    ],
   ],
   experiments: {
     typedRoutes: true,
