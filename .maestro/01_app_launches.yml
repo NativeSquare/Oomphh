@@ -1,0 +1,7 @@
+appId: com.oomphh.mobile.preview
+---
+- launchApp
+- assertVisible: "Sign in to your app"
+- assertVisible: "Email"
+- assertVisible: "Password"
+- assertVisible: "Continue"

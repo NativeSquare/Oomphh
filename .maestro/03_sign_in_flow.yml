@@ -1,0 +1,21 @@
+appId: com.oomphh.mobile.preview
+env:
+  TEST_EMAIL: ${TEST_EMAIL}
+  TEST_PASSWORD: ${TEST_PASSWORD}
+---
+- launchApp
+- assertVisible: "Sign in to your app"
+
+# Enter credentials
+- tapOn:
+    id: "email"
+- inputText: ${TEST_EMAIL}
+- tapOn:
+    id: "password"
+- inputText: ${TEST_PASSWORD}
+- tapOn: "Continue"
+
+# Wait for app to load (should see home tab or onboarding)
+- extendedWaitUntil:
+    visible: "Events|Home|Welcome"
+    timeout: 15000
