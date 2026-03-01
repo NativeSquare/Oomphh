@@ -9,7 +9,6 @@ import { eventMessages } from "./table/eventMessages";
 import { feedback } from "./table/feedback";
 import { messages } from "./table/messages";
 import { notificationPreferences } from "./table/notificationPreferences";
-import { pushTokens } from "./table/pushTokens";
 import { stories } from "./table/stories";
 import { storyLikes } from "./table/storyLikes";
 import { taps } from "./table/taps";
@@ -27,7 +26,6 @@ export default defineSchema({
   feedback,
   messages,
   notificationPreferences,
-  pushTokens,
   stories,
   storyLikes,
   taps,

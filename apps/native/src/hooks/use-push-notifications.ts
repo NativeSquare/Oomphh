@@ -9,25 +9,22 @@ import { Platform } from "react-native";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: false,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-    shouldShowBanner: false,
-    shouldShowList: false,
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
 export function usePushNotifications() {
-  const savePushToken = useMutation(api.table.pushTokens.savePushToken);
+  const recordToken = useMutation(api.pushNotifications.recordToken);
   const responseListener = useRef<Notifications.EventSubscription | null>(null);
 
   useEffect(() => {
     registerForPushNotifications().then((token) => {
       if (token) {
-        savePushToken({
-          token,
-          platform: Platform.OS as "ios" | "android",
-        }).catch((err) => {
+        recordToken({ token }).catch((err) => {
           console.error("Failed to save push token:", err);
         });
       }
@@ -58,7 +55,7 @@ export function usePushNotifications() {
     return () => {
       responseListener.current?.remove();
     };
-  }, [savePushToken]);
+  }, [recordToken]);
 }
 
 async function registerForPushNotifications(): Promise<string | null> {

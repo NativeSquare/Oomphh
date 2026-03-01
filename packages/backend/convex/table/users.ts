@@ -20,12 +20,6 @@ triggers.register("users", async (ctx, change) => {
       .withIndex("userId", (q) => q.eq("userId", change.id))) {
       await ctx.db.delete(session._id);
     }
-    // pushTokens
-    for await (const token of ctx.db
-      .query("pushTokens")
-      .withIndex("by_userId", (q) => q.eq("userId", change.id))) {
-      await ctx.db.delete(token._id);
-    }
     // notificationPreferences
     const prefs = await ctx.db
       .query("notificationPreferences")

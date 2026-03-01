@@ -2,9 +2,9 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { Triggers } from "convex-helpers/server/triggers";
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
-import { internal } from "../_generated/api";
 import { DataModel } from "../_generated/dataModel";
 import { mutation, query } from "../_generated/server";
+import { sendNotification } from "../pushNotifications";
 import { generateFunctions, makePartialSchema } from "../utils/generateFunctions";
 
 const triggers = new Triggers<DataModel>();
@@ -177,17 +177,13 @@ export const sendMessage = mutation({
         ? trimmedText.slice(0, 100)
         : "Sent you a photo";
 
-    await ctx.scheduler.runAfter(
-      0,
-      internal.notifications.sendPushNotification,
-      {
-        recipientUserId: args.otherUserId,
-        title: senderName,
-        body: preview,
-        data: { type: "message", conversationId: conversation._id },
-        category: "messages" as const,
-      }
-    );
+    await sendNotification(ctx, {
+      userId: args.otherUserId,
+      title: senderName,
+      body: preview,
+      data: { type: "message", conversationId: conversation._id },
+      category: "messages",
+    });
 
     // The trigger will update the conversation's lastMessageId and lastMessageTime
     return messageId;
@@ -261,17 +257,13 @@ export const sendMessageByConversationId = mutation({
         ? trimmedText.slice(0, 100)
         : "Sent you a photo";
 
-    await ctx.scheduler.runAfter(
-      0,
-      internal.notifications.sendPushNotification,
-      {
-        recipientUserId,
-        title: senderName,
-        body: preview,
-        data: { type: "message", conversationId: args.conversationId },
-        category: "messages" as const,
-      }
-    );
+    await sendNotification(ctx, {
+      userId: recipientUserId,
+      title: senderName,
+      body: preview,
+      data: { type: "message", conversationId: args.conversationId },
+      category: "messages",
+    });
 
     // The trigger will update the conversation's lastMessageId and lastMessageTime
     return messageId;

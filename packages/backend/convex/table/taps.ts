@@ -1,9 +1,9 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
-import { internal } from "../_generated/api";
 import { query } from "../_generated/server";
 import { mutation } from "../utils/customMutations";
+import { sendNotification } from "../pushNotifications";
 import { generateFunctions, makePartialSchema } from "../utils/generateFunctions";
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
@@ -80,17 +80,13 @@ export const sendTap = mutation({
     const fromUser = await ctx.db.get(fromUserId);
     const senderName = fromUser?.name ?? "Someone";
 
-    await ctx.scheduler.runAfter(
-      0,
-      internal.notifications.sendPushNotification,
-      {
-        recipientUserId: args.toUserId,
-        title: "New Tap",
-        body: `${senderName} tapped you ${args.emoji}`,
-        data: { type: "tap", fromUserId },
-        category: "taps" as const,
-      }
-    );
+    await sendNotification(ctx, {
+      userId: args.toUserId,
+      title: "New Tap",
+      body: `${senderName} tapped you ${args.emoji}`,
+      data: { type: "tap", fromUserId },
+      category: "taps",
+    });
 
     return tapId;
   },
