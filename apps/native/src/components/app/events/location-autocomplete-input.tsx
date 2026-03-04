@@ -5,7 +5,7 @@ import { api } from "@packages/backend/convex/_generated/api";
 import { useAction } from "convex/react";
 import { MapPin } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Pressable, View } from "react-native";
+import { ActivityIndicator, Platform, Pressable, View } from "react-native";
 
 type PlacePrediction = {
   place_id: string;
@@ -137,9 +137,13 @@ export function LocationAutocompleteInput({
     onSelect(prediction);
   };
 
+  const [inputHeight, setInputHeight] = useState(0);
+
   return (
-    <View>
-      <View className="relative">
+    <View style={{ position: "relative", zIndex: 50 }}>
+      <View
+        onLayout={(e) => setInputHeight(e.nativeEvent.layout.height)}
+      >
         <Input
           value={value}
           onChangeText={onChangeText}
@@ -159,7 +163,17 @@ export function LocationAutocompleteInput({
       </View>
 
       {showDropdown && predictions.length > 0 && (
-        <View className="border border-border bg-card rounded-md mt-1 overflow-hidden">
+        <View
+          className="border border-border bg-card rounded-md overflow-hidden"
+          style={{
+            position: "absolute",
+            top: inputHeight + 4,
+            left: 0,
+            right: 0,
+            zIndex: 999,
+            ...(Platform.OS === "android" ? { elevation: 5 } : {}),
+          }}
+        >
           {predictions.map((prediction) => (
             <Pressable
               key={prediction.place_id}

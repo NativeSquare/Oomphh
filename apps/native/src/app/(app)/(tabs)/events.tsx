@@ -18,6 +18,19 @@ import React from "react";
 import { Alert, ScrollView, View } from "react-native";
 import { EventFilterData } from "../event-filters";
 
+function parseDistanceToMeters(distance: string): number | null {
+  if (!distance || distance === "Any Distance") return null;
+
+  const parts = distance.split(" ");
+  const value = parseFloat(parts[0]);
+  if (isNaN(value)) return null;
+
+  const unit = parts.slice(1).join(" ").toLowerCase();
+  if (unit === "mile" || unit === "miles") return value * 1609.34;
+  if (unit === "km") return value * 1000;
+  return null;
+}
+
 function formatEventDate(timestamp: number): string {
   const date = new Date(timestamp);
   const days = [
@@ -93,10 +106,15 @@ export default function Events() {
   );
 
   // Build query filters for the backend
+  const distanceMeters = parseDistanceToMeters(filters.distance);
+
   const queryFilters: {
     eventType?: string[];
     dateRange?: string;
     city?: string;
+    searchLatitude?: number;
+    searchLongitude?: number;
+    maxDistanceMeters?: number;
   } = {};
 
   if (filters.eventType.length > 0) {
@@ -105,10 +123,14 @@ export default function Events() {
   if (filters.dateRange && filters.dateRange !== "Any Time") {
     queryFilters.dateRange = filters.dateRange;
   }
-  if (searchLocation?.name && searchLocation.name !== "My Location") {
+
+  if (searchLocation && distanceMeters !== null) {
+    queryFilters.searchLatitude = searchLocation.latitude;
+    queryFilters.searchLongitude = searchLocation.longitude;
+    queryFilters.maxDistanceMeters = distanceMeters;
+  } else if (searchLocation?.name && searchLocation.name !== "My Location") {
     queryFilters.city = searchLocation.name;
   } else if (searchLocation?.address) {
-    // Extract city from address (first meaningful part)
     const parts = searchLocation.address.split(",").map((s) => s.trim());
     if (parts.length > 0) {
       queryFilters.city = parts[0];
@@ -141,6 +163,10 @@ export default function Events() {
     }
   };
 
+  const handleLocationChange = (location: SearchLocation | null) => {
+    setSearchLocation(location);
+  };
+
   const isLoading = events === undefined;
 
   return (
@@ -151,12 +177,15 @@ export default function Events() {
       showsVerticalScrollIndicator={false}
     >
       <View className="w-full max-w-sm gap-5">
-        <EventsHeader
-          searchLocation={searchLocation}
-          hasActiveFilters={hasActiveFilters}
-          onFilterPress={() => router.push("/event-filters")}
-          onCreatePress={() => router.push("/create-event")}
-        />
+        <View style={{ zIndex: 50 }}>
+          <EventsHeader
+            searchLocation={searchLocation}
+            hasActiveFilters={hasActiveFilters}
+            onFilterPress={() => router.push("/event-filters")}
+            onCreatePress={() => router.push("/create-event")}
+            onLocationChange={handleLocationChange}
+          />
+        </View>
 
         {isLoading ? (
           <View className="items-center py-10">

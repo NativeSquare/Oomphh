@@ -130,15 +130,37 @@ export const createEvent = mutation({
   },
 });
 
+function calculateDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): number {
+  const R = 6371000;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 /**
  * Get non-past events as a flat list, sorted by soonest first.
- * Supports optional filters for eventType, dateRange, and city.
+ * Supports optional filters for eventType, dateRange, city, and distance.
  */
 export const getEvents = query({
   args: {
     eventType: v.optional(v.array(v.string())),
     dateRange: v.optional(v.string()),
     city: v.optional(v.string()),
+    searchLatitude: v.optional(v.number()),
+    searchLongitude: v.optional(v.number()),
+    maxDistanceMeters: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const currentUserId = await getAuthUserId(ctx);
@@ -171,6 +193,24 @@ export const getEvents = query({
       filteredEvents = filteredEvents.filter((e) =>
         e.location.toLowerCase().includes(cityLower)
       );
+    }
+
+    // Filter by distance from search coordinates
+    if (
+      args.searchLatitude !== undefined &&
+      args.searchLongitude !== undefined &&
+      args.maxDistanceMeters !== undefined
+    ) {
+      filteredEvents = filteredEvents.filter((e) => {
+        if (e.latitude === undefined || e.longitude === undefined) return false;
+        const dist = calculateDistance(
+          args.searchLatitude!,
+          args.searchLongitude!,
+          e.latitude,
+          e.longitude,
+        );
+        return dist <= args.maxDistanceMeters!;
+      });
     }
 
     // Filter by date range

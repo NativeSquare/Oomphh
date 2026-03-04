@@ -1,14 +1,13 @@
+import { LocationAutocompleteInput } from "@/components/app/events/location-autocomplete-input";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { EVENT_SEARCH_LOCATION_STORAGE_KEY } from "@/constants/events";
-import { useRouter } from "expo-router";
-import {
-  ChevronDown,
-  CirclePlus,
-  MapPin,
-  Settings2,
-} from "lucide-react-native";
+import { api } from "@packages/backend/convex/_generated/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAction } from "convex/react";
+import { CirclePlus, Settings2, X } from "lucide-react-native";
+import React, { useState } from "react";
 import { View } from "react-native";
 
 export type SearchLocation = {
@@ -23,6 +22,7 @@ export type EventsHeaderProps = {
   hasActiveFilters?: boolean;
   onFilterPress?: () => void;
   onCreatePress?: () => void;
+  onLocationChange?: (location: SearchLocation | null) => void;
 };
 
 export function EventsHeader({
@@ -30,50 +30,80 @@ export function EventsHeader({
   hasActiveFilters,
   onFilterPress,
   onCreatePress,
+  onLocationChange,
 }: EventsHeaderProps) {
-  const router = useRouter();
+  const [searchText, setSearchText] = useState("");
+  const placesDetails = useAction(api.table.places.details);
 
-  const handleLocationPress = () => {
-    if (searchLocation) {
-      router.push({
-        pathname: "/location-search",
-        params: {
-          selectedLat: String(searchLocation.latitude),
-          selectedLng: String(searchLocation.longitude),
-          selectedAddress: searchLocation.address,
-          selectedName: searchLocation.name,
-          storageKey: EVENT_SEARCH_LOCATION_STORAGE_KEY,
-        },
-      });
-    } else {
-      router.push({
-        pathname: "/location-search",
-        params: {
-          storageKey: EVENT_SEARCH_LOCATION_STORAGE_KEY,
-        },
-      });
+  const handlePlaceSelect = async (place: {
+    place_id: string;
+    description: string;
+  }) => {
+    try {
+      const details: any = await placesDetails({ placeId: place.place_id });
+      const lat = details?.location?.latitude;
+      const lng = details?.location?.longitude;
+
+      if (typeof lat !== "number" || typeof lng !== "number") {
+        console.error("Missing coordinates from place details");
+        return;
+      }
+
+      const formattedAddress = (details?.formattedAddress as string) ?? "";
+      const name =
+        (details?.displayName?.text as string) ??
+        formattedAddress.split(",")[0] ??
+        place.description;
+
+      const newLocation: SearchLocation = {
+        latitude: lat,
+        longitude: lng,
+        name,
+        address: formattedAddress,
+      };
+
+      await AsyncStorage.setItem(
+        EVENT_SEARCH_LOCATION_STORAGE_KEY,
+        JSON.stringify(newLocation),
+      );
+
+      setSearchText("");
+      onLocationChange?.(newLocation);
+    } catch (error) {
+      console.error("Error fetching place details:", error);
     }
+  };
+
+  const handleClearLocation = async () => {
+    try {
+      await AsyncStorage.removeItem(EVENT_SEARCH_LOCATION_STORAGE_KEY);
+    } catch (error) {
+      console.error("Error clearing location:", error);
+    }
+    setSearchText("");
+    onLocationChange?.(null);
   };
 
   return (
     <View className="gap-3">
       <Text className="text-xl font-medium text-white">Events</Text>
 
-      {/* Location + Filter + Create row */}
-      <View className="flex-row items-center gap-2">
-        <Button
-          variant="outline"
-          className="flex-1 flex-row items-center gap-2"
-          onPress={handleLocationPress}
-        >
-          <Icon as={MapPin} size={18} />
-          <View className="flex-1">
-            <Text numberOfLines={1} className="text-sm">
-              {searchLocation?.address || searchLocation?.name || "Everywhere"}
-            </Text>
-          </View>
-          <Icon as={ChevronDown} size={14} />
-        </Button>
+      <View className="flex-row items-start gap-2" style={{ zIndex: 50 }}>
+        <View className="flex-1" style={{ zIndex: 50 }}>
+          <LocationAutocompleteInput
+            value={searchText}
+            onChangeText={setSearchText}
+            onSelect={handlePlaceSelect}
+            placeholder={
+              searchLocation?.name || searchLocation?.address || "Everywhere"
+            }
+          />
+        </View>
+        {searchLocation && (
+          <Button variant="ghost" size="icon" onPress={handleClearLocation}>
+            <Icon as={X} size={18} />
+          </Button>
+        )}
         <Button
           variant={hasActiveFilters ? "default" : "outline"}
           size="icon"

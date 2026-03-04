@@ -46,7 +46,7 @@ export default function LocationSearch() {
   const [isCurrentLocation, setIsCurrentLocation] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Handle selected location from autocomplete
+  // Handle selected location from autocomplete — auto-save after showing pin
   useEffect(() => {
     if (params.selectedLat && params.selectedLng) {
       const lat = parseFloat(params.selectedLat);
@@ -68,7 +68,6 @@ export default function LocationSearch() {
         longitudeDelta: 0.01,
       });
 
-      // Animate to the selected location
       mapRef.current?.animateToRegion(
         {
           latitude: lat,
@@ -78,6 +77,11 @@ export default function LocationSearch() {
         },
         500,
       );
+
+      const timer = setTimeout(() => {
+        saveAndNavigateBack(newLocation, false);
+      }, 800);
+      return () => clearTimeout(timer);
     }
   }, [params.selectedLat, params.selectedLng]);
 
@@ -158,19 +162,24 @@ export default function LocationSearch() {
     getCurrentLocation();
   }, []);
 
-  const handleSetLocation = async () => {
-    if (!selectedLocation) return;
-
+  const saveAndNavigateBack = async (
+    location: {
+      latitude: number;
+      longitude: number;
+      name?: string;
+      address?: string;
+    },
+    isCurrentLoc: boolean,
+  ) => {
     try {
-      if (isCurrentLocation) {
-        // Clear stored location so the caller shows "My Location"
+      if (isCurrentLoc) {
         await AsyncStorage.removeItem(effectiveStorageKey);
       } else {
         const locationData = {
-          latitude: selectedLocation.latitude,
-          longitude: selectedLocation.longitude,
-          name: selectedLocation.name,
-          address: selectedLocation.address,
+          latitude: location.latitude,
+          longitude: location.longitude,
+          name: location.name,
+          address: location.address,
         };
         await AsyncStorage.setItem(
           effectiveStorageKey,
@@ -204,15 +213,21 @@ export default function LocationSearch() {
         longitude: location.coords.longitude,
       };
 
+      let finalLocation: {
+        latitude: number;
+        longitude: number;
+        name?: string;
+        address?: string;
+      } = { ...coords, name: "My Location" };
+
       setIsCurrentLocation(true);
-      setSelectedLocation({ ...coords, name: "My Location" });
+      setSelectedLocation(finalLocation);
       setRegion({
         ...coords,
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
       });
 
-      // Animate to current location
       mapRef.current?.animateToRegion(
         {
           ...coords,
@@ -222,7 +237,6 @@ export default function LocationSearch() {
         500,
       );
 
-      // Reverse geocode to get address info (but keep "My Location" as name)
       try {
         const [result] = await Location.reverseGeocodeAsync(coords);
         if (result) {
@@ -234,15 +248,18 @@ export default function LocationSearch() {
           ].filter(Boolean);
           const address = addressParts.join(", ");
 
-          setSelectedLocation({
+          finalLocation = {
             ...coords,
             name: "My Location",
             address: address || undefined,
-          });
+          };
+          setSelectedLocation(finalLocation);
         }
       } catch (error) {
         console.error("Error reverse geocoding:", error);
       }
+
+      await saveAndNavigateBack(finalLocation, true);
     } catch (error) {
       console.error("Error getting current location:", error);
     }
@@ -260,21 +277,16 @@ export default function LocationSearch() {
   }) => {
     const { latitude, longitude } = event.nativeEvent.coordinate;
 
-    // Set the selected location from long press with initial coords
-    const newLocation: {
+    let finalLocation: {
       latitude: number;
       longitude: number;
       address?: string;
       name?: string;
-    } = {
-      latitude,
-      longitude,
-    };
+    } = { latitude, longitude };
 
     setIsCurrentLocation(false);
-    setSelectedLocation(newLocation);
+    setSelectedLocation(finalLocation);
 
-    // Animate to the new location
     mapRef.current?.animateToRegion(
       {
         latitude,
@@ -285,7 +297,6 @@ export default function LocationSearch() {
       300,
     );
 
-    // Reverse geocode to get address info
     try {
       const [result] = await Location.reverseGeocodeAsync({
         latitude,
@@ -305,17 +316,19 @@ export default function LocationSearch() {
         ].filter(Boolean);
         const address = addressParts.join(", ");
 
-        setSelectedLocation({
+        finalLocation = {
           latitude,
           longitude,
           name,
           address: address || undefined,
-        });
+        };
+        setSelectedLocation(finalLocation);
       }
     } catch (error) {
       console.error("Error reverse geocoding:", error);
-      // Keep the location without name/address if reverse geocoding fails
     }
+
+    await saveAndNavigateBack(finalLocation, false);
   };
 
   return (
@@ -398,8 +411,7 @@ export default function LocationSearch() {
 
       {/* Action Buttons */}
       <View className="absolute bottom-0 left-0 right-0 z-10 pb-safe bg-background/95 backdrop-blur-sm">
-        <View className="flex-row items-center justify-between gap-4 p-4">
-          {/* Current Location Button */}
+        <View className="flex-row items-center justify-end p-4">
           <Button
             variant="outline"
             size="icon"
@@ -407,13 +419,6 @@ export default function LocationSearch() {
             className="rounded-full w-12 h-12"
           >
             <Icon as={Crosshair} size={20} />
-          </Button>
-
-          {/* Set Location Button */}
-          <Button onPress={handleSetLocation} className="flex-1 bg-primary">
-            <Text className="text-primary-foreground font-medium">
-              Set Location
-            </Text>
           </Button>
         </View>
       </View>
