@@ -5,6 +5,7 @@
 @layer base {
   @media (prefers-color-scheme: light) {
     :root {
+      --radius: 0.625rem;
       --background: 0 0% 3.9%;
       --foreground: 0 0% 98%;
       --card: 240 7% 11%;
@@ -41,6 +42,7 @@
 
   @media (prefers-color-scheme: dark) {
     :root {
+      --radius: 0.625rem;
       --background: 0 0% 3.9%;
       --foreground: 0 0% 98%;
       --card: 240 7% 11%;
