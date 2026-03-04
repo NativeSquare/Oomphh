@@ -78,10 +78,7 @@ export default function LocationSearch() {
         500,
       );
 
-      const timer = setTimeout(() => {
-        saveAndNavigateBack(newLocation, false);
-      }, 800);
-      return () => clearTimeout(timer);
+      saveLocation(newLocation, false);
     }
   }, [params.selectedLat, params.selectedLng]);
 
@@ -193,7 +190,7 @@ export default function LocationSearch() {
     initLocation();
   }, []);
 
-  const saveAndNavigateBack = async (
+  const saveLocation = async (
     location: {
       latitude: number;
       longitude: number;
@@ -219,11 +216,6 @@ export default function LocationSearch() {
       }
     } catch (error) {
       console.error("Error saving location:", error);
-    }
-    if (effectiveStorageKey === EVENT_SEARCH_LOCATION_STORAGE_KEY) {
-      router.replace("/(app)/(tabs)/events");
-    } else {
-      router.back();
     }
   };
 
@@ -290,7 +282,7 @@ export default function LocationSearch() {
         console.error("Error reverse geocoding:", error);
       }
 
-      await saveAndNavigateBack(finalLocation, true);
+      await saveLocation(finalLocation, true);
     } catch (error) {
       console.error("Error getting current location:", error);
     }
@@ -359,7 +351,7 @@ export default function LocationSearch() {
       console.error("Error reverse geocoding:", error);
     }
 
-    await saveAndNavigateBack(finalLocation, false);
+    await saveLocation(finalLocation, false);
   };
 
   return (
