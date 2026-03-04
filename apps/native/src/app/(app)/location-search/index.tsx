@@ -10,9 +10,10 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQuery } from "convex/react";
 import * as Location from "expo-location";
+import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ArrowLeft, Crosshair, MapPin } from "lucide-react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
@@ -21,11 +22,6 @@ export const SEARCH_LOCATION_STORAGE_KEY = "search_location";
 export default function LocationSearch() {
   const router = useRouter();
   const params = useLocalSearchParams<{
-    selectedLat?: string;
-    selectedLng?: string;
-    selectedAddress?: string;
-    selectedName?: string;
-    useCurrentLocation?: string;
     storageKey?: string;
   }>();
   const effectiveStorageKey = params.storageKey || SEARCH_LOCATION_STORAGE_KEY;
@@ -46,57 +42,52 @@ export default function LocationSearch() {
   const [isCurrentLocation, setIsCurrentLocation] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Handle selected location from autocomplete — auto-save after showing pin
-  useEffect(() => {
-    if (params.selectedLat && params.selectedLng) {
-      const lat = parseFloat(params.selectedLat);
-      const lng = parseFloat(params.selectedLng);
+  const isInitialMount = useRef(true);
 
-      const newLocation = {
-        latitude: lat,
-        longitude: lng,
-        address: params.selectedAddress,
-        name: params.selectedName,
-      };
-
-      setIsCurrentLocation(false);
-      setSelectedLocation(newLocation);
-      setRegion({
-        latitude: lat,
-        longitude: lng,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      });
-
-      mapRef.current?.animateToRegion(
-        {
-          latitude: lat,
-          longitude: lng,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        },
-        500,
-      );
-
-      saveLocation(newLocation, false);
-    }
-  }, [params.selectedLat, params.selectedLng]);
-
-  // Handle "use current location" from autocomplete
-  useEffect(() => {
-    if (params.useCurrentLocation === "true") {
-      handleCurrentLocation();
-    }
-  }, [params.useCurrentLocation]);
-
-  useEffect(() => {
-    const initLocation = async () => {
-      // If coming from autocomplete with selected coords, skip loading saved/device location
-      if (params.selectedLat && params.selectedLng) {
-        setIsLoading(false);
+  useFocusEffect(
+    useCallback(() => {
+      if (isInitialMount.current) {
+        isInitialMount.current = false;
         return;
       }
 
+      const reloadFromStorage = async () => {
+        const useCurrent = await AsyncStorage.getItem(
+          "__pending_use_current_location__",
+        );
+        if (useCurrent === "true") {
+          await AsyncStorage.removeItem("__pending_use_current_location__");
+          handleCurrentLocation();
+          return;
+        }
+
+        const saved = await AsyncStorage.getItem(effectiveStorageKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          const loc = {
+            latitude: parsed.latitude,
+            longitude: parsed.longitude,
+            name: parsed.name,
+            address: parsed.address,
+          };
+          setIsCurrentLocation(false);
+          setSelectedLocation(loc);
+          const newRegion = {
+            ...loc,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          };
+          setRegion(newRegion);
+          mapRef.current?.animateToRegion(newRegion, 500);
+        }
+      };
+
+      reloadFromStorage();
+    }, [effectiveStorageKey]),
+  );
+
+  useEffect(() => {
+    const initLocation = async () => {
       // Try loading a previously saved location from AsyncStorage
       try {
         const saved = await AsyncStorage.getItem(effectiveStorageKey);

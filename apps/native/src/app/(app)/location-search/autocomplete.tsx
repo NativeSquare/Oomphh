@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { api } from "@packages/backend/convex/_generated/api";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAction } from "convex/react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ArrowLeft, MapPin, Navigation } from "lucide-react-native";
@@ -15,6 +16,7 @@ import {
   ScrollView,
   View,
 } from "react-native";
+import { SEARCH_LOCATION_STORAGE_KEY } from ".";
 
 type PlacePrediction = {
   place_id: string;
@@ -48,6 +50,8 @@ export default function LocationAutocomplete() {
     callback?: string;
     storageKey?: string;
   }>();
+
+  const effectiveStorageKey = params.storageKey || SEARCH_LOCATION_STORAGE_KEY;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [predictions, setPredictions] = useState<PlacePrediction[]>([]);
@@ -159,19 +163,19 @@ export default function LocationAutocomplete() {
         formattedAddress.split(",")[0] ??
         "Selected place";
 
-      // Reset token once a place is chosen (new typing session next time)
       sessionTokenRef.current = makeSessionToken();
 
-      router.replace({
-        pathname: "/(app)/location-search",
-        params: {
-          selectedLat: String(lat),
-          selectedLng: String(lng),
-          selectedAddress: formattedAddress,
-          selectedName: name,
-          ...(params.storageKey ? { storageKey: params.storageKey } : {}),
-        },
-      });
+      await AsyncStorage.setItem(
+        effectiveStorageKey,
+        JSON.stringify({
+          latitude: lat,
+          longitude: lng,
+          address: formattedAddress,
+          name,
+        }),
+      );
+
+      router.back();
     } catch (err: any) {
       console.error("Details error:", err?.message ?? err);
       setError(err?.message ?? "Failed to get location details");
@@ -180,14 +184,10 @@ export default function LocationAutocomplete() {
     }
   };
 
-  const handleUseCurrentLocation = () => {
-    router.replace({
-      pathname: "/(app)/location-search",
-      params: {
-        useCurrentLocation: "true",
-        ...(params.storageKey ? { storageKey: params.storageKey } : {}),
-      },
-    });
+  const handleUseCurrentLocation = async () => {
+    await AsyncStorage.removeItem(effectiveStorageKey);
+    await AsyncStorage.setItem("__pending_use_current_location__", "true");
+    router.back();
   };
 
   return (
