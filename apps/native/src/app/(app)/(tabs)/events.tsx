@@ -67,10 +67,14 @@ export default function Events() {
       const saved = await AsyncStorage.getItem(EVENT_FILTERS_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        setFilters({
+        const next: EventFilterData = {
           eventType: parsed.eventType ?? [],
           dateRange: parsed.dateRange ?? "",
           distance: parsed.distance ?? "",
+        };
+        setFilters((prev) => {
+          if (JSON.stringify(prev) === JSON.stringify(next)) return prev;
+          return next;
         });
       }
     } catch (error) {
@@ -84,9 +88,13 @@ export default function Events() {
         EVENT_SEARCH_LOCATION_STORAGE_KEY,
       );
       if (saved) {
-        setSearchLocation(JSON.parse(saved));
+        const parsed = JSON.parse(saved) as SearchLocation;
+        setSearchLocation((prev) => {
+          if (JSON.stringify(prev) === JSON.stringify(parsed)) return prev;
+          return parsed;
+        });
       } else {
-        setSearchLocation(null);
+        setSearchLocation((prev) => (prev === null ? prev : null));
       }
     } catch (error) {
       console.error("Error loading event search location:", error);

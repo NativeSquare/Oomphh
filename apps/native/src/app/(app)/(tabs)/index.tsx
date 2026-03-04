@@ -56,7 +56,7 @@ export default function Home() {
       const savedFilters = await AsyncStorage.getItem(FILTERS_STORAGE_KEY);
       if (savedFilters) {
         const parsed = JSON.parse(savedFilters);
-        setFilters({
+        const next: FilterData = {
           minAge: parsed.minAge ?? DEFAULT_MIN_AGE,
           maxAge: parsed.maxAge ?? DEFAULT_MAX_AGE,
           minHeight: parsed.minHeight ?? DEFAULT_MIN_HEIGHT,
@@ -69,6 +69,10 @@ export default function Home() {
           bodyType: parsed.bodyType ?? "",
           ethnicity: parsed.ethnicity ?? "",
           relationshipStatus: parsed.relationshipStatus ?? "",
+        };
+        setFilters((prev) => {
+          if (JSON.stringify(prev) === JSON.stringify(next)) return prev;
+          return next;
         });
       }
     } catch (error) {
@@ -82,15 +86,19 @@ export default function Home() {
         SEARCH_LOCATION_STORAGE_KEY,
       );
       if (savedLocation) {
-        const parsed = JSON.parse(savedLocation);
-        setSearchLocation(parsed);
+        const parsed = JSON.parse(savedLocation) as SearchLocation;
+        setSearchLocation((prev) => {
+          if (JSON.stringify(prev) === JSON.stringify(parsed)) return prev;
+          return parsed;
+        });
+      } else {
+        setSearchLocation((prev) => (prev === null ? prev : null));
       }
     } catch (error) {
       console.error("Error loading search location:", error);
     }
   }, []);
 
-  // Load filters and location on mount and when screen comes into focus
   React.useEffect(() => {
     loadFilters();
     loadSearchLocation();
@@ -307,8 +315,8 @@ export default function Home() {
               ))
             : userRows.map((row, rowIndex) => (
                 <View key={rowIndex} className="flex-row gap-1.5">
-                  {row.map((userItem, index) => (
-                    <View key={index} style={{ width: itemWidth }}>
+                  {row.map((userItem) => (
+                    <View key={userItem._id} style={{ width: itemWidth }}>
                       <NearestUsersGridItem
                         userItem={userItem}
                         presenceState={presenceState}
