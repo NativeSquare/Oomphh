@@ -1,0 +1,25 @@
+appId: com.oomphh.mobile.preview
+env:
+  TEST_EMAIL: ${TEST_EMAIL}
+  TEST_PASSWORD: ${TEST_PASSWORD}
+---
+- launchApp
+- assertVisible: "Sign in to your app"
+
+# Sign in
+- tapOn:
+    id: "email"
+- inputText: ${TEST_EMAIL}
+- tapOn:
+    id: "password"
+- inputText: ${TEST_PASSWORD}
+- tapOn: "Continue"
+
+- extendedWaitUntil:
+    visible: "Events|Home"
+    timeout: 15000
+
+# Navigate to notification settings
+- tapOn: "Profile"
+- tapOn: "Notifications"
+- assertVisible: "Notifications"

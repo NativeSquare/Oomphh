@@ -1,0 +1,21 @@
+name: e2e-test-android
+
+on:
+  pull_request:
+    branches: ['main']
+
+jobs:
+  build_android:
+    type: build
+    params:
+      platform: android
+      profile: e2e-test
+
+  maestro_test:
+    needs: [build_android]
+    type: maestro
+    params:
+      build_id: ${{ needs.build_android.outputs.build_id }}
+      flow_path:
+        - '.maestro/01_app_launches.yml'
+        - '.maestro/02_sign_in_validation.yml'

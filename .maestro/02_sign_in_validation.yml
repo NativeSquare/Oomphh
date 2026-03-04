@@ -1,0 +1,19 @@
+appId: com.oomphh.mobile.preview
+---
+- launchApp
+- assertVisible: "Sign in to your app"
+
+# Test empty form submission
+- tapOn: "Continue"
+- assertVisible: "Email is required"
+
+# Test invalid email
+- tapOn:
+    id: "email"
+- inputText: "notanemail"
+- tapOn: "Continue"
+- assertVisible: "Invalid email"
+
+# Test navigation to sign up
+- tapOn: "Sign Up"
+- assertVisible: "Create an account"
