@@ -93,7 +93,37 @@ export default function LocationSearch() {
   }, [params.useCurrentLocation]);
 
   useEffect(() => {
-    const getCurrentLocation = async () => {
+    const initLocation = async () => {
+      // If coming from autocomplete with selected coords, skip loading saved/device location
+      if (params.selectedLat && params.selectedLng) {
+        setIsLoading(false);
+        return;
+      }
+
+      // Try loading a previously saved location from AsyncStorage
+      try {
+        const saved = await AsyncStorage.getItem(effectiveStorageKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          const savedLoc = {
+            latitude: parsed.latitude,
+            longitude: parsed.longitude,
+            name: parsed.name,
+            address: parsed.address,
+          };
+          setSelectedLocation(savedLoc);
+          setRegion({
+            latitude: parsed.latitude,
+            longitude: parsed.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          });
+        }
+      } catch (error) {
+        console.error("Error loading saved location:", error);
+      }
+
+      // Also fetch device location to update the map if no saved location
       const t0 = Date.now();
       let permissionMs = 0;
       let getPositionMs = 0;
@@ -126,15 +156,16 @@ export default function LocationSearch() {
           longitude: location.coords.longitude,
         };
 
-        // Only set location if no selected location from autocomplete
-        if (!params.selectedLat && !params.selectedLng) {
-          setSelectedLocation(coords);
+        // Only use device location if no saved location was loaded
+        setSelectedLocation((prev) => {
+          if (prev) return prev;
           setRegion({
             ...coords,
             latitudeDelta: 0.01,
             longitudeDelta: 0.01,
           });
-        }
+          return coords;
+        });
 
         logLocationMapTiming({
           permissionMs,
@@ -159,7 +190,7 @@ export default function LocationSearch() {
       }
     };
 
-    getCurrentLocation();
+    initLocation();
   }, []);
 
   const saveAndNavigateBack = async (
@@ -410,17 +441,15 @@ export default function LocationSearch() {
       </View>
 
       {/* Action Buttons */}
-      <View className="absolute bottom-0 left-0 right-0 z-10 pb-safe bg-background/95 backdrop-blur-sm">
-        <View className="flex-row items-center justify-end p-4">
-          <Button
-            variant="outline"
-            size="icon"
-            onPress={handleCurrentLocation}
-            className="rounded-full w-12 h-12"
-          >
-            <Icon as={Crosshair} size={20} />
-          </Button>
-        </View>
+      <View className="absolute bottom-0 left-0 z-10 mb-safe pb-4 pl-8">
+        <Button
+          variant="outline"
+          size="icon"
+          onPress={handleCurrentLocation}
+          className="rounded-full w-12 h-12"
+        >
+          <Icon as={Crosshair} size={20} />
+        </Button>
       </View>
     </View>
   );

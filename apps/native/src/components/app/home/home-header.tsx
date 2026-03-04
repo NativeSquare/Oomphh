@@ -41,19 +41,7 @@ export function HomeHeader({
   );
 
   const handleLocationPress = () => {
-    if (searchLocation) {
-      router.push({
-        pathname: "/location-search",
-        params: {
-          selectedLat: String(searchLocation.latitude),
-          selectedLng: String(searchLocation.longitude),
-          selectedAddress: searchLocation.address,
-          selectedName: searchLocation.name,
-        },
-      });
-    } else {
-      router.push("/location-search");
-    }
+    router.push("/location-search");
   };
 
   return (
