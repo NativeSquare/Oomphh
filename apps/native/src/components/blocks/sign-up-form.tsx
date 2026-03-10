@@ -14,7 +14,7 @@ import { SignUpSchema } from "@/validation/auth";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter } from "expo-router";
 import * as React from "react";
-import { ActivityIndicator, type TextInput, View } from "react-native";
+import { ActivityIndicator, Linking, type TextInput, View } from "react-native";
 import z from "zod";
 import { PasswordInput } from "../custom/password-input";
 import { Checkbox } from "../ui/checkbox";
@@ -176,7 +176,20 @@ export function SignUpForm() {
                   onPress={() => setAcceptTerms(!acceptTerms)}
                   htmlFor="terms"
                 >
-                  Accept terms and conditions
+                  Accept{" "}
+                  <Text
+                    className="text-sm text-primary underline"
+                    onPress={() => Linking.openURL("https://www.oomphh.cz/terms")}
+                  >
+                    terms and conditions
+                  </Text>
+                  {" "}and{" "}
+                  <Text
+                    className="text-sm text-primary underline"
+                    onPress={() => Linking.openURL("https://www.oomphh.cz/privacy")}
+                  >
+                    privacy policy
+                  </Text>
                 </Label>
               </View>
               {fieldErrors.acceptTerms && (

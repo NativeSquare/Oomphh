@@ -13,6 +13,7 @@ import { api } from "@packages/backend/convex/_generated/api";
 import { BottomSheetModal as GorhomBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useMutation, useQuery } from "convex/react";
 import { router } from "expo-router";
+import * as Linking from "expo-linking";
 import {
   Bell,
   CalendarDays,
@@ -105,12 +106,12 @@ export default function Profile() {
     {
       label: "Terms & Conditions",
       icon: FileText,
-      onPress: () => {},
+      onPress: () => Linking.openURL("https://www.oomphh.cz/terms"),
     },
     {
       label: "Privacy Policy",
       icon: ShieldCheck,
-      onPress: () => {},
+      onPress: () => Linking.openURL("https://www.oomphh.cz/privacy"),
     },
     {
       label: "Send Feedback",

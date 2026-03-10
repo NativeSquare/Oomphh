@@ -315,7 +315,6 @@ export default function UserProfile() {
 
           {/* USER INFOS Section */}
           {(shouldShowAge ||
-            user.birthLocation ||
             user.height ||
             user.weight) && (
             <View className="gap-2">
@@ -328,14 +327,6 @@ export default function UserProfile() {
                     <Icon as={Cake} size={20} className="text-foreground" />
                     <Text className="text-base text-foreground">
                       {age} years old
-                    </Text>
-                  </View>
-                )}
-                {user.birthLocation && (
-                  <View className="flex-row items-center gap-2">
-                    <Icon as={MapPin} size={20} className="text-foreground" />
-                    <Text className="text-base text-foreground">
-                      {user.birthLocation}
                     </Text>
                   </View>
                 )}
