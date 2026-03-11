@@ -1,7 +1,9 @@
 import { HomeFiltersRow } from "@/components/app/home/home-filters-row";
 import { HomeHeader } from "@/components/app/home/home-header";
+import { LockedGridItem } from "@/components/app/home/locked-grid-item";
 import { NearestUsersGridItem } from "@/components/app/home/nearest-users-grid-item";
 import { NearestUsersGridItemSkeleton } from "@/components/app/home/nearest-users-grid-item-skeleton";
+import { useSubscription } from "@/hooks/use-subscription";
 import { cmToFeetInches, kgToLbs } from "@/utils/measurements";
 import { usePresence } from "@convex-dev/presence/react-native";
 import { api } from "@packages/backend/convex/_generated/api";
@@ -258,21 +260,35 @@ export default function Home() {
       : undefined,
   });
 
+  const { gridLimit } = useSubscription();
+
   const displayUsers = useMemo(() => {
     if (!nearestUsers) return undefined;
     if (!showFavoritesOnly) return nearestUsers;
     return nearestUsers.filter((u) => favoriteIds.has(u._id));
   }, [nearestUsers, showFavoritesOnly, favoriteIds]);
 
+  const { visibleUsers, lockedUsers } = useMemo(() => {
+    if (!displayUsers) return { visibleUsers: undefined, lockedUsers: [] };
+    return {
+      visibleUsers: displayUsers.slice(0, gridLimit),
+      lockedUsers: displayUsers.slice(gridLimit),
+    };
+  }, [displayUsers, gridLimit]);
+
   const userRows = useMemo(() => {
-    if (!displayUsers) return [];
-    const rows: (typeof displayUsers)[] = [];
+    if (!visibleUsers) return [];
+    const allItems = [
+      ...visibleUsers.map((u) => ({ type: "visible" as const, user: u })),
+      ...lockedUsers.map((u) => ({ type: "locked" as const, user: u })),
+    ];
+    const rows: (typeof allItems)[] = [];
     const columnsPerRow = 3;
-    for (let i = 0; i < displayUsers.length; i += columnsPerRow) {
-      rows.push(displayUsers.slice(i, i + columnsPerRow));
+    for (let i = 0; i < allItems.length; i += columnsPerRow) {
+      rows.push(allItems.slice(i, i + columnsPerRow));
     }
     return rows;
-  }, [displayUsers]);
+  }, [visibleUsers, lockedUsers]);
 
   const screenWidth = Dimensions.get("window").width;
   const maxWidth = 384; // max-w-sm (384px)
@@ -302,7 +318,7 @@ export default function Home() {
           onClearAll={handleClearAll}
         />
         <View className="gap-1.5">
-          {displayUsers === undefined
+          {visibleUsers === undefined
             ? // Show skeleton loading state (3 rows, 3 items per row)
               Array.from({ length: 3 }).map((_, rowIndex) => (
                 <View key={rowIndex} className="flex-row gap-1.5">
@@ -315,12 +331,16 @@ export default function Home() {
               ))
             : userRows.map((row, rowIndex) => (
                 <View key={rowIndex} className="flex-row gap-1.5">
-                  {row.map((userItem) => (
-                    <View key={userItem._id} style={{ width: itemWidth }}>
-                      <NearestUsersGridItem
-                        userItem={userItem}
-                        presenceState={presenceState}
-                      />
+                  {row.map((item) => (
+                    <View key={item.user._id} style={{ width: itemWidth }}>
+                      {item.type === "visible" ? (
+                        <NearestUsersGridItem
+                          userItem={item.user}
+                          presenceState={presenceState}
+                        />
+                      ) : (
+                        <LockedGridItem userItem={item.user} />
+                      )}
                     </View>
                   ))}
                 </View>

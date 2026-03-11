@@ -402,6 +402,12 @@ importers:
       react-native-otp-entry:
         specifier: ^1.8.5
         version: 1.8.5(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
+      react-native-purchases:
+        specifier: ^9.11.2
+        version: 9.11.2(react-native-web@0.21.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
+      react-native-purchases-ui:
+        specifier: ^9.11.2
+        version: 9.11.2(react-native-purchases@9.11.2(react-native-web@0.21.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native-web@0.21.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
       react-native-reanimated:
         specifier: ~4.1.6
         version: 4.1.6(@babel/core@7.29.0)(react-native-worklets@0.5.1(@babel/core@7.29.0)(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
@@ -3673,6 +3679,15 @@ packages:
 
   '@react-navigation/routers@7.5.3':
     resolution: {integrity: sha512-1tJHg4KKRJuQ1/EvJxatrMef3NZXEPzwUIUZ3n1yJ2t7Q97siwRtbynRpQG9/69ebbtiZ8W3ScOZF/OmhvM4Rg==}
+
+  '@revenuecat/purchases-js-hybrid-mappings@17.44.0':
+    resolution: {integrity: sha512-8v8N0PR+AzWgZBHWeETt9md76xfqW+thgYZAdDSbTE2Tyd6NsbnbQLAxMQVHwC+2GyREBRqO2X0di3N+3jD6aw==}
+
+  '@revenuecat/purchases-js@1.27.0':
+    resolution: {integrity: sha512-PRV5jbOyQ9ehNGyp0EeBV+Ri0T0QBTDJiftg7W0/eUFhGWs9irfw3ipQdjpmoikYxckrZQLzpsFhJ6zP/M+YgQ==}
+
+  '@revenuecat/purchases-typescript-internal@17.44.0':
+    resolution: {integrity: sha512-YvSxMSiGLNNvqeIGrSwxqg5GjBkHBbB2MVSd/AvRnj97FGWsJ43kp7LMMNN6NHtghw4v42nVWG1IpznGvEOBww==}
 
   '@rn-primitives/accordion@1.2.0':
     resolution: {integrity: sha512-gt1NQC6XTbSN6KEqX3QDbvqO4kXFDKhQGiljL/pq1WO0iJNVaV47/3E8fLOZLEuj2FSkQblNhSvVc4WU/7qHoA==}
@@ -7615,6 +7630,27 @@ packages:
       react: '*'
       react-native: '*'
 
+  react-native-purchases-ui@9.11.2:
+    resolution: {integrity: sha512-+JrWmVMXdyOjYku8qYrScoZh951Xtjbym10g0FzYiqlAQWKcjJm1N5+SpFoZr6gCTijt2Np5ZFg3juP+1hCWnw==}
+    peerDependencies:
+      react: '*'
+      react-native: '>= 0.73.0'
+      react-native-purchases: 9.11.2
+      react-native-web: '*'
+    peerDependenciesMeta:
+      react-native-web:
+        optional: true
+
+  react-native-purchases@9.11.2:
+    resolution: {integrity: sha512-u+uyve9PKaqoK+SwsGTUNZbIy8ket4D0Px4fgI5XHtq18TlXV6gOAnwnRm61cxNhjP/H1ElGXC4z05zm1LfocA==}
+    peerDependencies:
+      react: '>= 16.6.3'
+      react-native: '>= 0.73.0'
+      react-native-web: '*'
+    peerDependenciesMeta:
+      react-native-web:
+        optional: true
+
   react-native-reanimated-carousel@4.0.3:
     resolution: {integrity: sha512-YZXlvZNghR5shFcI9hTA7h7bEhh97pfUSLZvLBAshpbkuYwJDKmQXejO/199T6hqGq0wCRwR0CWf2P4Vs6A4Fw==}
     peerDependencies:
@@ -8251,6 +8287,7 @@ packages:
   tar@7.5.7:
     resolution: {integrity: sha512-fov56fJiRuThVFXD6o6/Q354S7pnWMJIVlDBYijsTNx6jKSE4pvrDTs6lUnmGvNyfJwFQQwWy3owKz1ucIhveQ==}
     engines: {node: '>=18'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   temp-dir@2.0.0:
     resolution: {integrity: sha512-aoBAniQmmwtcKp/7BzsH8Cxzv8OL736p7v1ihGb5e9DJ9kTwGWHrQrVB5+lfVDzfGrdRzXch+ig7LHaY1JTOrg==}
@@ -12895,6 +12932,14 @@ snapshots:
   '@react-navigation/routers@7.5.3':
     dependencies:
       nanoid: 3.3.11
+
+  '@revenuecat/purchases-js-hybrid-mappings@17.44.0':
+    dependencies:
+      '@revenuecat/purchases-js': 1.27.0
+
+  '@revenuecat/purchases-js@1.27.0': {}
+
+  '@revenuecat/purchases-typescript-internal@17.44.0': {}
 
   '@rn-primitives/accordion@1.2.0(@types/react-dom@19.2.3(@types/react@19.1.17))(@types/react@19.1.17)(react-dom@19.1.0(react@19.1.0))(react-native-web@0.21.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)':
     dependencies:
@@ -17649,6 +17694,24 @@ snapshots:
     dependencies:
       react: 19.1.0
       react-native: 0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0)
+
+  react-native-purchases-ui@9.11.2(react-native-purchases@9.11.2(react-native-web@0.21.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native-web@0.21.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
+    dependencies:
+      '@revenuecat/purchases-typescript-internal': 17.44.0
+      react: 19.1.0
+      react-native: 0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0)
+      react-native-purchases: 9.11.2(react-native-web@0.21.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
+    optionalDependencies:
+      react-native-web: 0.21.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+
+  react-native-purchases@9.11.2(react-native-web@0.21.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
+    dependencies:
+      '@revenuecat/purchases-js-hybrid-mappings': 17.44.0
+      '@revenuecat/purchases-typescript-internal': 17.44.0
+      react: 19.1.0
+      react-native: 0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0)
+    optionalDependencies:
+      react-native-web: 0.21.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 
   react-native-reanimated-carousel@4.0.3(react-native-gesture-handler@2.28.0(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native-reanimated@4.1.6(@babel/core@7.29.0)(react-native-worklets@0.5.1(@babel/core@7.29.0)(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
     dependencies:

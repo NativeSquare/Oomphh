@@ -1,5 +1,6 @@
 import "@/lib/nativewind-interop";
 import { initLogRocket } from "@/lib/logrocket";
+import { RevenueCatProvider } from "@/lib/revenue-cat";
 import { fetchUpdatesAsync } from "@/utils/fetch-updates-async";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { api } from "@packages/backend/convex/_generated/api";
@@ -47,12 +48,14 @@ export default function RootLayout() {
             : undefined
         }
       >
-        <GestureHandlerRootView>
-          <BottomSheetModalProvider>
-            <RootStack />
-            <PortalHost />
-          </BottomSheetModalProvider>
-        </GestureHandlerRootView>
+        <RevenueCatProvider>
+          <GestureHandlerRootView>
+            <BottomSheetModalProvider>
+              <RootStack />
+              <PortalHost />
+            </BottomSheetModalProvider>
+          </GestureHandlerRootView>
+        </RevenueCatProvider>
       </ConvexAuthProvider>
     </KeyboardProvider>
   );
