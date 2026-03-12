@@ -66,12 +66,13 @@ export function useSubscription() {
     }
   }, []);
 
+  // Match by product identifier — consistent across test store and production
   const premiumPackage = currentOffering?.availablePackages?.find(
-    (pkg) => pkg.identifier === "premium_monthly",
+    (pkg) => pkg.product.identifier === "com.oomphh.premium_monthly",
   ) ?? null;
 
   const unlimitedPackage = currentOffering?.availablePackages?.find(
-    (pkg) => pkg.identifier === "unlimited_monthly",
+    (pkg) => pkg.product.identifier === "com.oomphh.unlimited_monthly",
   ) ?? null;
 
   return {

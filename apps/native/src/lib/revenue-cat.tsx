@@ -6,7 +6,7 @@ import Purchases, {
   type PurchasesOffering,
 } from "react-native-purchases";
 
-const API_KEY = "test_xDfMLNKOdciUHRGoXibOabkxwHZ";
+const API_KEY = process.env.EXPO_PUBLIC_REVENUECAT_API_KEY!;
 
 const PREMIUM_ENTITLEMENT_ID = "Premium";
 const UNLIMITED_ENTITLEMENT_ID = "Unlimited";
@@ -54,6 +54,20 @@ export function RevenueCatProvider({
       setCustomerInfo(info);
 
       const offerings = await Purchases.getOfferings();
+      if (__DEV__) {
+        console.log(
+          "[RevenueCat] Current offering:",
+          offerings.current?.identifier,
+        );
+        console.log(
+          "[RevenueCat] Available packages:",
+          offerings.current?.availablePackages?.map((p) => ({
+            identifier: p.identifier,
+            productId: p.product.identifier,
+            priceString: p.product.priceString,
+          })),
+        );
+      }
       setCurrentOffering(offerings.current);
 
       setIsReady(true);
