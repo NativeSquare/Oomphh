@@ -6,8 +6,8 @@ import {
   SettingItem,
   SettingsRow,
 } from "@/components/app/settings/settings-row";
+import { SubscriptionPlanCard } from "@/components/app/settings/subscription-plan-card";
 import { Text } from "@/components/ui/text";
-import { useSubscription } from "@/hooks/use-subscription";
 import type { MeasurementSystem } from "@/utils/measurements";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { api } from "@packages/backend/convex/_generated/api";
@@ -18,10 +18,8 @@ import * as Linking from "expo-linking";
 import {
   Bell,
   CalendarDays,
-  Crown,
   File,
   FileText,
-  Headset,
   Images,
   LockOpen,
   LogOut,
@@ -31,15 +29,13 @@ import {
   UserMinus,
 } from "lucide-react-native";
 import React from "react";
-import { Alert, Platform, ScrollView, View } from "react-native";
-import RevenueCatUI from "react-native-purchases-ui";
+import { ScrollView, View } from "react-native";
 
 export default function Profile() {
   const { signOut } = useAuthActions();
   const deleteUser = useMutation(api.table.users.del);
   const patchUser = useMutation(api.table.users.patch);
   const user = useQuery(api.table.users.currentUser);
-  const { tier } = useSubscription();
   const deleteAccountBottomSheetRef =
     React.useRef<GorhomBottomSheetModal>(null);
   const measurementSystemSheetRef = React.useRef<GorhomBottomSheetModal>(null);
@@ -66,37 +62,12 @@ export default function Profile() {
     signOut();
   }, [signOut]);
 
-  const handleManageSubscription = React.useCallback(async () => {
-    if (Platform.OS === "web") return;
-    try {
-      await RevenueCatUI.presentCustomerCenter();
-    } catch {
-      Alert.alert(
-        "Subscription Management",
-        "Unable to open subscription management. Please try again.",
-      );
-    }
-  }, []);
-
-  const handleUpgrade = React.useCallback(() => {
-    router.push("/paywall" as any);
-  }, []);
-
   const settingsItems: SettingItem[] = [
     {
       label: "Edit Profile",
       icon: Pencil,
       onPress: () => router.push("/edit-profile"),
     },
-    ...(tier === "unlimited"
-      ? []
-      : [
-          {
-            label: tier === "free" ? "Upgrade to Premium" : "Upgrade to Unlimited",
-            icon: Crown,
-            onPress: handleUpgrade,
-          },
-        ]),
     {
       label: "My Events",
       icon: CalendarDays,
@@ -137,15 +108,6 @@ export default function Profile() {
       icon: LockOpen,
       onPress: () => router.push("/permissions"),
     },
-    ...(tier !== "free"
-      ? [
-          {
-            label: "Manage Subscription",
-            icon: Headset,
-            onPress: handleManageSubscription,
-          },
-        ]
-      : []),
     {
       label: "Delete Account",
       icon: UserMinus,
@@ -171,6 +133,8 @@ export default function Profile() {
         <Text className="text-xl font-medium leading-[30px] text-white mt-5">
           Profile Settings
         </Text>
+
+        <SubscriptionPlanCard />
 
         <View className="flex-col">
           <MeasurementSystemRow
