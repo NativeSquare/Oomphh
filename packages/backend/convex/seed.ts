@@ -1,6 +1,8 @@
 import { GeospatialIndex } from "@convex-dev/geospatial";
-import { components } from "./_generated/api";
+import { v } from "convex/values";
+import { components, internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
+import { internalAction, internalQuery } from "./_generated/server";
 import { internalMutation } from "./utils/customMutations";
 
 const geospatial = new GeospatialIndex<Id<"users">>(components.geospatial);
@@ -134,6 +136,9 @@ const RELATIONSHIP_STATUSES = [
   "Single", "In a relationship", "Open relationship", "Married",
 ];
 
+// Number of unique profile pictures to fetch from randomuser.me (portraits 0-99 available)
+const PROFILE_PICTURE_COUNT = 30;
+
 function seededRandom(seed: number) {
   let s = seed;
   return () => {
@@ -153,7 +158,6 @@ function pickMultiple<T>(arr: T[], min: number, max: number, rand: () => number)
 }
 
 function randomBirthDate(rand: () => number): string {
-  // Ages between 20 and 45
   const age = 20 + Math.floor(rand() * 26);
   const year = new Date().getFullYear() - age;
   const month = 1 + Math.floor(rand() * 12);
@@ -161,27 +165,86 @@ function randomBirthDate(rand: () => number): string {
   return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}T00:00:00Z`;
 }
 
-export const seedPreviewUsers = internalMutation({
+/**
+ * Entry point: internalAction that fetches profile pictures from randomuser.me,
+ * uploads them to Convex storage, then calls the mutation to create users.
+ */
+export const seedPreviewUsers = internalAction({
   args: {},
   handler: async (ctx) => {
-    // Check if we already seeded by looking for a user with a seed email pattern
-    const existing = await ctx.db
-      .query("users")
-      .filter((q) => q.eq(q.field("email"), "seed-0@oomphh.preview"))
-      .first();
-
-    if (existing) {
+    // Check if already seeded
+    const alreadySeeded: boolean = await ctx.runQuery(
+      internal.seed.isAlreadySeeded,
+      {}
+    );
+    if (alreadySeeded) {
       console.log("Preview users already seeded, skipping.");
       return { seeded: false, count: 0 };
     }
 
+    // Fetch and upload profile pictures from randomuser.me
+    console.log(`Fetching ${PROFILE_PICTURE_COUNT} profile pictures from randomuser.me...`);
+    const storageIds: Id<"_storage">[] = [];
+
+    for (let i = 0; i < PROFILE_PICTURE_COUNT; i++) {
+      try {
+        const imageUrl = `https://randomuser.me/api/portraits/men/${i}.jpg`;
+        const response = await fetch(imageUrl);
+        if (!response.ok) {
+          console.warn(`Failed to fetch portrait ${i}: ${response.status}`);
+          continue;
+        }
+        const blob = await response.blob();
+        const storageId = await ctx.storage.store(blob);
+        storageIds.push(storageId);
+      } catch (e) {
+        console.warn(`Error fetching portrait ${i}:`, e);
+      }
+    }
+
+    console.log(`Uploaded ${storageIds.length}/${PROFILE_PICTURE_COUNT} profile pictures.`);
+
+    // Create all users in a mutation
+    const result = await ctx.runMutation(internal.seed.createSeedUsers, {
+      profilePictureIds: storageIds.filter((id) => id !== null),
+    });
+
+    return result;
+  },
+});
+
+export const isAlreadySeeded = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    const existing = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), "seed-0@oomphh.preview"))
+      .first();
+    return existing !== null;
+  },
+});
+
+export const createSeedUsers = internalMutation({
+  args: {
+    profilePictureIds: v.array(v.id("_storage")),
+  },
+  handler: async (ctx, args) => {
     let count = 0;
+    const { profilePictureIds } = args;
 
     for (let i = 0; i < SEED_USERS.length; i++) {
       const { city, lat, lng } = SEED_USERS[i];
       const rand = seededRandom(i * 7919 + 42);
 
       const name = FIRST_NAMES[i % FIRST_NAMES.length];
+
+      // Assign a profile picture (cycle through available ones)
+      const profilePictures: Id<"_storage">[] = [];
+      if (profilePictureIds.length > 0) {
+        profilePictures.push(
+          profilePictureIds[i % profilePictureIds.length]
+        );
+      }
 
       const userId = await ctx.db.insert("users", {
         name,
@@ -190,11 +253,11 @@ export const seedPreviewUsers = internalMutation({
         birthDate: randomBirthDate(rand),
         birthLocation: city,
         height: {
-          value: 165 + Math.floor(rand() * 30), // 165-194 cm
+          value: 165 + Math.floor(rand() * 30),
           unit: "cm",
         },
         weight: {
-          value: 60 + Math.floor(rand() * 40), // 60-99 kg
+          value: 60 + Math.floor(rand() * 40),
           unit: "kg",
         },
         bodyTypes: pick(BODY_TYPES, rand),
@@ -205,11 +268,10 @@ export const seedPreviewUsers = internalMutation({
         relationshipStatus: pick(RELATIONSHIP_STATUSES, rand),
         hasCompletedOnboarding: true,
         measurementSystem: "metric",
+        profilePictures,
       });
 
-      // Register in the geospatial index so they appear in discovery
       await geospatial.insert(ctx, userId, { latitude: lat, longitude: lng }, {});
-
       count++;
     }
 
@@ -252,12 +314,11 @@ export const seedPreviewUsers = internalMutation({
         measurementSystem: "metric",
       });
 
-      // Create auth account so they can log in with email/password
       await ctx.db.insert("authAccounts", {
         userId,
         provider: "password",
         providerAccountId: authUser.email,
-        secret: authUser.password, // stored as-is (no hashing in this project)
+        secret: authUser.password,
       });
 
       await geospatial.insert(ctx, userId, { latitude: authUser.lat, longitude: authUser.lng }, {});

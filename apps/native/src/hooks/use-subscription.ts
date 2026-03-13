@@ -11,8 +11,8 @@ import Purchases, {
 } from "react-native-purchases";
 
 const GRID_LIMITS: Record<SubscriptionTier, number> = {
-  free: 2,
-  premium: 5,
+  free: 15,
+  premium: 30,
   unlimited: Infinity,
 };
 
