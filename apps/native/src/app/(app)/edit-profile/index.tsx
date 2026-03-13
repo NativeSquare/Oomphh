@@ -11,7 +11,13 @@ import { useMutation, useQuery } from "convex/react";
 import { router } from "expo-router";
 import { ChevronLeft, Eye } from "lucide-react-native";
 import React from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  View,
+} from "react-native";
 
 export type EditProfileFormData = Partial<
   Pick<
@@ -91,50 +97,55 @@ export default function EditProfile() {
   };
 
   return (
-    <View className="flex-1 mt-safe">
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="interactive"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1 }}
-        contentContainerClassName="px-4 pb-6"
-      >
-        <View className="w-full max-w-md self-center flex-1">
-          {renderHeader()}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <View className="flex-1 mt-safe">
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerClassName="px-4 pb-6"
+        >
+          <View className="w-full max-w-md self-center flex-1">
+            {renderHeader()}
 
-          <View className="gap-6">
-            <ProfilePhotosSection
-              formData={formData}
-              setFormData={setFormData}
-            />
+            <View className="gap-6">
+              <ProfilePhotosSection
+                formData={formData}
+                setFormData={setFormData}
+              />
 
-            <Tabs
-              value={activeTab}
-              onValueChange={(value) => setActiveTab(value as TabValue)}
-            >
-              <TabsList>
-                {[
-                  { value: "personal", label: "Personal info" },
-                  { value: "preferences", label: "Preferences" },
-                ].map((tab, index) => (
-                  <TabsTrigger key={index} value={tab.value}>
-                    <Text className="text-sm font-medium">{tab.label}</Text>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
+              <Tabs
+                value={activeTab}
+                onValueChange={(value) => setActiveTab(value as TabValue)}
+              >
+                <TabsList>
+                  {[
+                    { value: "personal", label: "Personal info" },
+                    { value: "preferences", label: "Preferences" },
+                  ].map((tab, index) => (
+                    <TabsTrigger key={index} value={tab.value}>
+                      <Text className="text-sm font-medium">{tab.label}</Text>
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
 
-            {activeTab === "personal" ? (
-              <PersonalInfoTab formData={formData} setFormData={setFormData} />
-            ) : (
-              <PreferencesTab formData={formData} setFormData={setFormData} />
-            )}
+              {activeTab === "personal" ? (
+                <PersonalInfoTab formData={formData} setFormData={setFormData} />
+              ) : (
+                <PreferencesTab formData={formData} setFormData={setFormData} />
+              )}
+            </View>
           </View>
+        </ScrollView>
+        <View className="w-full max-w-md self-center px-4 pb-4 mb-safe">
+          {renderFooter()}
         </View>
-      </ScrollView>
-      <View className="w-full max-w-md self-center px-4 pb-4 mb-safe">
-        {renderFooter()}
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }

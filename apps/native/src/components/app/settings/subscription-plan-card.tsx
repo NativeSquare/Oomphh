@@ -1,53 +1,73 @@
-import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { useSubscription } from "@/hooks/use-subscription";
-import type { SubscriptionTier } from "@/lib/revenue-cat";
+import {
+  PREMIUM_ENTITLEMENT_ID,
+  UNLIMITED_ENTITLEMENT_ID,
+  type SubscriptionTier,
+} from "@/lib/revenue-cat";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Crown, Sparkles, User, ChevronRight } from "lucide-react-native";
+import { ChevronRight, Crown, Sparkles, User } from "lucide-react-native";
 import { Alert, Platform, Pressable, View } from "react-native";
 import RevenueCatUI from "react-native-purchases-ui";
 
-const PLAN_CONFIG: Record<
-  SubscriptionTier,
-  {
-    label: string;
-    description: string;
-    icon: typeof Crown;
-    accentColor: string;
-    bgColor: string;
-    borderColor: string;
-  }
-> = {
-  free: {
-    label: "Free Plan",
-    description: "Basic features with limited access",
-    icon: User,
-    accentColor: "#70707b",
-    bgColor: "bg-secondary/30",
-    borderColor: "border-border",
-  },
-  premium: {
-    label: "Premium Plan",
-    description: "Enhanced features and more access",
-    icon: Crown,
-    accentColor: "#e56400",
-    bgColor: "bg-[#e56400]/5",
-    borderColor: "border-[#e56400]/30",
-  },
-  unlimited: {
-    label: "Unlimited Plan",
-    description: "Full access to everything",
-    icon: Sparkles,
-    accentColor: "#e56400",
-    bgColor: "bg-[#e56400]/10",
-    borderColor: "border-[#e56400]/40",
-  },
+const PERIOD_LABELS: Record<string, string> = {
+  P1M: "month",
+  P3M: "quarter",
+  P1Y: "year",
+};
+
+function formatRenewalDate(dateString: string | null): string | null {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return null;
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+const PLAN_ICON: Record<SubscriptionTier, typeof Crown> = {
+  free: User,
+  premium: Crown,
+  unlimited: Sparkles,
+};
+
+const PLAN_LABEL: Record<SubscriptionTier, string> = {
+  free: "Free",
+  premium: "Premium",
+  unlimited: "Unlimited",
 };
 
 export function SubscriptionPlanCard() {
-  const { tier } = useSubscription();
-  const config = PLAN_CONFIG[tier];
+  const { tier, customerInfo, currentOffering } = useSubscription();
+
+  // Resolve active subscription pricing from entitlement + offerings
+  const activeEntitlement =
+    tier === "unlimited"
+      ? customerInfo?.entitlements.active[UNLIMITED_ENTITLEMENT_ID]
+      : tier === "premium"
+        ? customerInfo?.entitlements.active[PREMIUM_ENTITLEMENT_ID]
+        : null;
+
+  const activeProductId = activeEntitlement?.productIdentifier ?? null;
+
+  const activePackage = activeProductId
+    ? currentOffering?.availablePackages?.find(
+        (pkg) => pkg.product.identifier === activeProductId,
+      )
+    : null;
+
+  const priceString = activePackage?.product.priceString ?? null;
+  const periodLabel =
+    PERIOD_LABELS[activePackage?.product.subscriptionPeriod ?? ""] ?? null;
+
+  const renewalDate = formatRenewalDate(
+    activeEntitlement?.expirationDate ?? null,
+  );
+  const willRenew = activeEntitlement?.willRenew ?? false;
 
   const handleManageSubscription = async () => {
     if (Platform.OS === "web") return;
@@ -61,53 +81,142 @@ export function SubscriptionPlanCard() {
     }
   };
 
-  return (
-    <View
-      className={`rounded-2xl border ${config.borderColor} ${config.bgColor} p-4 gap-4`}
-    >
-      {/* Plan info */}
-      <View className="flex-row items-center gap-3">
-        <View
-          className="size-10 rounded-full items-center justify-center"
-          style={{ backgroundColor: `${config.accentColor}20` }}
-        >
-          <Icon as={config.icon} size={20} color={config.accentColor} />
-        </View>
-        <View className="flex-1">
-          <Text className="text-base font-semibold text-white">
-            {config.label}
-          </Text>
-          <Text className="text-xs text-muted-foreground">
-            {config.description}
-          </Text>
-        </View>
-      </View>
+  if (tier === "free") {
+    return (
+      <View className="rounded-2xl border border-border bg-[#131316] overflow-hidden">
+        <View className="p-5 gap-4">
+          <View className="flex-row items-center gap-3">
+            <View className="size-11 rounded-full bg-[#1a1a1e] items-center justify-center">
+              <Icon as={User} size={22} color="#70707b" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-lg font-bold text-white">Free Plan</Text>
+              <Text className="text-xs text-muted-foreground mt-0.5">
+                Upgrade to unlock all features
+              </Text>
+            </View>
+          </View>
 
-      {/* Action buttons */}
-      <View className="gap-2">
-        {tier !== "unlimited" && (
-          <Button
-            className="w-full bg-[#e56400] rounded-full"
-            onPress={() => router.push("/paywall" as any)}
-          >
-            <Text className="text-sm font-semibold text-white">
-              {tier === "free" ? "Upgrade to Premium" : "Upgrade to Unlimited"}
-            </Text>
-          </Button>
-        )}
-
-        {tier !== "free" && (
           <Pressable
-            onPress={handleManageSubscription}
-            className="flex-row items-center justify-center gap-1.5 py-2.5 rounded-full active:opacity-70"
+            onPress={() => router.push("/paywall" as any)}
+            className="active:opacity-80 overflow-hidden rounded-xl"
           >
-            <Text className="text-sm font-medium text-muted-foreground">
-              Manage Subscription
-            </Text>
-            <Icon as={ChevronRight} size={14} className="text-muted-foreground" />
+            <LinearGradient
+              colors={["#e56400", "#c45500"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{
+                paddingVertical: 14,
+                alignItems: "center",
+                borderRadius: 12,
+              }}
+            >
+              <Text className="text-sm font-bold text-white tracking-wide">
+                Upgrade Now
+              </Text>
+            </LinearGradient>
           </Pressable>
-        )}
+        </View>
       </View>
+    );
+  }
+
+  // Paid plan card
+  const isPremium = tier === "premium";
+
+  return (
+    <View className="rounded-2xl overflow-hidden">
+      <LinearGradient
+        colors={
+          isPremium
+            ? ["#1a1400", "#1a1000", "#131316"]
+            : ["#2a1500", "#1c0e00", "#131316"]
+        }
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+      >
+        <View className="border border-[#e56400]/25 rounded-2xl">
+          <View className="p-5 gap-4">
+            {/* Plan name + price */}
+            <View className="flex-row items-start justify-between">
+              <View className="flex-row items-center gap-3 flex-1">
+                <View
+                  className="size-11 rounded-full items-center justify-center"
+                  style={{ backgroundColor: "rgba(229, 100, 0, 0.15)" }}
+                >
+                  <Icon
+                    as={PLAN_ICON[tier]}
+                    size={22}
+                    color="#e56400"
+                  />
+                </View>
+                <View>
+                  <Text className="text-lg font-bold text-white">
+                    {PLAN_LABEL[tier]}
+                  </Text>
+                  {renewalDate && (
+                    <Text className="text-xs text-muted-foreground mt-0.5">
+                      {willRenew ? "Renews" : "Expires"} {renewalDate}
+                    </Text>
+                  )}
+                </View>
+              </View>
+
+              {priceString && periodLabel && (
+                <View className="items-end">
+                  <Text className="text-lg font-bold text-white">
+                    {priceString}
+                  </Text>
+                  <Text className="text-xs text-muted-foreground">
+                    per {periodLabel}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* Actions */}
+            <View className="flex-row gap-2">
+              {isPremium && (
+                <Pressable
+                  onPress={() => router.push("/paywall" as any)}
+                  className="flex-1 py-3 rounded-xl items-center justify-center active:opacity-80 overflow-hidden"
+                >
+                  <LinearGradient
+                    colors={["#e56400", "#c45500"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      borderRadius: 12,
+                    }}
+                  />
+                  <Text className="text-sm font-semibold text-white">
+                    Go Unlimited
+                  </Text>
+                </Pressable>
+              )}
+
+              <Pressable
+                onPress={handleManageSubscription}
+                className={`${isPremium ? "flex-1" : "flex-1"} flex-row items-center justify-center gap-1.5 py-3 rounded-xl bg-white/5 active:opacity-70`}
+              >
+                <Text className="text-sm font-medium text-[#d1d1d6]">
+                  Manage
+                </Text>
+                <Icon
+                  as={ChevronRight}
+                  size={14}
+                  color="#d1d1d6"
+                />
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </LinearGradient>
     </View>
   );
 }

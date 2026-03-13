@@ -55,6 +55,7 @@ export function BirthLocationField({
   const autocompleteCities = useAction(api.table.places.autocompleteCities);
   const sessionTokenRef = useRef<string>(makeSessionToken());
   const isSelectingRef = useRef(false);
+  const hasInteractedRef = useRef(false);
 
   useEffect(() => {
     setInputValue(value);
@@ -71,6 +72,10 @@ export function BirthLocationField({
   useEffect(() => {
     if (isSelectingRef.current) {
       isSelectingRef.current = false;
+      return;
+    }
+
+    if (!hasInteractedRef.current) {
       return;
     }
 
@@ -154,6 +159,7 @@ export function BirthLocationField({
           <Input
             value={inputValue}
             onChangeText={(text) => {
+              hasInteractedRef.current = true;
               setInputValue(text);
               if (text !== value) {
                 onChange?.(text);
