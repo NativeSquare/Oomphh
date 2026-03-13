@@ -17,6 +17,7 @@ import type * as lib_auth_ResendOTPPasswordReset from "../lib/auth/ResendOTPPass
 import type * as migrations from "../migrations.js";
 import type * as presence from "../presence.js";
 import type * as pushNotifications from "../pushNotifications.js";
+import type * as seed from "../seed.js";
 import type * as storage from "../storage.js";
 import type * as table_albums from "../table/albums.js";
 import type * as table_conversations from "../table/conversations.js";
@@ -51,6 +52,7 @@ declare const fullApi: ApiFromModules<{
   migrations: typeof migrations;
   presence: typeof presence;
   pushNotifications: typeof pushNotifications;
+  seed: typeof seed;
   storage: typeof storage;
   "table/albums": typeof table_albums;
   "table/conversations": typeof table_conversations;

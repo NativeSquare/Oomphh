@@ -213,7 +213,58 @@ export const seedPreviewUsers = internalMutation({
       count++;
     }
 
-    console.log(`Seeded ${count} preview users across ${new Set(SEED_USERS.map((u) => u.city)).size} cities.`);
+    // Seed authenticated users (can actually log in)
+    const AUTH_USERS = [
+      {
+        email: "maxime.gey@nativesquare.fr",
+        password: "preview2026",
+        name: "Maxime",
+        city: "Paris",
+        lat: 48.8566,
+        lng: 2.3522,
+      },
+      {
+        email: "testuser@oomphh.cz",
+        password: "preview2026",
+        name: "Test User",
+        city: "Paris",
+        lat: 48.8606,
+        lng: 2.3376,
+      },
+    ];
+
+    for (const authUser of AUTH_USERS) {
+      const userId = await ctx.db.insert("users", {
+        name: authUser.name,
+        email: authUser.email,
+        bio: `Hey from ${authUser.city}! 👋`,
+        birthDate: "1995-06-15T00:00:00Z",
+        birthLocation: authUser.city,
+        height: { value: 180, unit: "cm" },
+        weight: { value: 75, unit: "kg" },
+        bodyTypes: "Athletic",
+        orientation: "Gay",
+        position: "Versatile",
+        lookingFor: ["Connections", "Friends", "Dating"],
+        ethnicity: "White",
+        relationshipStatus: "Single",
+        hasCompletedOnboarding: true,
+        measurementSystem: "metric",
+      });
+
+      // Create auth account so they can log in with email/password
+      await ctx.db.insert("authAccounts", {
+        userId,
+        provider: "password",
+        providerAccountId: authUser.email,
+        secret: authUser.password, // stored as-is (no hashing in this project)
+      });
+
+      await geospatial.insert(ctx, userId, { latitude: authUser.lat, longitude: authUser.lng }, {});
+      count++;
+    }
+
+    console.log(`Seeded ${count} preview users (including ${AUTH_USERS.length} with login) across ${new Set(SEED_USERS.map((u) => u.city)).size}+ cities.`);
     return { seeded: true, count };
   },
 });
