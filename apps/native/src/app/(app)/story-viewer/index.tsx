@@ -99,6 +99,7 @@ export default function StoryViewer() {
   const deleteStory = useMutation(api.table.stories.deleteStory);
   const toggleStoryLike = useMutation(api.table.storyLikes.toggleStoryLike);
   const sendMessage = useMutation(api.table.messages.sendMessage);
+  const markStoryViewed = useMutation(api.table.storyViews.markStoryViewed);
 
   // Fetch stories for the current author
   const storyGroups = useQuery(
@@ -306,6 +307,15 @@ export default function StoryViewer() {
     }
   }, [storyIndex, currentStories.length]);
 
+  // Mark story as viewed when it becomes active
+  React.useEffect(() => {
+    if (currentStory?._id) {
+      markStoryViewed({ storyId: currentStory._id as Id<"stories"> }).catch(
+        () => {},
+      );
+    }
+  }, [currentStory?._id]);
+
   // Reset timer when story changes
   React.useEffect(() => {
     if (currentStory) {
@@ -408,18 +418,29 @@ export default function StoryViewer() {
             className="flex-row items-center px-3 py-2"
             pointerEvents="box-none"
           >
-            <Avatar className="size-8" alt={currentGroup.authorName}>
-              {currentGroup.authorAvatarUrl ? (
-                <AvatarImage source={{ uri: currentGroup.authorAvatarUrl }} />
-              ) : (
-                <AvatarFallback className="bg-secondary">
-                  <Ionicons name="person" size={16} color="#a1a1aa" />
-                </AvatarFallback>
-              )}
-            </Avatar>
-            <Text className="ml-2 flex-1 text-sm font-semibold text-white">
-              {currentGroup.authorName}
-            </Text>
+            <Pressable
+              onPress={() => {
+                if (isOwnStory) {
+                  router.push("/my-profile");
+                } else {
+                  router.push(`/user/${currentAuthorId}`);
+                }
+              }}
+              className="flex-1 flex-row items-center"
+            >
+              <Avatar className="size-8" alt={currentGroup.authorName}>
+                {currentGroup.authorAvatarUrl ? (
+                  <AvatarImage source={{ uri: currentGroup.authorAvatarUrl }} />
+                ) : (
+                  <AvatarFallback className="bg-secondary">
+                    <Ionicons name="person" size={16} color="#a1a1aa" />
+                  </AvatarFallback>
+                )}
+              </Avatar>
+              <Text className="ml-2 flex-1 text-sm font-semibold text-white">
+                {currentGroup.authorName}
+              </Text>
+            </Pressable>
             {isOwnStory && (
               <Pressable
                 onPress={handleDeleteStory}

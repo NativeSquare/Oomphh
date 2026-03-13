@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import {
   Popover,
+  PopoverClose,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
@@ -240,13 +241,14 @@ export default function UserProfile() {
               <PopoverContent side="bottom" align="end" className="w-auto p-3">
                 <View className="flex-row flex-wrap gap-2">
                   {EMOJI_OPTIONS.map((emoji) => (
-                    <Pressable
-                      key={emoji}
-                      onPress={() => handleTapPress(emoji)}
-                      className="w-12 h-12 items-center justify-center rounded-lg active:opacity-70"
-                    >
-                      <Text className="text-3xl">{emoji}</Text>
-                    </Pressable>
+                    <PopoverClose key={emoji} asChild>
+                      <Pressable
+                        onPress={() => handleTapPress(emoji)}
+                        className="w-12 h-12 items-center justify-center rounded-lg active:opacity-70"
+                      >
+                        <Text className="text-3xl">{emoji}</Text>
+                      </Pressable>
+                    </PopoverClose>
                   ))}
                 </View>
               </PopoverContent>

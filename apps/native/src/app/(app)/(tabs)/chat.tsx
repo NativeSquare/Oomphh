@@ -161,7 +161,7 @@ export default function Chat() {
   };
 
   return (
-    <View className="flex-1">
+    <View className="flex-1 bg-background">
       <View className="px-5 pt-4" style={{ paddingTop: insets.top + 16 }}>
         <View className="flex-row items-center justify-between mb-5">
           <Text className="text-xl font-medium leading-[30px] text-white">

@@ -103,6 +103,7 @@ export function CachedPicturesGrid({
         onLongPress={() => handleLongPress(picture)}
         delayLongPress={300}
         className="relative active:opacity-70"
+        style={{ overflow: "visible" }}
       >
         <Image
           source={{ uri: picture.localUri }}
@@ -169,7 +170,8 @@ export function CachedPicturesGrid({
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 8, paddingHorizontal: 16 }}
+          style={{ overflow: "visible" }}
+          contentContainerStyle={{ gap: 8, paddingHorizontal: 16, paddingTop: 8, paddingRight: 24 }}
         >
           {pictures.map(renderPicture)}
         </ScrollView>
@@ -181,7 +183,7 @@ export function CachedPicturesGrid({
   return (
     <View>
       {renderMultiSelectHeader()}
-      <View className="flex-row flex-wrap gap-2 px-4">
+      <View className="flex-row flex-wrap gap-2 px-4 pt-2 pr-6" style={{ overflow: "visible" }}>
         {pictures.map(renderPicture)}
       </View>
     </View>

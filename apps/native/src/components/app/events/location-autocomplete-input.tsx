@@ -3,9 +3,15 @@ import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { api } from "@packages/backend/convex/_generated/api";
 import { useAction } from "convex/react";
-import { MapPin } from "lucide-react-native";
+import { MapPin, X } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Platform, Pressable, View } from "react-native";
+import {
+  ActivityIndicator,
+  Platform,
+  Pressable,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 type PlacePrediction = {
   place_id: string;
@@ -36,6 +42,9 @@ export type LocationAutocompleteInputProps = {
   onSelect: (place: PlacePrediction) => void;
   placeholder?: string;
   editable?: boolean;
+  onFocus?: () => void;
+  showClear?: boolean;
+  onClear?: () => void;
 };
 
 export function LocationAutocompleteInput({
@@ -44,6 +53,9 @@ export function LocationAutocompleteInput({
   onSelect,
   placeholder = "Search for a location",
   editable = true,
+  onFocus: onFocusProp,
+  showClear,
+  onClear,
 }: LocationAutocompleteInputProps) {
   const [predictions, setPredictions] = useState<PlacePrediction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -141,9 +153,7 @@ export function LocationAutocompleteInput({
 
   return (
     <View style={{ position: "relative", zIndex: 50 }}>
-      <View
-        onLayout={(e) => setInputHeight(e.nativeEvent.layout.height)}
-      >
+      <View onLayout={(e) => setInputHeight(e.nativeEvent.layout.height)}>
         <Input
           value={value}
           onChangeText={onChangeText}
@@ -151,15 +161,25 @@ export function LocationAutocompleteInput({
           editable={editable}
           autoCapitalize="none"
           autoCorrect={false}
+          className={showClear || isLoading ? "pr-9" : undefined}
           onFocus={() => {
             if (predictions.length > 0) setShowDropdown(true);
+            onFocusProp?.();
           }}
         />
-        {isLoading && (
+        {isLoading ? (
           <View className="absolute right-3 top-1/2 -translate-y-1/2">
             <ActivityIndicator size="small" />
           </View>
-        )}
+        ) : showClear ? (
+          <TouchableOpacity
+            onPress={onClear}
+            hitSlop={8}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2"
+          >
+            <Icon as={X} size={16} className="text-muted-foreground" />
+          </TouchableOpacity>
+        ) : null}
       </View>
 
       {showDropdown && predictions.length > 0 && (

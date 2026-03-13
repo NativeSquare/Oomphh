@@ -53,4 +53,6 @@ function PopoverContent({
   );
 }
 
-export { Popover, PopoverContent, PopoverTrigger };
+const PopoverClose = PopoverPrimitive.Close;
+
+export { Popover, PopoverClose, PopoverContent, PopoverTrigger };

@@ -18,19 +18,6 @@ import React from "react";
 import { Alert, ScrollView, View } from "react-native";
 import { EventFilterData } from "../event-filters";
 
-function parseDistanceToMeters(distance: string): number | null {
-  if (!distance || distance === "Any Distance") return null;
-
-  const parts = distance.split(" ");
-  const value = parseFloat(parts[0]);
-  if (isNaN(value)) return null;
-
-  const unit = parts.slice(1).join(" ").toLowerCase();
-  if (unit === "mile" || unit === "miles") return value * 1609.34;
-  if (unit === "km") return value * 1000;
-  return null;
-}
-
 function formatEventDate(timestamp: number): string {
   const date = new Date(timestamp);
   const days = [
@@ -113,16 +100,12 @@ export default function Events() {
     }, [loadFilters, loadSearchLocation]),
   );
 
-  // Build query filters for the backend
-  const distanceMeters = parseDistanceToMeters(filters.distance);
-
   const queryFilters: {
     eventType?: string[];
     dateRange?: string;
-    city?: string;
     searchLatitude?: number;
     searchLongitude?: number;
-    maxDistanceMeters?: number;
+    maxDistance?: number;
   } = {};
 
   if (filters.eventType.length > 0) {
@@ -132,24 +115,22 @@ export default function Events() {
     queryFilters.dateRange = filters.dateRange;
   }
 
-  if (searchLocation && distanceMeters !== null) {
+  if (searchLocation) {
     queryFilters.searchLatitude = searchLocation.latitude;
     queryFilters.searchLongitude = searchLocation.longitude;
-    queryFilters.maxDistanceMeters = distanceMeters;
-  } else if (searchLocation?.name && searchLocation.name !== "My Location") {
-    queryFilters.city = searchLocation.name;
-  } else if (searchLocation?.address) {
-    const parts = searchLocation.address.split(",").map((s) => s.trim());
-    if (parts.length > 0) {
-      queryFilters.city = parts[0];
+  }
+
+  if (filters.distance && filters.distance !== "Any Distance") {
+    const km = parseInt(filters.distance, 10);
+    if (!isNaN(km)) {
+      queryFilters.maxDistance = km * 1000; // convert km to meters
     }
   }
 
   const hasActiveFilters =
     filters.eventType.length > 0 ||
     (filters.dateRange !== "" && filters.dateRange !== "Any Time") ||
-    filters.distance !== "" ||
-    searchLocation !== null;
+    (filters.distance !== "" && filters.distance !== "Any Distance");
 
   const events = useQuery(api.table.events.getEvents, queryFilters);
   const joinEvent = useMutation(api.table.events.joinEvent);
@@ -179,6 +160,7 @@ export default function Events() {
 
   return (
     <ScrollView
+      className="bg-background"
       keyboardShouldPersistTaps="handled"
       contentContainerClassName="items-center p-4 py-8 mt-safe"
       keyboardDismissMode="interactive"

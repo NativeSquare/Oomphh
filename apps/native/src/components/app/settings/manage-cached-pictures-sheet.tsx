@@ -58,8 +58,8 @@ export const ManageCachedPicturesSheet = forwardRef<GorhomBottomSheetModal>(
               </Text>
             </View>
             {cachedPictures.length > 0 && (
-              <Button variant="destructive" size="sm" onPress={handleClearAll}>
-                <Text className="text-sm font-medium text-destructive-foreground">
+              <Button variant="outline" size="sm" onPress={handleClearAll} className="border-destructive">
+                <Text className="text-sm font-medium text-destructive">
                   Clear All
                 </Text>
               </Button>
@@ -74,6 +74,7 @@ export const ManageCachedPicturesSheet = forwardRef<GorhomBottomSheetModal>(
             <ScrollView
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ paddingBottom: 20 }}
+              style={{ overflow: "visible" }}
             >
               <CachedPicturesGrid
                 pictures={cachedPictures}

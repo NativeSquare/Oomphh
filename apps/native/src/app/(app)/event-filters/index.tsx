@@ -6,15 +6,12 @@ import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import {
   DATE_RANGES,
+  DISTANCE_RANGES,
   EVENT_FILTERS_STORAGE_KEY,
   EVENT_TYPES,
-  IMPERIAL_DISTANCES,
-  METRIC_DISTANCES,
 } from "@/constants/events";
-import { api } from "@packages/backend/convex/_generated/api";
 import { BottomSheetModal as GorhomBottomSheetModal } from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useQuery } from "convex/react";
 import { router } from "expo-router";
 import { Calendar, ChevronLeft, MapPin, Tag } from "lucide-react-native";
 import React from "react";
@@ -27,13 +24,6 @@ export type EventFilterData = {
 };
 
 export default function EventFilters() {
-  const user = useQuery(api.table.users.currentUser);
-  const measurementSystem = user?.measurementSystem ?? "imperial";
-  const distances =
-    measurementSystem === "metric"
-      ? [...METRIC_DISTANCES]
-      : [...IMPERIAL_DISTANCES];
-
   const defaultFilters: EventFilterData = {
     eventType: [],
     dateRange: "",
@@ -53,9 +43,9 @@ export default function EventFilters() {
         if (saved) {
           const parsed = JSON.parse(saved);
           setFilters({
-            eventType: parsed.eventType ?? [],
-            dateRange: parsed.dateRange ?? "",
-            distance: parsed.distance ?? "",
+          eventType: parsed.eventType ?? [],
+          dateRange: parsed.dateRange ?? "",
+          distance: parsed.distance ?? "",
           });
         }
       } catch (error) {
@@ -138,18 +128,19 @@ export default function EventFilters() {
               </View>
             </View>
 
-            {/* Location Section */}
+            {/* Distance Section */}
             <View>
-              <PreferenceSectionHeader icon={MapPin} title="Location" />
+              <PreferenceSectionHeader icon={MapPin} title="Distance" />
               <View className="rounded-xl overflow-hidden">
                 <PreferenceRow
-                  label="Distance"
+                  label="Max Distance"
                   values={filters.distance || undefined}
                   onPress={() => distanceSheetRef.current?.present()}
                   isLast
                 />
               </View>
             </View>
+
           </View>
         </View>
       </ScrollView>
@@ -198,8 +189,8 @@ export default function EventFilters() {
 
       <PreferenceSelectionSheet
         bottomSheetRef={distanceSheetRef}
-        title="Distance"
-        options={distances}
+        title="Max Distance"
+        options={[...DISTANCE_RANGES]}
         selectedValues={filters.distance || undefined}
         onSelect={(option) =>
           setFilters({
@@ -208,6 +199,7 @@ export default function EventFilters() {
           })
         }
       />
+
     </View>
   );
 }

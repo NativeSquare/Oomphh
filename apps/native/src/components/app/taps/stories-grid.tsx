@@ -18,6 +18,7 @@ import {
   ActivityIndicator,
   Alert,
   Dimensions,
+  Image as RNImage,
   Pressable,
   View,
 } from "react-native";
@@ -36,6 +37,16 @@ export function StoriesGrid({ user }: StoriesGridProps) {
   const storyGroups = useQuery(
     api.table.geospatial.getNearbyStories,
     user._id ? { userId: user._id } : "skip",
+  );
+
+  const [pendingImageUri, setPendingImageUri] = React.useState<string | null>(
+    null,
+  );
+
+  const viewedStoryIds = useQuery(api.table.storyViews.getViewedStoryIds);
+  const viewedSet = React.useMemo(
+    () => new Set(viewedStoryIds ?? []),
+    [viewedStoryIds],
   );
 
   const currentUserStoryCount =
@@ -60,11 +71,14 @@ export function StoriesGrid({ user }: StoriesGridProps) {
   };
 
   const handleImageSelected = async (image: ImagePickerAsset) => {
+    setPendingImageUri(image.uri);
     try {
       const result = await uploadImageWithId(image.uri);
       await createStory({ imageStorageId: result.storageId });
     } catch (error: any) {
       Alert.alert("Error", error.message ?? "Failed to create story");
+    } finally {
+      setPendingImageUri(null);
     }
   };
 
@@ -98,7 +112,7 @@ export function StoriesGrid({ user }: StoriesGridProps) {
 
   const allGroups = storyGroups;
 
-  if (allGroups.length === 0) {
+  if (allGroups.length === 0 && !pendingImageUri) {
     return (
       <View className="items-center gap-4 py-8">
         <Text className="text-muted-foreground">No stories nearby</Text>
@@ -140,6 +154,27 @@ export function StoriesGrid({ user }: StoriesGridProps) {
         <Text className="text-sm font-medium text-black">Add Story</Text>
       </Pressable>
 
+      {pendingImageUri && currentUserStoryCount === 0 && (
+        <View className="flex-row gap-1.5">
+          <View
+            style={{ width: itemWidth }}
+            className="relative aspect-square overflow-hidden rounded-xl border-2 border-[#E56400]"
+          >
+            <RNImage
+              source={{ uri: pendingImageUri }}
+              style={{ width: "100%", height: "100%" }}
+              resizeMode="cover"
+            />
+            <View className="absolute inset-0 items-center justify-center bg-black/50">
+              <ActivityIndicator size="large" color="#E56400" />
+              <Text className="mt-2 text-xs font-medium text-white">
+                Uploading...
+              </Text>
+            </View>
+          </View>
+        </View>
+      )}
+
       {rows.map((row, rowIndex) => (
         <View key={rowIndex} className="flex-row gap-1.5">
           {row.map((group) => {
@@ -147,15 +182,22 @@ export function StoriesGrid({ user }: StoriesGridProps) {
               (state) => state.userId === group.authorId,
             );
             const isOnline = userPresence?.online ?? false;
-            const displayName =
-              group.authorId === user._id ? "Your Story" : group.authorName;
+            const isOwnGroup = group.authorId === user._id;
+            const displayName = isOwnGroup ? "Your Story" : group.authorName;
+            const hasUnviewed = group.stories.some(
+              (s) => !viewedSet.has(s._id as Id<"stories">),
+            );
+            const isUploadingToThisGroup = isOwnGroup && !!pendingImageUri;
 
             return (
               <Pressable
                 key={group.authorId}
                 onPress={() => handleStoryPress(group.authorId)}
-                style={{ width: itemWidth }}
-                className="relative aspect-square rounded-xl border-2 border-[#E56400]"
+                style={{
+                  width: itemWidth,
+                  borderColor: hasUnviewed ? "#E56400" : "#52525b",
+                }}
+                className="relative aspect-square rounded-xl border-2"
               >
                 <View className="flex-1 overflow-hidden rounded-[10px]">
                   <Avatar
@@ -210,6 +252,14 @@ export function StoriesGrid({ user }: StoriesGridProps) {
                       {group.stories.length === 1 ? "story" : "stories"}
                     </Text>
                   </View>
+                  {isUploadingToThisGroup && (
+                    <View className="absolute inset-0 items-center justify-center rounded-[10px] bg-black/50">
+                      <ActivityIndicator size="large" color="#E56400" />
+                      <Text className="mt-2 text-xs font-medium text-white">
+                        Uploading...
+                      </Text>
+                    </View>
+                  )}
                 </View>
               </Pressable>
             );

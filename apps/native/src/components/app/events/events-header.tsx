@@ -6,7 +6,7 @@ import { EVENT_SEARCH_LOCATION_STORAGE_KEY } from "@/constants/events";
 import { api } from "@packages/backend/convex/_generated/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAction } from "convex/react";
-import { CirclePlus, Settings2, X } from "lucide-react-native";
+import { CirclePlus, Settings2 } from "lucide-react-native";
 import React, { useState } from "react";
 import { View } from "react-native";
 
@@ -33,7 +33,12 @@ export function EventsHeader({
   onLocationChange,
 }: EventsHeaderProps) {
   const [searchText, setSearchText] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
   const placesDetails = useAction(api.table.places.details);
+
+  const locationLabel =
+    searchLocation?.name || searchLocation?.address || "";
+  const displayValue = isEditing ? searchText : locationLabel;
 
   const handlePlaceSelect = async (place: {
     place_id: string;
@@ -68,6 +73,7 @@ export function EventsHeader({
       );
 
       setSearchText("");
+      setIsEditing(false);
       onLocationChange?.(newLocation);
     } catch (error) {
       console.error("Error fetching place details:", error);
@@ -81,7 +87,18 @@ export function EventsHeader({
       console.error("Error clearing location:", error);
     }
     setSearchText("");
+    setIsEditing(false);
     onLocationChange?.(null);
+  };
+
+  const handleChangeText = (text: string) => {
+    setSearchText(text);
+    if (!isEditing) setIsEditing(true);
+  };
+
+  const handleFocus = () => {
+    setIsEditing(true);
+    setSearchText(locationLabel);
   };
 
   return (
@@ -91,19 +108,15 @@ export function EventsHeader({
       <View className="flex-row items-start gap-2" style={{ zIndex: 50 }}>
         <View className="flex-1" style={{ zIndex: 50 }}>
           <LocationAutocompleteInput
-            value={searchText}
-            onChangeText={setSearchText}
+            value={displayValue}
+            onChangeText={handleChangeText}
             onSelect={handlePlaceSelect}
-            placeholder={
-              searchLocation?.name || searchLocation?.address || "Everywhere"
-            }
+            onFocus={handleFocus}
+            placeholder="Search Location"
+            showClear={!!searchLocation && !isEditing}
+            onClear={handleClearLocation}
           />
         </View>
-        {searchLocation && (
-          <Button variant="ghost" size="icon" onPress={handleClearLocation}>
-            <Icon as={X} size={18} />
-          </Button>
-        )}
         <Button
           variant={hasActiveFilters ? "default" : "outline"}
           size="icon"

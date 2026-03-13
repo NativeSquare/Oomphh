@@ -149,7 +149,7 @@ export function BirthLocationField({
   };
 
   return (
-    <View className="gap-2">
+    <View className={`gap-2 ${showDropdown ? "pb-40" : ""}`}>
       <Text className="text-sm text-muted-foreground">
         {label}
         {required && <Text className="text-destructive"> *</Text>}

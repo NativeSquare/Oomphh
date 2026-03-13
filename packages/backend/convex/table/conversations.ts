@@ -202,6 +202,9 @@ export const getConversations = query({
               text: message.text,
               timestamp: message._creationTime,
               isOutgoing: message.senderId === currentUserId,
+              imageUrls: message.imageUrls,
+              viewOnce: message.viewOnce,
+              albumTitle: message.albumTitle,
             };
           }
         }
@@ -221,6 +224,9 @@ export const getConversations = query({
               text: allMessages.text,
               timestamp: allMessages._creationTime,
               isOutgoing: allMessages.senderId === currentUserId,
+              imageUrls: allMessages.imageUrls,
+              viewOnce: allMessages.viewOnce,
+              albumTitle: allMessages.albumTitle,
             };
           }
         }
@@ -252,7 +258,16 @@ export const getConversations = query({
             name: otherUser.name,
             image: imageUrl,
           },
-          lastMessage: lastMessage?.text || null,
+          lastMessage: lastMessage
+            ? lastMessage.text ||
+              (lastMessage.viewOnce
+                ? "View-once photo"
+                : lastMessage.albumTitle
+                  ? `Shared an album: ${lastMessage.albumTitle}`
+                  : lastMessage.imageUrls?.length
+                    ? "Sent a photo"
+                    : null)
+            : null,
           lastMessageTime:
             lastMessage?.timestamp ||
             conversation.lastMessageTime ||

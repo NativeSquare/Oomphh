@@ -1,9 +1,15 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { GeospatialIndex } from "@convex-dev/geospatial";
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
+import { components } from "../_generated/api";
+import { Id } from "../_generated/dataModel";
 import { query } from "../_generated/server";
 import { mutation, triggers } from "../utils/customMutations";
 import { generateFunctions, makePartialSchema } from "../utils/generateFunctions";
+
+const getGeospatial = () =>
+  new GeospatialIndex<Id<"users">>(components.geospatial);
 
 // Cascade deletion: when an event is deleted, delete all its attendees
 triggers.register("events", async (ctx, change) => {
@@ -150,23 +156,34 @@ function calculateDistance(
 }
 
 /**
- * Get non-past events as a flat list, sorted by soonest first.
- * Supports optional filters for eventType, dateRange, city, and distance.
+ * Get non-past events sorted by distance to the search origin.
+ * Falls back to the current user's location when no explicit coordinates are provided.
+ * If no location is available at all, sorts by date (soonest first).
  */
 export const getEvents = query({
   args: {
     eventType: v.optional(v.array(v.string())),
     dateRange: v.optional(v.string()),
-    city: v.optional(v.string()),
     searchLatitude: v.optional(v.number()),
     searchLongitude: v.optional(v.number()),
-    maxDistanceMeters: v.optional(v.number()),
+    maxDistance: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const currentUserId = await getAuthUserId(ctx);
     if (!currentUserId) return [];
 
-    const now = Date.now();
+    // Resolve the search origin: explicit search location > user's current location
+    let searchLat = args.searchLatitude;
+    let searchLng = args.searchLongitude;
+    if (searchLat === undefined || searchLng === undefined) {
+      const userGeo = await getGeospatial().get(ctx, currentUserId);
+      if (userGeo) {
+        searchLat = userGeo.coordinates.latitude;
+        searchLng = userGeo.coordinates.longitude;
+      }
+    }
+    const hasSearchOrigin = searchLat !== undefined && searchLng !== undefined;
+
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 
@@ -187,30 +204,11 @@ export const getEvents = query({
       );
     }
 
-    // Filter by city (case-insensitive substring match on location)
-    if (args.city) {
-      const cityLower = args.city.toLowerCase();
-      filteredEvents = filteredEvents.filter((e) =>
-        e.location.toLowerCase().includes(cityLower)
+    // When we have a search origin, exclude events without coordinates
+    if (hasSearchOrigin) {
+      filteredEvents = filteredEvents.filter(
+        (e) => e.latitude !== undefined && e.longitude !== undefined
       );
-    }
-
-    // Filter by distance from search coordinates
-    if (
-      args.searchLatitude !== undefined &&
-      args.searchLongitude !== undefined &&
-      args.maxDistanceMeters !== undefined
-    ) {
-      filteredEvents = filteredEvents.filter((e) => {
-        if (e.latitude === undefined || e.longitude === undefined) return false;
-        const dist = calculateDistance(
-          args.searchLatitude!,
-          args.searchLongitude!,
-          e.latitude,
-          e.longitude,
-        );
-        return dist <= args.maxDistanceMeters!;
-      });
     }
 
     // Filter by date range
@@ -314,6 +312,8 @@ export const getEvents = query({
           title: event.title,
           date: event.date,
           location: event.location,
+          latitude: event.latitude,
+          longitude: event.longitude,
           imageUrl: event.imageUrl,
           description: event.description,
           eventType: event.eventType,
@@ -333,7 +333,24 @@ export const getEvents = query({
       })
     );
 
-    // Sort by soonest first
+    if (hasSearchOrigin) {
+      const withDistance = enrichedEvents.map((e) => ({
+        ...e,
+        distance: calculateDistance(
+          searchLat!,
+          searchLng!,
+          e.latitude!,
+          e.longitude!,
+        ),
+      }));
+
+      const filtered = args.maxDistance
+        ? withDistance.filter((e) => e.distance <= args.maxDistance!)
+        : withDistance;
+
+      return filtered.sort((a, b) => a.distance - b.distance);
+    }
+
     return enrichedEvents.sort((a, b) => a.date - b.date);
   },
 });

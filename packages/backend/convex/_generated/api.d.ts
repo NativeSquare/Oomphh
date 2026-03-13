@@ -30,6 +30,7 @@ import type * as table_notificationPreferences from "../table/notificationPrefer
 import type * as table_places from "../table/places.js";
 import type * as table_stories from "../table/stories.js";
 import type * as table_storyLikes from "../table/storyLikes.js";
+import type * as table_storyViews from "../table/storyViews.js";
 import type * as table_taps from "../table/taps.js";
 import type * as table_users from "../table/users.js";
 import type * as table_views from "../table/views.js";
@@ -65,6 +66,7 @@ declare const fullApi: ApiFromModules<{
   "table/places": typeof table_places;
   "table/stories": typeof table_stories;
   "table/storyLikes": typeof table_storyLikes;
+  "table/storyViews": typeof table_storyViews;
   "table/taps": typeof table_taps;
   "table/users": typeof table_users;
   "table/views": typeof table_views;

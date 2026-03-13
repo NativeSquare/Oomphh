@@ -11,6 +11,7 @@ import { messages } from "./table/messages";
 import { notificationPreferences } from "./table/notificationPreferences";
 import { stories } from "./table/stories";
 import { storyLikes } from "./table/storyLikes";
+import { storyViews } from "./table/storyViews";
 import { taps } from "./table/taps";
 import { users } from "./table/users";
 import { views } from "./table/views";
@@ -28,6 +29,7 @@ export default defineSchema({
   notificationPreferences,
   stories,
   storyLikes,
+  storyViews,
   taps,
   users,
   views,

@@ -70,8 +70,15 @@ export const deleteStory = mutation({
       throw new Error("Only the author can delete this story");
     }
 
-    // Delete the stored image
     await ctx.storage.delete(story.imageStorageId);
+
+    const views = await ctx.db
+      .query("storyViews")
+      .withIndex("by_storyId", (q) => q.eq("storyId", args.storyId))
+      .collect();
+    for (const view of views) {
+      await ctx.db.delete(view._id);
+    }
 
     await ctx.db.delete(args.storyId);
   },
@@ -92,8 +99,16 @@ export const cleanupExpiredStories = internalMutation({
       .collect();
 
     for (const story of expiredStories) {
-      // Delete the stored image
       await ctx.storage.delete(story.imageStorageId);
+
+      const views = await ctx.db
+        .query("storyViews")
+        .withIndex("by_storyId", (q) => q.eq("storyId", story._id))
+        .collect();
+      for (const view of views) {
+        await ctx.db.delete(view._id);
+      }
+
       await ctx.db.delete(story._id);
     }
 

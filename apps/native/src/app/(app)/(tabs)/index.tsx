@@ -7,6 +7,7 @@ import { useSubscription } from "@/hooks/use-subscription";
 import { cmToFeetInches, kgToLbs } from "@/utils/measurements";
 import { usePresence } from "@convex-dev/presence/react-native";
 import { api } from "@packages/backend/convex/_generated/api";
+import type { Doc } from "@packages/backend/convex/_generated/dataModel";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { useQuery } from "convex/react";
@@ -247,7 +248,44 @@ export default function Home() {
     return Object.keys(result).length > 0 ? result : undefined;
   }, [filters]);
 
-  if (!user?._id) return null;
+  if (!user?._id) return <View className="flex-1 bg-background" />;
+
+  return (
+    <HomeContent
+      user={user}
+      activeFiltersForQuery={activeFiltersForQuery}
+      searchLocation={searchLocation}
+      showFavoritesOnly={showFavoritesOnly}
+      favoriteIds={favoriteIds}
+      hasActiveFilters={hasActiveFilters}
+      activeFilterLabels={activeFilterLabels}
+      handleClearAll={handleClearAll}
+      setShowFavoritesOnly={setShowFavoritesOnly}
+    />
+  );
+}
+
+function HomeContent({
+  user,
+  activeFiltersForQuery,
+  searchLocation,
+  showFavoritesOnly,
+  favoriteIds,
+  hasActiveFilters,
+  activeFilterLabels,
+  handleClearAll,
+  setShowFavoritesOnly,
+}: {
+  user: Doc<"users">;
+  activeFiltersForQuery: Partial<FilterData> | undefined;
+  searchLocation: { latitude: number; longitude: number; name?: string; address?: string } | null;
+  showFavoritesOnly: boolean;
+  favoriteIds: Set<string>;
+  hasActiveFilters: boolean;
+  activeFilterLabels: string[];
+  handleClearAll: () => void;
+  setShowFavoritesOnly: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const presenceState = usePresence(api.presence, "public", user._id);
   const nearestUsers = useQuery(api.table.geospatial.getNearestUsers, {
     id: user._id,
@@ -310,6 +348,7 @@ export default function Home() {
 
   return (
     <ScrollView
+      className="bg-background"
       keyboardShouldPersistTaps="handled"
       contentContainerClassName="sm:flex-1 items-center justify-center p-4 py-8 sm:py-4 sm:p-6 mt-safe"
       keyboardDismissMode="interactive"
