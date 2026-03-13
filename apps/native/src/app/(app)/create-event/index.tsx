@@ -21,14 +21,13 @@ import {
   Alert,
   Image,
   Keyboard,
-  KeyboardAvoidingView,
   Linking,
   Platform,
   Pressable,
-  ScrollView,
   TextInput,
   View,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 export default function CreateEvent() {
   const [title, setTitle] = React.useState("");
@@ -202,18 +201,14 @@ export default function CreateEvent() {
   const isBusy = isSubmitting || isUploading;
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
-    >
       <View className="flex-1 bg-background mt-safe">
-        <ScrollView
+        <KeyboardAwareScrollView
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="interactive"
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ flexGrow: 1 }}
           contentContainerClassName="px-4 pb-6"
+          bottomOffset={120}
         >
           <View className="w-full max-w-md self-center flex-1">
             {/* Header */}
@@ -437,7 +432,7 @@ export default function CreateEvent() {
               />
             </View>
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
 
         {/* Footer */}
         <View className="w-full max-w-md self-center px-4 pb-4 mb-safe">
@@ -512,6 +507,5 @@ export default function CreateEvent() {
           </View>
         </BottomSheetModal>
       </View>
-    </KeyboardAvoidingView>
   );
 }

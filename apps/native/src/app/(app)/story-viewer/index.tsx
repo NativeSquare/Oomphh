@@ -530,7 +530,7 @@ export default function StoryViewer() {
             <Pressable
               onPress={handleLikeStory}
               hitSlop={12}
-              className="rounded-full bg-black/40 p-3"
+              className="p-1"
             >
               <Heart
                 size={26}

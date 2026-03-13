@@ -101,6 +101,11 @@ export function EventsHeader({
     setSearchText(locationLabel);
   };
 
+  const handleBlur = () => {
+    setIsEditing(false);
+    setSearchText("");
+  };
+
   return (
     <View className="gap-3">
       <Text className="text-xl font-medium text-white">Events</Text>
@@ -112,6 +117,7 @@ export function EventsHeader({
             onChangeText={handleChangeText}
             onSelect={handlePlaceSelect}
             onFocus={handleFocus}
+            onBlur={handleBlur}
             placeholder="Search Location"
             showClear={!!searchLocation && !isEditing}
             onClear={handleClearLocation}

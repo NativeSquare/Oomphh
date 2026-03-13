@@ -43,6 +43,7 @@ export type LocationAutocompleteInputProps = {
   placeholder?: string;
   editable?: boolean;
   onFocus?: () => void;
+  onBlur?: () => void;
   showClear?: boolean;
   onClear?: () => void;
 };
@@ -54,6 +55,7 @@ export function LocationAutocompleteInput({
   placeholder = "Search for a location",
   editable = true,
   onFocus: onFocusProp,
+  onBlur: onBlurProp,
   showClear,
   onClear,
 }: LocationAutocompleteInputProps) {
@@ -64,6 +66,7 @@ export function LocationAutocompleteInput({
   const placesAutocomplete = useAction(api.table.places.autocomplete);
   const sessionTokenRef = useRef<string>(makeSessionToken());
   const isSelectingRef = useRef(false);
+  const isFocusedRef = useRef(false);
 
   // Reset session token when input is cleared
   useEffect(() => {
@@ -81,6 +84,9 @@ export function LocationAutocompleteInput({
       isSelectingRef.current = false;
       return;
     }
+
+    // Don't fetch if input is not focused (e.g. value changed from parent on navigation)
+    if (!isFocusedRef.current) return;
 
     let cancelled = false;
 
@@ -163,8 +169,17 @@ export function LocationAutocompleteInput({
           autoCorrect={false}
           className={showClear || isLoading ? "pr-9" : undefined}
           onFocus={() => {
+            isFocusedRef.current = true;
             if (predictions.length > 0) setShowDropdown(true);
             onFocusProp?.();
+          }}
+          onBlur={() => {
+            isFocusedRef.current = false;
+            // Delay to allow dropdown item press to register before hiding
+            setTimeout(() => {
+              setShowDropdown(false);
+            }, 150);
+            onBlurProp?.();
           }}
         />
         {isLoading ? (
