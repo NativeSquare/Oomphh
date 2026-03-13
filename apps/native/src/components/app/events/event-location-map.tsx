@@ -14,12 +14,25 @@ export type EventLocationMapProps = {
 
 const DELTA = 0.005;
 
+function isValidCoordinate(lat?: number, lng?: number): boolean {
+  return (
+    lat !== undefined &&
+    lng !== undefined &&
+    Number.isFinite(lat) &&
+    Number.isFinite(lng) &&
+    lat >= -90 &&
+    lat <= 90 &&
+    lng >= -180 &&
+    lng <= 180
+  );
+}
+
 export function EventLocationMap({
   latitude,
   longitude,
   location,
 }: EventLocationMapProps) {
-  if (!latitude || !longitude) {
+  if (!isValidCoordinate(latitude, longitude)) {
     return (
       <View className="h-[124px] rounded-[10px] bg-[#1a1a1e] overflow-hidden items-center justify-center">
         <Ionicons name="map-outline" size={40} color="#70707b" />

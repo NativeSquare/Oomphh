@@ -26,17 +26,24 @@ export async function sendNotification(
 
   if (prefs && !prefs[args.category]) return;
 
-  await pushNotifications.sendPushNotification(ctx, {
-    userId: args.userId,
-    notification: {
-      title: args.title,
-      body: args.body,
-      data: args.data,
-      sound: "default",
-      priority: "high",
-      channelId: "default",
-    },
-  });
+  try {
+    await pushNotifications.sendPushNotification(ctx, {
+      userId: args.userId,
+      notification: {
+        title: args.title,
+        body: args.body,
+        data: args.data,
+        sound: "default",
+        priority: "high",
+        channelId: "default",
+      },
+    });
+  } catch (error) {
+    console.error(
+      `Failed to send ${args.category} push notification to user ${args.userId}:`,
+      error,
+    );
+  }
 }
 
 export const recordToken = mutation({

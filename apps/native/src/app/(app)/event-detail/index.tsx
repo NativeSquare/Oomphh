@@ -1,5 +1,6 @@
 import { AttendeeAvatars } from "@/components/app/events/attendee-avatars";
 import { EventLocationMap } from "@/components/app/events/event-location-map";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
@@ -69,10 +70,21 @@ function formatEventDate(timestamp: number): string {
   return `${dayName}, ${monthName} ${dayOfMonth} · ${displayHours}:${displayMinutes} ${ampm}`;
 }
 
-export default function EventDetail() {
+export default function EventDetailScreen() {
+  return (
+    <ErrorBoundary>
+      <EventDetail />
+    </ErrorBoundary>
+  );
+}
+
+function EventDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const [isJoining, setIsJoining] = React.useState(false);
+  const [heroImageFailed, setHeroImageFailed] = React.useState(false);
+  const [organizerAvatarFailed, setOrganizerAvatarFailed] =
+    React.useState(false);
   const { capabilities } = useSubscription();
 
   const event = useQuery(
@@ -141,11 +153,12 @@ export default function EventDetail() {
       >
         {/* Hero Image */}
         <View className="relative h-[280px]">
-          {event.imageUrl ? (
+          {event.imageUrl && !heroImageFailed ? (
             <Image
               source={{ uri: event.imageUrl }}
               className="w-full h-full rounded-b-2xl"
               resizeMode="cover"
+              onError={() => setHeroImageFailed(true)}
             />
           ) : (
             <View className="w-full h-full rounded-b-2xl bg-[#1a1a1e] items-center justify-center">
@@ -356,10 +369,11 @@ export default function EventDetail() {
               Organizer
             </Text>
             <View className="flex-row items-center gap-2">
-              {event.organizerAvatarUrl ? (
+              {event.organizerAvatarUrl && !organizerAvatarFailed ? (
                 <Image
                   source={{ uri: event.organizerAvatarUrl }}
                   className="size-10 rounded-full"
+                  onError={() => setOrganizerAvatarFailed(true)}
                 />
               ) : (
                 <View className="size-10 rounded-full bg-[#1a1a1e] items-center justify-center">
