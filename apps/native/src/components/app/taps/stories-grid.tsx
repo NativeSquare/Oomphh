@@ -1,6 +1,7 @@
 import { UploadMediaBottomSheetModal } from "@/components/shared/upload-media-bottom-sheet-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Text } from "@/components/ui/text";
+import { useSubscription } from "@/hooks/use-subscription";
 import { useUploadImage } from "@/hooks/use-upload-image";
 import { usePresence } from "@convex-dev/presence/react-native";
 import { api } from "@packages/backend/convex/_generated/api";
@@ -30,13 +31,31 @@ export function StoriesGrid({ user }: StoriesGridProps) {
   const { uploadImageWithId, isUploading } = useUploadImage();
   const createStory = useMutation(api.table.stories.createStory);
   const presenceState = usePresence(api.presence, "public", user._id);
+  const { capabilities } = useSubscription();
 
   const storyGroups = useQuery(
     api.table.geospatial.getNearbyStories,
     user._id ? { userId: user._id } : "skip",
   );
 
+  const currentUserStoryCount =
+    storyGroups?.find((g) => g.authorId === user._id)?.stories.length ?? 0;
+
   const handleAddStoryPress = () => {
+    if (currentUserStoryCount >= capabilities.maxStories) {
+      Alert.alert(
+        "Story Limit Reached",
+        `You can have up to ${capabilities.maxStories} active stories on your current plan. Upgrade to add more.`,
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Upgrade",
+            onPress: () => router.push("/paywall" as any),
+          },
+        ],
+      );
+      return;
+    }
     uploadMediaRef.current?.present();
   };
 

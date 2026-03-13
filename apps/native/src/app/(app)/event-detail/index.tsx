@@ -3,6 +3,7 @@ import { EventLocationMap } from "@/components/app/events/event-location-map";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { useSubscription } from "@/hooks/use-subscription";
 import { api } from "@packages/backend/convex/_generated/api";
 import { Id } from "@packages/backend/convex/_generated/dataModel";
 import { Ionicons } from "@expo/vector-icons";
@@ -11,6 +12,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import {
   ArrowLeft,
   Clock,
+  Crown,
   ExternalLink,
   Facebook,
   Globe,
@@ -71,16 +73,30 @@ export default function EventDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const [isJoining, setIsJoining] = React.useState(false);
+  const { capabilities } = useSubscription();
 
   const event = useQuery(
     api.table.events.getEvent,
     id ? { eventId: id as Id<"events"> } : "skip",
   );
+  const myRSVPCount = useQuery(api.table.events.getMyRSVPCount);
   const joinEvent = useMutation(api.table.events.joinEvent);
   const leaveEvent = useMutation(api.table.events.leaveEvent);
 
   const handleJoinLeave = async () => {
     if (!event || !id) return;
+
+    if (!event.hasJoined && (myRSVPCount ?? 0) >= capabilities.maxEventRSVPs) {
+      Alert.alert(
+        "RSVP Limit Reached",
+        `You can RSVP to up to ${capabilities.maxEventRSVPs} events on your current plan. Upgrade to join more.`,
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Upgrade", onPress: () => router.push("/paywall" as any) },
+        ],
+      );
+      return;
+    }
 
     setIsJoining(true);
     try {
@@ -207,10 +223,22 @@ export default function EventDetail() {
                 Attendees ({event.totalAttendees}
                 {event.maxAttendees ? `/${event.maxAttendees}` : ""})
               </Text>
-              <AttendeeAvatars
-                avatars={event.attendeeAvatars}
-                totalCount={event.totalAttendees}
-              />
+              {capabilities.eventParticipantsVisible ? (
+                <AttendeeAvatars
+                  avatars={event.attendeeAvatars}
+                  totalCount={event.totalAttendees}
+                />
+              ) : (
+                <Pressable
+                  onPress={() => router.push("/paywall" as any)}
+                  className="flex-row items-center gap-2 rounded-xl bg-secondary/30 px-3 py-3"
+                >
+                  <Icon as={Crown} size={18} className="text-[#e56400]" />
+                  <Text className="text-sm text-[#e56400]">
+                    Upgrade to see attendees
+                  </Text>
+                </Pressable>
+              )}
             </View>
           )}
 

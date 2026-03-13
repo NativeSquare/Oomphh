@@ -1,13 +1,14 @@
 import { StoryProgressBar } from "@/components/app/stories/story-progress-bar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Text } from "@/components/ui/text";
+import { useSubscription } from "@/hooks/use-subscription";
 import { api } from "@packages/backend/convex/_generated/api";
 import { Id } from "@packages/backend/convex/_generated/dataModel";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "convex/react";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import { Heart, Send } from "lucide-react-native";
+import { Crown, Heart, Send } from "lucide-react-native";
 import React from "react";
 import {
   ActivityIndicator,
@@ -39,6 +40,7 @@ export default function StoryViewer() {
 
   const insets = useSafeAreaInsets();
   const screenWidth = Dimensions.get("window").width;
+  const { capabilities } = useSubscription();
 
   // Parse author IDs from params
   const authorIds: Id<"users">[] = React.useMemo(() => {
@@ -453,7 +455,17 @@ export default function StoryViewer() {
             }}
             pointerEvents="box-none"
           >
-            {sentFeedback ? (
+            {!capabilities.storyMessagingAllowed ? (
+              <Pressable
+                onPress={() => router.push("/paywall" as any)}
+                className="flex-1 flex-row items-center justify-center gap-2 rounded-full border border-white/30 bg-black/40 px-4 py-3"
+              >
+                <Crown size={16} color="#e56400" />
+                <Text className="text-sm font-medium text-[#e56400]">
+                  Upgrade to message from stories
+                </Text>
+              </Pressable>
+            ) : sentFeedback ? (
               <View className="flex-1 flex-row items-center justify-center rounded-full border border-white/30 bg-black/40 px-4 py-3">
                 <Text className="text-sm font-medium text-white">
                   Message sent!

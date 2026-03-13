@@ -11,6 +11,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { useDisappearingPhotoCount } from "@/hooks/use-disappearing-photo-count";
+import { useSubscription } from "@/hooks/use-subscription";
 import { useUploadImage } from "@/hooks/use-upload-image";
 import { formatChatTimestamp } from "@/utils/formatChatTimestamp";
 import { getConvexErrorMessage } from "@/utils/getConvexErrorMessage";
@@ -45,6 +47,11 @@ export default function ChatDetail() {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [attachedImageUris, setAttachedImageUris] = useState<string[]>([]);
   const [isViewOnce, setIsViewOnce] = useState(false);
+  const { capabilities } = useSubscription();
+  const { count: disappearingPhotosSent, increment: incrementDisappearingCount } =
+    useDisappearingPhotoCount();
+  const canSendDisappearingPhoto =
+    disappearingPhotosSent < capabilities.maxDisappearingPhotos;
   const uploadMediaBottomSheetRef = useRef<BottomSheetModal>(null);
   const selectAlbumModalRef = useRef<BottomSheetModal>(null);
 
@@ -198,15 +205,22 @@ export default function ChatDetail() {
         uploadedImageUrls = await uploadImages(attachedImageUris);
       }
 
+      const sendAsViewOnce = hasImages && isViewOnce;
+
       await sendMessage({
         otherUserId,
         text: message,
         imageUrls: uploadedImageUrls,
-        viewOnce: hasImages ? isViewOnce : false,
+        viewOnce: sendAsViewOnce,
       });
+
+      if (sendAsViewOnce) {
+        await incrementDisappearingCount();
+      }
+
       setMessage("");
       setAttachedImageUris([]);
-      setIsViewOnce(false); // Reset view-once after sending
+      setIsViewOnce(false);
     } catch (error) {
       setError(getConvexErrorMessage(error));
       console.error("Error sending message:", error);
@@ -485,7 +499,13 @@ export default function ChatDetail() {
             onRemoveImage={handleRemoveImage}
             isLoading={isUploading}
             isViewOnce={isViewOnce}
-            onToggleViewOnce={() => setIsViewOnce(!isViewOnce)}
+            onToggleViewOnce={() => {
+              if (!isViewOnce && !canSendDisappearingPhoto) {
+                router.push("/paywall" as any);
+                return;
+              }
+              setIsViewOnce(!isViewOnce);
+            }}
             showViewOnceOption
           />
         </View>

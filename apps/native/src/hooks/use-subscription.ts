@@ -4,23 +4,19 @@ import {
   useRevenueCat,
   type SubscriptionTier,
 } from "@/lib/revenue-cat";
+import { SUBSCRIPTION_CAPABILITIES } from "@/lib/subscription-capabilities";
 import { useCallback, useState } from "react";
 import { Alert, Platform } from "react-native";
 import Purchases, {
   type PurchasesPackage,
 } from "react-native-purchases";
 
-const GRID_LIMITS: Record<SubscriptionTier, number> = {
-  free: 15,
-  premium: 30,
-  unlimited: Infinity,
-};
-
 export function useSubscription() {
   const { customerInfo, tier, currentOffering, isReady } = useRevenueCat();
   const [isPurchasing, setIsPurchasing] = useState(false);
 
-  const gridLimit = GRID_LIMITS[tier];
+  const capabilities = SUBSCRIPTION_CAPABILITIES[tier];
+  const gridLimit = capabilities.gridLimit;
 
   const purchasePackage = useCallback(
     async (pkg: PurchasesPackage) => {
@@ -66,7 +62,6 @@ export function useSubscription() {
     }
   }, []);
 
-  // Match by product identifier — consistent across test store and production
   const findPackage = (id: string) =>
     currentOffering?.availablePackages?.find(
       (pkg) => pkg.product.identifier === id,
@@ -94,6 +89,7 @@ export function useSubscription() {
     isPurchasing,
     customerInfo,
     currentOffering,
+    capabilities,
     gridLimit,
     premiumPackage,
     unlimitedPackage,

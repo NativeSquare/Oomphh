@@ -3,6 +3,7 @@ import { UploadMediaBottomSheetModal } from "@/components/shared/upload-media-bo
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { useSubscription } from "@/hooks/use-subscription";
 import { useUploadImage } from "@/hooks/use-upload-image";
 import { getConvexErrorMessage } from "@/utils/getConvexErrorMessage";
 import { api } from "@packages/backend/convex/_generated/api";
@@ -13,7 +14,7 @@ import type { ImagePickerAsset } from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import { ArrowLeft, Image as ImageIcon, Plus } from "lucide-react-native";
 import { useRef, useState } from "react";
-import { Image, Pressable, ScrollView, View } from "react-native";
+import { Alert, Image, Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AlbumDetail() {
@@ -27,6 +28,7 @@ export default function AlbumDetail() {
   );
   const setCoverPhoto = useMutation(api.table.albums.setCoverPhoto);
   const { uploadImage, isUploading } = useUploadImage();
+  const { capabilities } = useSubscription();
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedPhotoIds, setSelectedPhotoIds] = useState<
     Set<Id<"albumPhotos">>
@@ -56,6 +58,18 @@ export default function AlbumDetail() {
   };
 
   const handleAddPhotoPress = () => {
+    const currentPhotoCount = album?.photoCount ?? 0;
+    if (currentPhotoCount >= capabilities.maxPhotosPerAlbum) {
+      Alert.alert(
+        "Photo Limit Reached",
+        `You can have up to ${capabilities.maxPhotosPerAlbum} photos per album on your current plan. Upgrade to add more.`,
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Upgrade", onPress: () => router.push("/paywall" as any) },
+        ],
+      );
+      return;
+    }
     uploadMediaBottomSheetRef.current?.present();
   };
 

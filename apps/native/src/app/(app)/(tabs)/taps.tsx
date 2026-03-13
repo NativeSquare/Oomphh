@@ -1,14 +1,16 @@
 import { StoriesGrid } from "@/components/app/taps/stories-grid";
 import { SearchInput } from "@/components/custom/search-input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { useSubscription } from "@/hooks/use-subscription";
 import { formatRelativeTime } from "@/utils/formatRelativeTime";
 import { api } from "@packages/backend/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import { Eye, Heart } from "lucide-react-native";
+import { Crown, Eye, Heart } from "lucide-react-native";
 import React, { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -21,6 +23,7 @@ export default function Taps() {
   const insets = useSafeAreaInsets();
   const { tab } = useLocalSearchParams<{ tab?: string }>();
   const [activeTab, setActiveTab] = useState<TabType>("Taps");
+  const { capabilities } = useSubscription();
 
   // Sync the tab search param to the active tab state
   React.useEffect(() => {
@@ -46,6 +49,12 @@ export default function Taps() {
     );
   }, [taps, searchQuery]);
 
+  const visibleTaps = React.useMemo(() => {
+    return filteredTaps.slice(0, capabilities.tapsVisible);
+  }, [filteredTaps, capabilities.tapsVisible]);
+
+  const hasMoreTaps = filteredTaps.length > capabilities.tapsVisible;
+
   const filteredViews = React.useMemo(() => {
     if (!views) return [];
     if (!searchQuery.trim()) return views;
@@ -55,6 +64,12 @@ export default function Taps() {
       view.fromUser?.name?.toLowerCase().includes(query),
     );
   }, [views, searchQuery]);
+
+  const visibleViews = React.useMemo(() => {
+    return filteredViews.slice(0, capabilities.viewsVisible);
+  }, [filteredViews, capabilities.viewsVisible]);
+
+  const hasMoreViews = filteredViews.length > capabilities.viewsVisible;
 
   const filteredStoryLikes = React.useMemo(() => {
     if (!storyLikes) return [];
@@ -132,7 +147,7 @@ export default function Taps() {
           {/* Taps List */}
           {activeTab === "Taps" && (
             <View className="gap-0">
-              {filteredTaps.length === 0 ? (
+              {visibleTaps.length === 0 ? (
                 <View className="py-8 items-center">
                   <Text className="text-muted-foreground">
                     {taps === undefined
@@ -143,59 +158,83 @@ export default function Taps() {
                   </Text>
                 </View>
               ) : (
-                filteredTaps.map((tap, index) => {
-                  const isFirst = index === 0;
-                  const isLast = index === filteredTaps.length - 1;
-                  const borderRadius = {
-                    ...(isFirst && {
-                      borderTopLeftRadius: 16,
-                      borderTopRightRadius: 16,
-                    }),
-                    ...(isLast && {
-                      borderBottomLeftRadius: 16,
-                      borderBottomRightRadius: 16,
-                    }),
-                  };
+                <>
+                  {visibleTaps.map((tap, index) => {
+                    const isFirst = index === 0;
+                    const isLast =
+                      index === visibleTaps.length - 1 && !hasMoreTaps;
+                    const borderRadius = {
+                      ...(isFirst && {
+                        borderTopLeftRadius: 16,
+                        borderTopRightRadius: 16,
+                      }),
+                      ...(isLast && {
+                        borderBottomLeftRadius: 16,
+                        borderBottomRightRadius: 16,
+                      }),
+                    };
 
-                  return (
-                    <Pressable
-                      key={tap._id}
-                      onPress={() => router.push(`/user/${tap.fromUser?._id}`)}
-                      className="bg-card border border-border flex-row gap-3 items-start p-4 active:opacity-80"
-                      style={borderRadius}
-                    >
-                      <Avatar
-                        className="size-10 rounded-full shrink-0"
-                        alt={tap.fromUser?.name ?? "Unknown User"}
+                    return (
+                      <Pressable
+                        key={tap._id}
+                        onPress={() =>
+                          router.push(`/user/${tap.fromUser?._id}`)
+                        }
+                        className="bg-card border border-border flex-row gap-3 items-start p-4 active:opacity-80"
+                        style={borderRadius}
                       >
-                        <AvatarImage
-                          source={{ uri: tap.fromUser?.image ?? undefined }}
-                        />
-                        <AvatarFallback className="bg-secondary rounded-full">
-                          <Text className="text-muted-foreground">
-                            {tap.fromUser?.name?.[0]?.toUpperCase() ?? "?"}
+                        <Avatar
+                          className="size-10 rounded-full shrink-0"
+                          alt={tap.fromUser?.name ?? "Unknown User"}
+                        >
+                          <AvatarImage
+                            source={{ uri: tap.fromUser?.image ?? undefined }}
+                          />
+                          <AvatarFallback className="bg-secondary rounded-full">
+                            <Text className="text-muted-foreground">
+                              {tap.fromUser?.name?.[0]?.toUpperCase() ?? "?"}
+                            </Text>
+                          </AvatarFallback>
+                        </Avatar>
+                        <View className="flex-1 gap-0.5">
+                          <Text className="text-sm font-medium text-white">
+                            {tap.fromUser?.name ?? "Unknown User"}
                           </Text>
-                        </AvatarFallback>
-                      </Avatar>
-                      <View className="flex-1 gap-0.5">
-                        <Text className="text-sm font-medium text-white">
-                          {tap.fromUser?.name ?? "Unknown User"}
-                        </Text>
-                        <Text className="text-xs leading-[18px] text-card-foreground">
-                          sent you a tap
-                        </Text>
-                      </View>
-                      <View className="items-end gap-1 shrink-0">
-                        <Text className="text-xs leading-[18px] text-muted-foreground">
-                          {formatRelativeTime(tap._creationTime)}
-                        </Text>
-                        <View className="size-6 items-center justify-center">
-                          <Text className="text-base">{tap.emoji}</Text>
+                          <Text className="text-xs leading-[18px] text-card-foreground">
+                            sent you a tap
+                          </Text>
                         </View>
-                      </View>
+                        <View className="items-end gap-1 shrink-0">
+                          <Text className="text-xs leading-[18px] text-muted-foreground">
+                            {formatRelativeTime(tap._creationTime)}
+                          </Text>
+                          <View className="size-6 items-center justify-center">
+                            <Text className="text-base">{tap.emoji}</Text>
+                          </View>
+                        </View>
+                      </Pressable>
+                    );
+                  })}
+                  {hasMoreTaps && (
+                    <Pressable
+                      onPress={() => router.push("/paywall" as any)}
+                      className="bg-card border border-border p-4 items-center gap-2"
+                      style={{
+                        borderBottomLeftRadius: 16,
+                        borderBottomRightRadius: 16,
+                      }}
+                    >
+                      <Icon
+                        as={Crown}
+                        size={20}
+                        className="text-[#e56400]"
+                      />
+                      <Text className="text-sm font-medium text-[#e56400]">
+                        Upgrade to see all {filteredTaps.length} taps
+                      </Text>
                     </Pressable>
-                  );
-                })
+                  )}
+                </>
               )}
             </View>
           )}
@@ -203,7 +242,7 @@ export default function Taps() {
           {/* Views List */}
           {activeTab === "Views" && (
             <View className="gap-0">
-              {filteredViews.length === 0 ? (
+              {visibleViews.length === 0 ? (
                 <View className="py-8 items-center">
                   <Text className="text-muted-foreground">
                     {views === undefined
@@ -214,63 +253,87 @@ export default function Taps() {
                   </Text>
                 </View>
               ) : (
-                filteredViews.map((view, index) => {
-                  const isFirst = index === 0;
-                  const isLast = index === filteredViews.length - 1;
-                  const borderRadius = {
-                    ...(isFirst && {
-                      borderTopLeftRadius: 16,
-                      borderTopRightRadius: 16,
-                    }),
-                    ...(isLast && {
-                      borderBottomLeftRadius: 16,
-                      borderBottomRightRadius: 16,
-                    }),
-                  };
+                <>
+                  {visibleViews.map((view, index) => {
+                    const isFirst = index === 0;
+                    const isLast =
+                      index === visibleViews.length - 1 && !hasMoreViews;
+                    const borderRadius = {
+                      ...(isFirst && {
+                        borderTopLeftRadius: 16,
+                        borderTopRightRadius: 16,
+                      }),
+                      ...(isLast && {
+                        borderBottomLeftRadius: 16,
+                        borderBottomRightRadius: 16,
+                      }),
+                    };
 
-                  return (
-                    <Pressable
-                      key={view._id}
-                      onPress={() => router.push(`/user/${view.fromUser?._id}`)}
-                      className="bg-card border border-border flex-row gap-3 items-start p-4 active:opacity-80"
-                      style={borderRadius}
-                    >
-                      <Avatar
-                        className="size-10 rounded-full shrink-0"
-                        alt={view.fromUser?.name ?? "Unknown User"}
+                    return (
+                      <Pressable
+                        key={view._id}
+                        onPress={() =>
+                          router.push(`/user/${view.fromUser?._id}`)
+                        }
+                        className="bg-card border border-border flex-row gap-3 items-start p-4 active:opacity-80"
+                        style={borderRadius}
                       >
-                        <AvatarImage
-                          source={{ uri: view.fromUser?.image ?? undefined }}
-                        />
-                        <AvatarFallback className="bg-secondary rounded-full">
-                          <Text className="text-muted-foreground">
-                            {view.fromUser?.name?.[0]?.toUpperCase() ?? "?"}
-                          </Text>
-                        </AvatarFallback>
-                      </Avatar>
-                      <View className="flex-1 gap-0.5">
-                        <Text className="text-sm font-medium text-white">
-                          {view.fromUser?.name ?? "Unknown User"}
-                        </Text>
-                        <Text className="text-xs leading-[18px] text-card-foreground">
-                          Has viewed your profile
-                        </Text>
-                      </View>
-                      <View className="items-end gap-1 shrink-0">
-                        <Text className="text-xs leading-[18px] text-muted-foreground">
-                          {formatRelativeTime(view._creationTime)}
-                        </Text>
-                        <View className="size-6 items-center justify-center">
-                          <Icon
-                            as={Eye}
-                            size={16}
-                            className="text-muted-foreground"
+                        <Avatar
+                          className="size-10 rounded-full shrink-0"
+                          alt={view.fromUser?.name ?? "Unknown User"}
+                        >
+                          <AvatarImage
+                            source={{ uri: view.fromUser?.image ?? undefined }}
                           />
+                          <AvatarFallback className="bg-secondary rounded-full">
+                            <Text className="text-muted-foreground">
+                              {view.fromUser?.name?.[0]?.toUpperCase() ?? "?"}
+                            </Text>
+                          </AvatarFallback>
+                        </Avatar>
+                        <View className="flex-1 gap-0.5">
+                          <Text className="text-sm font-medium text-white">
+                            {view.fromUser?.name ?? "Unknown User"}
+                          </Text>
+                          <Text className="text-xs leading-[18px] text-card-foreground">
+                            Has viewed your profile
+                          </Text>
                         </View>
-                      </View>
+                        <View className="items-end gap-1 shrink-0">
+                          <Text className="text-xs leading-[18px] text-muted-foreground">
+                            {formatRelativeTime(view._creationTime)}
+                          </Text>
+                          <View className="size-6 items-center justify-center">
+                            <Icon
+                              as={Eye}
+                              size={16}
+                              className="text-muted-foreground"
+                            />
+                          </View>
+                        </View>
+                      </Pressable>
+                    );
+                  })}
+                  {hasMoreViews && (
+                    <Pressable
+                      onPress={() => router.push("/paywall" as any)}
+                      className="bg-card border border-border p-4 items-center gap-2"
+                      style={{
+                        borderBottomLeftRadius: 16,
+                        borderBottomRightRadius: 16,
+                      }}
+                    >
+                      <Icon
+                        as={Crown}
+                        size={20}
+                        className="text-[#e56400]"
+                      />
+                      <Text className="text-sm font-medium text-[#e56400]">
+                        Upgrade to see all {filteredViews.length} views
+                      </Text>
                     </Pressable>
-                  );
-                })
+                  )}
+                </>
               )}
             </View>
           )}

@@ -260,13 +260,23 @@ export default function Home() {
       : undefined,
   });
 
-  const { gridLimit } = useSubscription();
+  const { gridLimit, capabilities } = useSubscription();
 
   const displayUsers = useMemo(() => {
     if (!nearestUsers) return undefined;
-    if (!showFavoritesOnly) return nearestUsers;
-    return nearestUsers.filter((u) => favoriteIds.has(u._id));
-  }, [nearestUsers, showFavoritesOnly, favoriteIds]);
+    let users = nearestUsers;
+
+    if (showFavoritesOnly) {
+      users = users.filter((u) => favoriteIds.has(u._id));
+    }
+
+    // Apply remote browsing limit when using a custom search location
+    if (searchLocation && isFinite(capabilities.remoteBrowsingLimit)) {
+      users = users.slice(0, capabilities.remoteBrowsingLimit);
+    }
+
+    return users;
+  }, [nearestUsers, showFavoritesOnly, favoriteIds, searchLocation, capabilities.remoteBrowsingLimit]);
 
   const { visibleUsers, lockedUsers } = useMemo(() => {
     if (!displayUsers) return { visibleUsers: undefined, lockedUsers: [] };

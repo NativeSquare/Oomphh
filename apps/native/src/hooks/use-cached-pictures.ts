@@ -4,7 +4,7 @@ import * as React from "react";
 
 const CACHE_STORAGE_KEY = "cached_pictures";
 const CACHE_DIRECTORY = `${FileSystem.cacheDirectory}cached_pictures/`;
-const MAX_CACHED_PICTURES = 20;
+const DEFAULT_MAX_CACHED_PICTURES = 20;
 
 export type CachedPicture = {
   id: string;
@@ -45,8 +45,9 @@ export type AddToCacheParams = {
 /**
  * Hook for managing locally cached pictures.
  * Pictures are stored in the app's cache directory with metadata in AsyncStorage.
+ * @param maxCachedPictures - Maximum number of cached pictures allowed (defaults to 20).
  */
-export function useCachedPictures() {
+export function useCachedPictures(maxCachedPictures = DEFAULT_MAX_CACHED_PICTURES) {
   const [cachedPictures, setCachedPictures] = React.useState<CachedPicture[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -109,9 +110,9 @@ export function useCachedPictures() {
         let updatedPictures = [newPicture, ...currentPictures];
 
         // Enforce max limit - remove oldest pictures if over limit
-        if (updatedPictures.length > MAX_CACHED_PICTURES) {
-          const picturesToRemove = updatedPictures.slice(MAX_CACHED_PICTURES);
-          updatedPictures = updatedPictures.slice(0, MAX_CACHED_PICTURES);
+        if (updatedPictures.length > maxCachedPictures) {
+          const picturesToRemove = updatedPictures.slice(maxCachedPictures);
+          updatedPictures = updatedPictures.slice(0, maxCachedPictures);
 
           // Delete old files
           for (const pic of picturesToRemove) {

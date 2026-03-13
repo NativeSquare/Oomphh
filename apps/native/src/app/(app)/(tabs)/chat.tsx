@@ -5,6 +5,7 @@ import { DeleteAlbumBottomSheet } from "@/components/app/chat/delete-album-botto
 import { SearchInput } from "@/components/custom/search-input";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { useSubscription } from "@/hooks/use-subscription";
 import { formatChatListTimestamp } from "@/utils/formatChatTimestamp";
 import { getConvexErrorMessage } from "@/utils/getConvexErrorMessage";
 import { api } from "@packages/backend/convex/_generated/api";
@@ -14,7 +15,7 @@ import { useMutation, useQuery } from "convex/react";
 import { router } from "expo-router";
 import { Plus } from "lucide-react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { Alert, Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type ChatTabType = "Chats" | "Album";
@@ -24,6 +25,7 @@ export default function Chat() {
   const [activeTab, setActiveTab] = useState<ChatTabType>("Chats");
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateAlbumModalOpen, setIsCreateAlbumModalOpen] = useState(false);
+  const { capabilities } = useSubscription();
   const deleteAlbumSheetRef = useRef<GorhomBottomSheetModal>(null);
   const [albumToDelete, setAlbumToDelete] = useState<{
     id: Id<"albums">;
@@ -104,6 +106,18 @@ export default function Chat() {
   );
 
   const handleCreateAlbum = () => {
+    const albumCount = albums?.length ?? 0;
+    if (albumCount >= capabilities.maxAlbums) {
+      Alert.alert(
+        "Album Limit Reached",
+        `You can create up to ${capabilities.maxAlbums} album${capabilities.maxAlbums === 1 ? "" : "s"} on your current plan. Upgrade to create more.`,
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Upgrade", onPress: () => router.push("/paywall" as any) },
+        ],
+      );
+      return;
+    }
     setIsCreateAlbumModalOpen(true);
   };
 

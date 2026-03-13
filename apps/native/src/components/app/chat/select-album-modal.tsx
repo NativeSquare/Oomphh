@@ -3,6 +3,8 @@ import { SearchInput } from "@/components/custom/search-input";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { useSubscription } from "@/hooks/use-subscription";
+import type { AlbumVisibilityOption } from "@/lib/subscription-capabilities";
 import { api } from "@packages/backend/convex/_generated/api";
 import type { Id } from "@packages/backend/convex/_generated/dataModel";
 import { BottomSheetModal as GorhomBottomSheetModal } from "@gorhom/bottom-sheet";
@@ -27,12 +29,17 @@ export type AppAlbum = {
   thumbnailUrls: string[];
 };
 
-// Duration options in milliseconds
-const DURATION_OPTIONS = [
-  { label: "1 hour", value: 1 * 60 * 60 * 1000 },
-  { label: "24 hours", value: 24 * 60 * 60 * 1000 },
-  { label: "7 days", value: 7 * 24 * 60 * 60 * 1000 },
-  { label: "30 days", value: 30 * 24 * 60 * 60 * 1000 },
+// Duration options mapped to visibility capability keys
+const ALL_DURATION_OPTIONS: {
+  key: AlbumVisibilityOption;
+  label: string;
+  value: number;
+}[] = [
+  { key: "10min", label: "10 minutes", value: 10 * 60 * 1000 },
+  { key: "1hour", label: "1 hour", value: 1 * 60 * 60 * 1000 },
+  { key: "24hours", label: "24 hours", value: 24 * 60 * 60 * 1000 },
+  { key: "viewOnce", label: "View once", value: 1 },
+  { key: "unlimited", label: "Unlimited", value: 0 },
 ];
 
 type ModalStep = "select-album" | "select-duration";
@@ -51,6 +58,15 @@ export function SelectAlbumModal({
   const [selectedAlbumId, setSelectedAlbumId] =
     React.useState<Id<"albums"> | null>(null);
   const [searchQuery, setSearchQuery] = React.useState("");
+  const { capabilities } = useSubscription();
+
+  const durationOptions = React.useMemo(
+    () =>
+      ALL_DURATION_OPTIONS.filter((opt) =>
+        capabilities.albumVisibilityOptions.includes(opt.key),
+      ),
+    [capabilities.albumVisibilityOptions],
+  );
 
   // Fetch albums from Convex
   const albums = useQuery(api.table.albums.getAlbums);
@@ -310,9 +326,9 @@ export function SelectAlbumModal({
                 How long should the recipient have access to this album?
               </Text>
               <View className="gap-3">
-                {DURATION_OPTIONS.map((option) => (
+                {durationOptions.map((option) => (
                   <Pressable
-                    key={option.value}
+                    key={option.key}
                     onPress={() => handleDurationSelect(option.value)}
                     className="bg-[#1a1a1e] border border-[#26272b] rounded-xl px-4 py-4 active:opacity-70"
                   >

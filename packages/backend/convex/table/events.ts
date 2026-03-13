@@ -620,3 +620,29 @@ export const deleteEvent = mutation({
     await ctx.db.delete(args.eventId);
   },
 });
+
+/**
+ * Get the number of upcoming events the current user has RSVPed to.
+ */
+export const getMyRSVPCount = query({
+  args: {},
+  handler: async (ctx) => {
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) return 0;
+
+    const rsvps = await ctx.db
+      .query("eventAttendees")
+      .withIndex("userId", (q) => q.eq("userId", currentUserId))
+      .collect();
+
+    const now = Date.now();
+    let count = 0;
+    for (const rsvp of rsvps) {
+      const event = await ctx.db.get(rsvp.eventId);
+      if (event && event.date >= now) {
+        count++;
+      }
+    }
+    return count;
+  },
+});

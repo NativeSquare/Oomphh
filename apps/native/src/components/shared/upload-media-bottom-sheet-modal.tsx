@@ -8,6 +8,7 @@ import {
     type CachedPicture,
     useCachedPictures,
 } from "@/hooks/use-cached-pictures";
+import { useSubscription } from "@/hooks/use-subscription";
 import { BottomSheetModal as GorhomBottomSheetModal } from "@gorhom/bottom-sheet";
 import type { CameraCapturedPicture } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
@@ -43,8 +44,9 @@ export function UploadMediaBottomSheetModal({
   cacheOnSelect = false,
 }: UploadMediaBottomSheetModalProps) {
   const [showCamera, setShowCamera] = React.useState(false);
+  const { capabilities } = useSubscription();
 
-  const { cachedPictures, addToCache } = useCachedPictures();
+  const { cachedPictures, addToCache } = useCachedPictures(capabilities.maxCachedPhotos);
 
   const handleCachedPictureSelect = (picture: CachedPicture) => {
     const imageAsset: ImagePicker.ImagePickerAsset = {
@@ -138,12 +140,16 @@ export function UploadMediaBottomSheetModal({
         return;
       }
 
+      const maxSelection = allowsMultipleSelection
+        ? (isFinite(capabilities.maxPhotosPerSend) ? capabilities.maxPhotosPerSend : 10)
+        : 1;
+
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsMultipleSelection: allowsMultipleSelection,
         allowsEditing: allowsEditing,
         quality: 1.0,
-        selectionLimit: allowsMultipleSelection ? 10 : 1,
+        selectionLimit: maxSelection,
       });
 
       if (!result.canceled && result.assets.length > 0) {

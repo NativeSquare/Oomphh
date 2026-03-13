@@ -2,6 +2,7 @@ import { BottomSheetModal } from "@/components/custom/bottom-sheet";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useCachedPictures } from "@/hooks/use-cached-pictures";
+import { useSubscription } from "@/hooks/use-subscription";
 import { BottomSheetModal as GorhomBottomSheetModal } from "@gorhom/bottom-sheet";
 import { forwardRef } from "react";
 import { ActivityIndicator, Alert, ScrollView, View } from "react-native";
@@ -9,8 +10,9 @@ import { CachedPicturesGrid } from "./cached-pictures-grid";
 
 export const ManageCachedPicturesSheet = forwardRef<GorhomBottomSheetModal>(
   (_, ref) => {
+    const { capabilities } = useSubscription();
     const { cachedPictures, isLoading, removeFromCache, clearCache } =
-      useCachedPictures();
+      useCachedPictures(capabilities.maxCachedPhotos);
 
     const handleDelete = (id: string) => {
       Alert.alert(

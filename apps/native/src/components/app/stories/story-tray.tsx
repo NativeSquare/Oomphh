@@ -1,4 +1,5 @@
 import { UploadMediaBottomSheetModal } from "@/components/shared/upload-media-bottom-sheet-modal";
+import { useSubscription } from "@/hooks/use-subscription";
 import { useUploadImage } from "@/hooks/use-upload-image";
 import { api } from "@packages/backend/convex/_generated/api";
 import { Doc, Id } from "@packages/backend/convex/_generated/dataModel";
@@ -22,6 +23,7 @@ export function StoryTray({ user, searchLocation }: StoryTrayProps) {
   const uploadMediaRef = React.useRef<GorhomBottomSheetModal>(null);
   const { uploadImageWithId, isUploading } = useUploadImage();
   const createStory = useMutation(api.table.stories.createStory);
+  const { capabilities } = useSubscription();
 
   const currentUserAvatarUrl = useQuery(
     api.storage.getImageUrl,
@@ -38,10 +40,27 @@ export function StoryTray({ user, searchLocation }: StoryTrayProps) {
       : "skip",
   );
 
-  const currentUserHasStories =
-    storyGroups?.some((group) => group.authorId === user._id) ?? false;
+  const currentUserStoryGroup = storyGroups?.find(
+    (group) => group.authorId === user._id,
+  );
+  const currentUserHasStories = !!currentUserStoryGroup;
+  const currentStoryCount = currentUserStoryGroup?.stories.length ?? 0;
 
   const handleAddStoryPress = () => {
+    if (currentStoryCount >= capabilities.maxStories) {
+      Alert.alert(
+        "Story Limit Reached",
+        `You can have up to ${capabilities.maxStories} active stories on your current plan. Upgrade to add more.`,
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Upgrade",
+            onPress: () => router.push("/paywall" as any),
+          },
+        ],
+      );
+      return;
+    }
     uploadMediaRef.current?.present();
   };
 

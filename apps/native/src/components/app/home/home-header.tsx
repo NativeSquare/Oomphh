@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { useSubscription } from "@/hooks/use-subscription";
 import { api } from "@packages/backend/convex/_generated/api";
 import { Doc } from "@packages/backend/convex/_generated/dataModel";
 import { Ionicons } from "@expo/vector-icons";
@@ -35,12 +36,17 @@ export function HomeHeader({
   onFavoritesToggle,
 }: HomeHeaderProps) {
   const router = useRouter();
+  const { capabilities } = useSubscription();
   const imageUrl = useQuery(
     api.storage.getImageUrl,
     user.profilePictures?.[0] ? { storageId: user.profilePictures[0] } : "skip",
   );
 
   const handleLocationPress = () => {
+    if (!capabilities.remoteBrowsing) {
+      router.push("/paywall" as any);
+      return;
+    }
     router.push("/location-search");
   };
 
