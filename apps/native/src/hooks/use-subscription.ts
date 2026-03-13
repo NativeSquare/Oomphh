@@ -67,13 +67,26 @@ export function useSubscription() {
   }, []);
 
   // Match by product identifier — consistent across test store and production
-  const premiumPackage = currentOffering?.availablePackages?.find(
-    (pkg) => pkg.product.identifier === "com.oomphh.premium_monthly",
-  ) ?? null;
+  const findPackage = (id: string) =>
+    currentOffering?.availablePackages?.find(
+      (pkg) => pkg.product.identifier === id,
+    ) ?? null;
 
-  const unlimitedPackage = currentOffering?.availablePackages?.find(
-    (pkg) => pkg.product.identifier === "com.oomphh.unlimited_monthly",
-  ) ?? null;
+  const premiumPackage = findPackage("com.oomphh.premium_monthly");
+  const unlimitedPackage = findPackage("com.oomphh.unlimited_monthly");
+
+  const packages = {
+    premium: {
+      monthly: premiumPackage,
+      quarterly: findPackage("com.oomphh.premium_quarterly"),
+      annually: findPackage("com.oomphh.premium_annually"),
+    },
+    unlimited: {
+      monthly: unlimitedPackage,
+      quarterly: findPackage("com.oomphh.unlimited_quarterly"),
+      annually: findPackage("com.oomphh.unlimited_annually"),
+    },
+  };
 
   return {
     isReady,
@@ -84,6 +97,7 @@ export function useSubscription() {
     gridLimit,
     premiumPackage,
     unlimitedPackage,
+    packages,
     purchasePackage,
     restorePurchases,
   };

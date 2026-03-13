@@ -20,6 +20,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 type PlanId = "premium" | "unlimited";
+type BillingPeriod = "monthly" | "quarterly" | "annually";
 
 interface PlanDisplayInfo {
   id: PlanId;
@@ -29,12 +30,24 @@ interface PlanDisplayInfo {
   trial: string | null;
 }
 
+const PERIOD_LABELS: Record<BillingPeriod, string> = {
+  monthly: "Monthly",
+  quarterly: "Quarterly",
+  annually: "Annually",
+};
+
 const FEATURES = [
   "Unlimited Access to All Content",
   "Exclusive Premium Stories",
   "Advanced Filters & Customization",
   "Ad-Free Experience",
 ];
+
+const PERIOD_TEXT: Record<string, string> = {
+  P1M: "month",
+  P3M: "quarter",
+  P1Y: "year",
+};
 
 function getPlanFromPackage(
   pkg: PurchasesPackage,
@@ -52,7 +65,7 @@ function getPlanFromPackage(
     id: planId,
     name: planId === "premium" ? "Premium Plan" : "Unlimited Plan",
     price: product.priceString,
-    period: `Per ${product.subscriptionPeriod === "P1M" ? "month" : product.subscriptionPeriod}`,
+    period: `Per ${PERIOD_TEXT[product.subscriptionPeriod ?? ""] ?? product.subscriptionPeriod}`,
     trial: trialText,
   };
 }
@@ -61,29 +74,40 @@ export default function PaywallScreen() {
   const insets = useSafeAreaInsets();
   const {
     isReady,
-    premiumPackage,
-    unlimitedPackage,
+    packages,
     purchasePackage,
     restorePurchases,
     isPurchasing,
   } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<PlanId>("unlimited");
+  const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>("monthly");
 
   const plans = useMemo(() => {
     const result: PlanDisplayInfo[] = [];
-    if (premiumPackage) {
-      result.push(getPlanFromPackage(premiumPackage, "premium"));
+    const premiumPkg = packages.premium[billingPeriod];
+    const unlimitedPkg = packages.unlimited[billingPeriod];
+    if (premiumPkg) {
+      result.push(getPlanFromPackage(premiumPkg, "premium"));
     }
-    if (unlimitedPackage) {
-      result.push(getPlanFromPackage(unlimitedPackage, "unlimited"));
+    if (unlimitedPkg) {
+      result.push(getPlanFromPackage(unlimitedPkg, "unlimited"));
     }
     return result;
-  }, [premiumPackage, unlimitedPackage]);
+  }, [packages, billingPeriod]);
 
-  const packagesAvailable = !!(premiumPackage || unlimitedPackage);
+  // Determine which billing periods are available (have at least one package)
+  const availablePeriods = useMemo(() => {
+    const periods: BillingPeriod[] = [];
+    for (const period of ["monthly", "quarterly", "annually"] as const) {
+      if (packages.premium[period] || packages.unlimited[period]) {
+        periods.push(period);
+      }
+    }
+    return periods;
+  }, [packages]);
 
   const handlePurchase = async () => {
-    const pkg = selectedPlan === "premium" ? premiumPackage : unlimitedPackage;
+    const pkg = packages[selectedPlan][billingPeriod];
     if (!pkg) {
       Alert.alert(
         "Not Available",
@@ -172,6 +196,32 @@ export default function PaywallScreen() {
               </View>
             ))}
           </View>
+
+          {/* Billing Period Toggle */}
+          {availablePeriods.length > 1 && (
+            <View className="flex-row rounded-xl bg-secondary/30 p-1 mb-6">
+              {availablePeriods.map((period) => {
+                const isActive = billingPeriod === period;
+                return (
+                  <Pressable
+                    key={period}
+                    onPress={() => setBillingPeriod(period)}
+                    className={`flex-1 items-center py-2.5 rounded-lg ${
+                      isActive ? "bg-[#e56400]" : ""
+                    }`}
+                  >
+                    <Text
+                      className={`text-sm font-semibold ${
+                        isActive ? "text-white" : "text-muted-foreground"
+                      }`}
+                    >
+                      {PERIOD_LABELS[period]}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          )}
 
           {/* Plan Selection */}
           <View className="gap-3 mb-8">

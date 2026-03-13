@@ -125,15 +125,65 @@ const FIRST_NAMES = [
 ];
 
 const BODY_TYPES = ["Slim", "Average", "Athletic", "Muscular", "Stocky"];
-const ORIENTATIONS = ["Gay", "Bisexual", "Queer", "Pansexual"];
-const POSITIONS = ["Top", "Bottom", "Versatile", "Side"];
-const LOOKING_FOR_OPTIONS = ["Connections", "Friends", "Dating"];
+const ORIENTATIONS = ["Straight", "Gay", "Bisexual", "Queer", "Pansexual", "Asexual", "Demisexual", "Ask Me"];
+const POSITIONS = ["Top", "Bottom", "Versatile", "Vers Top", "Vers Bottom", "Side", "Ask Me", "Not Specified"];
+const LOOKING_FOR_OPTIONS = ["Chat", "Dates", "Friends", "Networking", "Relationship", "Hookups", "Not Specified"];
 const ETHNICITIES = [
   "Asian", "Black", "Latino/Hispanic", "Middle Eastern", "Mixed",
-  "Pacific Islander", "South Asian", "White", "Other",
+  "Native American", "Pacific Islander", "South Asian", "White", "Other",
 ];
 const RELATIONSHIP_STATUSES = [
-  "Single", "In a relationship", "Open relationship", "Married",
+  "Single", "Dating", "Committed", "Open relationship", "Married", "Partnered", "Polyamorous",
+];
+
+const TAP_EMOJIS = ["🍸", "❤️‍🔥", "❌", "😈", "⚡"];
+
+const SEED_EVENTS = [
+  {
+    title: "Friday Night Out",
+    location: "Le Marais, Paris",
+    latitude: 48.8566,
+    longitude: 2.3522,
+    description: "Join us for a fun night out in Le Marais! Drinks, music, and great vibes.",
+    eventType: "Party",
+    maxAttendees: 50,
+  },
+  {
+    title: "Brunch & Chill",
+    location: "Shoreditch, London",
+    latitude: 51.5235,
+    longitude: -0.0765,
+    description: "Relaxed brunch meetup. Great food, great company.",
+    eventType: "Food & Drinks",
+    maxAttendees: 20,
+  },
+  {
+    title: "Beach Volleyball Tournament",
+    location: "Bondi Beach, Sydney",
+    latitude: -33.8915,
+    longitude: 151.2767,
+    description: "Friendly volleyball tournament followed by a BBQ. All levels welcome!",
+    eventType: "Sports",
+    maxAttendees: 30,
+  },
+  {
+    title: "Art Gallery Opening",
+    location: "Chelsea, New York",
+    latitude: 40.7465,
+    longitude: -74.0014,
+    description: "Exclusive opening night at a contemporary art gallery. Wine and canapes provided.",
+    eventType: "Art & Culture",
+    maxAttendees: 40,
+  },
+  {
+    title: "Rooftop Party",
+    location: "Kreuzberg, Berlin",
+    latitude: 52.4966,
+    longitude: 13.3904,
+    description: "Summer rooftop party with DJ sets and panoramic city views.",
+    eventType: "Music",
+    maxAttendees: 100,
+  },
 ];
 
 // Number of unique profile pictures to fetch from randomuser.me (portraits 0-99 available)
@@ -324,6 +374,89 @@ export const createSeedUsers = internalMutation({
       await geospatial.insert(ctx, userId, { latitude: authUser.lat, longitude: authUser.lng }, {});
       count++;
     }
+
+    // Collect all seed user IDs for seeding views, taps, stories, events
+    const allSeedUsers = await ctx.db
+      .query("users")
+      .filter((q) => q.neq(q.field("email"), "maxime.gey@nativesquare.fr"))
+      .filter((q) => q.neq(q.field("email"), "testuser@oomphh.cz"))
+      .collect();
+
+    // Find Maxime's user ID
+    const maximeUser = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), "maxime.gey@nativesquare.fr"))
+      .first();
+
+    if (maximeUser && allSeedUsers.length >= 10) {
+      // Seed 10 views from mock users to Maxime's profile
+      for (let i = 0; i < 10; i++) {
+        await ctx.db.insert("views", {
+          fromUserId: allSeedUsers[i]._id,
+          toUserId: maximeUser._id,
+        });
+      }
+      console.log("Seeded 10 views to Maxime's profile.");
+
+      // Seed 10 taps from mock users to Maxime's profile
+      for (let i = 0; i < 10; i++) {
+        await ctx.db.insert("taps", {
+          fromUserId: allSeedUsers[i + 10]._id,
+          toUserId: maximeUser._id,
+          emoji: TAP_EMOJIS[i % TAP_EMOJIS.length],
+        });
+      }
+      console.log("Seeded 10 taps to Maxime's profile.");
+    }
+
+    // Seed 20 stories from mock users (reuse profile picture storage IDs)
+    if (args.profilePictureIds.length > 0) {
+      const now = Date.now();
+      const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+      for (let i = 0; i < 20 && i < allSeedUsers.length; i++) {
+        await ctx.db.insert("stories", {
+          authorId: allSeedUsers[i]._id,
+          imageStorageId: args.profilePictureIds[i % args.profilePictureIds.length],
+          expiresAt: now + TWENTY_FOUR_HOURS_MS,
+        });
+      }
+      console.log("Seeded 20 stories from mock users.");
+    }
+
+    // Seed 5 events from mock users
+    for (let i = 0; i < SEED_EVENTS.length && i < allSeedUsers.length; i++) {
+      const event = SEED_EVENTS[i];
+      const now = Date.now();
+      // Schedule events 1-7 days in the future
+      const eventDate = now + (i + 1) * 24 * 60 * 60 * 1000;
+
+      const eventId = await ctx.db.insert("events", {
+        organizerId: allSeedUsers[i]._id,
+        title: event.title,
+        location: event.location,
+        latitude: event.latitude,
+        longitude: event.longitude,
+        date: eventDate,
+        description: event.description,
+        eventType: event.eventType,
+        maxAttendees: event.maxAttendees,
+      });
+
+      // Organizer auto-joins
+      await ctx.db.insert("eventAttendees", {
+        eventId,
+        userId: allSeedUsers[i]._id,
+      });
+
+      // Add a few random attendees
+      for (let j = 1; j <= 3 && i + j < allSeedUsers.length; j++) {
+        await ctx.db.insert("eventAttendees", {
+          eventId,
+          userId: allSeedUsers[i + j]._id,
+        });
+      }
+    }
+    console.log("Seeded 5 events from mock users.");
 
     console.log(`Seeded ${count} preview users (including ${AUTH_USERS.length} with login) across ${new Set(SEED_USERS.map((u) => u.city)).size}+ cities.`);
     return { seeded: true, count };
