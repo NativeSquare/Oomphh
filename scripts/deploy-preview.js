@@ -22,7 +22,7 @@ function run(command, args, opts = {}) {
 }
 
 // Step 1 — Deploy Convex backend to preview (capture output to extract URL)
-console.log("=== Step 1/3: Deploying Convex backend to preview ===");
+console.log("=== Step 1/4: Deploying Convex backend to preview ===");
 const deployResult = run("pnpm", ["run", "deploy:preview"], {
   cwd: BACKEND_DIR,
   stdio: ["inherit", "pipe", "pipe"],
@@ -46,7 +46,7 @@ const convexUrl = urlMatch[0];
 console.log(`\nExtracted Convex URL: ${convexUrl}`);
 
 // Step 2 — Update EAS environment variable with the new URL
-console.log("\n=== Step 2/3: Updating EAS environment variable ===");
+console.log("\n=== Step 2/4: Updating EAS environment variable ===");
 run(
   "eas",
   [
@@ -62,7 +62,15 @@ run(
   { cwd: NATIVE_DIR, stdio: "inherit" },
 );
 
-// Step 3 — Publish EAS update
+// Step 3 — Seed preview database with fake users
+console.log("\n=== Step 3/4: Seeding preview database ===");
+run(
+  "pnpm",
+  ["exec", "convex", "run", "--preview-name", "preview", "seed:seedPreviewUsers"],
+  { cwd: BACKEND_DIR, stdio: "inherit" },
+);
+
+// Step 4 — Publish EAS update
 const commitMsg = spawnSync("git", ["log", "-1", "--format=%s"], {
   encoding: "utf-8",
   shell: true,
@@ -74,7 +82,7 @@ if (commitMsg) {
   updateArgs.push("--message", `"${commitMsg}"`);
 }
 
-console.log("\n=== Step 3/3: Publishing EAS update ===");
+console.log("\n=== Step 4/4: Publishing EAS update ===");
 run("eas", updateArgs, {
   cwd: NATIVE_DIR,
   stdio: "inherit",
