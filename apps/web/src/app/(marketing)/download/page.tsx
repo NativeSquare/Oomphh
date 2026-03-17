@@ -3,8 +3,8 @@ import Image from "next/image";
 import { Apple, Smartphone } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Download — Oomphh",
-  description: "Download the Oomphh app for iOS and Android. Find your people.",
+  title: "Download — OOmphh",
+  description: "Download the OOmphh app for iOS and Android. Find your people.",
 };
 
 export default function DownloadPage() {
@@ -19,7 +19,7 @@ export default function DownloadPage() {
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <div className="text-center">
             <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-              Download Oomphh
+              Download OOmphh
             </h1>
             <p className="mt-4 text-lg text-muted-foreground">
               Get the app and start meeting your people.
@@ -82,7 +82,7 @@ export default function DownloadPage() {
               >
                 <Image
                   src={src}
-                  alt="Oomphh app preview"
+                  alt="OOmphh app preview"
                   width={180}
                   height={360}
                   className="w-full object-cover"
@@ -96,7 +96,7 @@ export default function DownloadPage() {
               Coming soon to iOS and Android
             </h2>
             <p className="mt-2 text-muted-foreground">
-              Oomphh is in development. Follow along for launch updates.
+              OOmphh is in development. Follow along for launch updates.
             </p>
           </div>
         </div>

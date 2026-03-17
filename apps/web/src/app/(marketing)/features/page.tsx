@@ -55,7 +55,7 @@ const features: Array<{
 ];
 
 export const metadata: Metadata = {
-  title: "Features — Oomphh",
+  title: "Features — OOmphh",
   description:
     "Explore features: Who's Nearby, events, stories, and smart filters. Built for real connection.",
 };
@@ -108,7 +108,7 @@ export default function FeaturesPage() {
                       >
                         <Image
                           src={img}
-                          alt={`Oomphh app - ${feature.title}`}
+                          alt={`OOmphh app - ${feature.title}`}
                           width={220}
                           height={440}
                           className="w-full object-cover"

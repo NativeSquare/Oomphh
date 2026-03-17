@@ -37,39 +37,6 @@ export default function ContactPage() {
                   info@oomphh.cz
                 </a>
               </div>
-
-              <div>
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-[#FF9A56]">
-                  Support
-                </h2>
-                <a
-                  href="mailto:info@oomphh.cz"
-                  className="mt-2 block text-lg text-foreground transition-colors hover:text-[#FF9A56]"
-                >
-                  info@oomphh.cz
-                </a>
-              </div>
-
-              <div>
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-[#FF9A56]">
-                  Press &amp; media
-                </h2>
-                <a
-                  href="mailto:info@oomphh.cz"
-                  className="mt-2 block text-lg text-foreground transition-colors hover:text-[#FF9A56]"
-                >
-                  info@oomphh.cz
-                </a>
-              </div>
-
-              <div>
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-[#FF9A56]">
-                  Location
-                </h2>
-                <p className="mt-2 text-lg text-muted-foreground">
-                  Prague, Czech Republic
-                </p>
-              </div>
             </div>
 
             {submitted ? (

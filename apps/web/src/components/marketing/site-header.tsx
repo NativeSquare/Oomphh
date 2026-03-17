@@ -22,7 +22,7 @@ export function SiteHeader() {
         <Link href="/" className="flex items-center gap-1.5">
           <img
             src={LOGO_SRC}
-            alt="oomphh"
+            alt="OOmphh"
             className="h-7 object-contain sm:h-8"
             style={{ mixBlendMode: "lighten" }}
           />

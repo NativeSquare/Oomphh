@@ -50,7 +50,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   userInterfaceStyle: "dark",
   newArchEnabled: true,
   ios: {
-    supportsTablet: true,
+    supportsTablet: false,
     userInterfaceStyle: "dark",
     bundleIdentifier: getUniqueIdentifier(),
     icon: "./assets/images/oomphh-ios.png",

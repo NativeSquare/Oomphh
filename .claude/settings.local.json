@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/Users/geyma/Projects/Oomphh -type f \\\\\\(-name *.json -o -name *.ts -o -name *.tsx -o -name *.js -o -name *.plist \\\\\\) -not -path */node_modules/* -not -path */.next/* -not -path */dist/*)"
+    ]
+  }
+}

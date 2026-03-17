@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Oomphh — Date people around you",
+  title: "OOmphh — Date people around you",
   description:
     "Meet compatible people nearby in real-time. Personality-first matching, so you skip the small talk and meet people who actually get you.",
 };

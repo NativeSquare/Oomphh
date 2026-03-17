@@ -39,7 +39,7 @@ export function SiteFooter() {
           <div className="mb-3.5 flex items-center gap-1.5">
             <img
               src={LOGO_SRC}
-              alt="oomphh"
+              alt="OOmphh"
               className="h-6 object-contain"
               style={{ mixBlendMode: "lighten" }}
             />
@@ -88,7 +88,7 @@ export function SiteFooter() {
       </div>
 
       <div className="mx-auto mt-9 max-w-[1200px] border-t border-white/[0.04] pt-5 text-center text-[11.5px] font-light text-white/[0.18]">
-        © {new Date().getFullYear()} oomphh, Inc. All rights reserved.
+        © {new Date().getFullYear()} OOmphh, Inc. All rights reserved.
       </div>
     </footer>
   );

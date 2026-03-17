@@ -28,7 +28,7 @@ const steps = [
 ];
 
 export const metadata: Metadata = {
-  title: "How it works — Oomphh",
+  title: "How it works — OOmphh",
   description:
     "Explore, connect, meet. Simple steps to find your people and make it happen.",
 };
