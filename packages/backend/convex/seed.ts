@@ -221,7 +221,7 @@ function randomBirthDate(rand: () => number): string {
  */
 export const seedPreviewUsers = internalAction({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx): Promise<{ seeded: boolean; count: number }> => {
     // Check if already seeded
     const alreadySeeded: boolean = await ctx.runQuery(
       internal.seed.isAlreadySeeded,
