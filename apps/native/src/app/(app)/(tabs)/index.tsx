@@ -50,6 +50,7 @@ export default function Home() {
   };
   const [filters, setFilters] = React.useState<FilterData>(defaultFilters);
   const [showFavoritesOnly, setShowFavoritesOnly] = React.useState(false);
+  const [showOnlineOnly, setShowOnlineOnly] = React.useState(false);
   const [searchLocation, setSearchLocation] =
     React.useState<SearchLocation | null>(null);
   const favorites = useQuery(api.table.users.getFavorites);
@@ -207,12 +208,17 @@ export default function Home() {
       labels.push("Favorites");
     }
 
+    if (showOnlineOnly) {
+      labels.push("Online");
+    }
+
     return labels;
-  }, [filters, measurementSystem, showFavoritesOnly]);
+  }, [filters, measurementSystem, showFavoritesOnly, showOnlineOnly]);
 
   const handleClearAll = async () => {
     setFilters(defaultFilters);
     setShowFavoritesOnly(false);
+    setShowOnlineOnly(false);
     try {
       await AsyncStorage.setItem(
         FILTERS_STORAGE_KEY,
@@ -256,11 +262,13 @@ export default function Home() {
       activeFiltersForQuery={activeFiltersForQuery}
       searchLocation={searchLocation}
       showFavoritesOnly={showFavoritesOnly}
+      showOnlineOnly={showOnlineOnly}
       favoriteIds={favoriteIds}
       hasActiveFilters={hasActiveFilters}
       activeFilterLabels={activeFilterLabels}
       handleClearAll={handleClearAll}
       setShowFavoritesOnly={setShowFavoritesOnly}
+      setShowOnlineOnly={setShowOnlineOnly}
     />
   );
 }
@@ -270,21 +278,25 @@ function HomeContent({
   activeFiltersForQuery,
   searchLocation,
   showFavoritesOnly,
+  showOnlineOnly,
   favoriteIds,
   hasActiveFilters,
   activeFilterLabels,
   handleClearAll,
   setShowFavoritesOnly,
+  setShowOnlineOnly,
 }: {
   user: Doc<"users">;
   activeFiltersForQuery: Partial<FilterData> | undefined;
   searchLocation: { latitude: number; longitude: number; name?: string; address?: string } | null;
   showFavoritesOnly: boolean;
+  showOnlineOnly: boolean;
   favoriteIds: Set<string>;
   hasActiveFilters: boolean;
   activeFilterLabels: string[];
   handleClearAll: () => void;
   setShowFavoritesOnly: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowOnlineOnly: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const presenceState = usePresence(api.presence, "public", user._id);
   const nearestUsers = useQuery(api.table.geospatial.getNearestUsers, {
@@ -308,13 +320,23 @@ function HomeContent({
       users = users.filter((u) => favoriteIds.has(u._id));
     }
 
+    if (showOnlineOnly) {
+      users = users.filter((u) => {
+        if (u.privacy?.hideOnlineStatus === true) return false;
+        const presence = (presenceState || []).find(
+          (state) => state.userId === u._id,
+        );
+        return presence?.online ?? false;
+      });
+    }
+
     // Apply remote browsing limit when using a custom search location
     if (searchLocation && isFinite(capabilities.remoteBrowsingLimit)) {
       users = users.slice(0, capabilities.remoteBrowsingLimit);
     }
 
     return users;
-  }, [nearestUsers, showFavoritesOnly, favoriteIds, searchLocation, capabilities.remoteBrowsingLimit]);
+  }, [nearestUsers, showFavoritesOnly, showOnlineOnly, favoriteIds, presenceState, searchLocation, capabilities.remoteBrowsingLimit]);
 
   const { visibleUsers, lockedUsers } = useMemo(() => {
     if (!displayUsers) return { visibleUsers: undefined, lockedUsers: [] };
@@ -361,6 +383,8 @@ function HomeContent({
           onFilterPress={() => router.push("/filters")}
           showFavoritesOnly={showFavoritesOnly}
           onFavoritesToggle={() => setShowFavoritesOnly((prev) => !prev)}
+          showOnlineOnly={showOnlineOnly}
+          onOnlineToggle={() => setShowOnlineOnly((prev) => !prev)}
         />
         <HomeFiltersRow
           activeFilterLabels={activeFilterLabels}

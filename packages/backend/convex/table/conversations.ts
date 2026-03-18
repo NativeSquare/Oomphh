@@ -205,6 +205,7 @@ export const getConversations = query({
               imageUrls: message.imageUrls,
               viewOnce: message.viewOnce,
               albumTitle: message.albumTitle,
+              hasLocation: message.latitude !== undefined && message.longitude !== undefined,
             };
           }
         }
@@ -227,6 +228,7 @@ export const getConversations = query({
               imageUrls: allMessages.imageUrls,
               viewOnce: allMessages.viewOnce,
               albumTitle: allMessages.albumTitle,
+              hasLocation: allMessages.latitude !== undefined && allMessages.longitude !== undefined,
             };
           }
         }
@@ -262,11 +264,13 @@ export const getConversations = query({
             ? lastMessage.text ||
               (lastMessage.viewOnce
                 ? "View-once photo"
-                : lastMessage.albumTitle
-                  ? `Shared an album: ${lastMessage.albumTitle}`
-                  : lastMessage.imageUrls?.length
-                    ? "Sent a photo"
-                    : null)
+                : lastMessage.hasLocation
+                  ? "Shared a location"
+                  : lastMessage.albumTitle
+                    ? `Shared an album: ${lastMessage.albumTitle}`
+                    : lastMessage.imageUrls?.length
+                      ? "Sent a photo"
+                      : null)
             : null,
           lastMessageTime:
             lastMessage?.timestamp ||

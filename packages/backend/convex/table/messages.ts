@@ -70,6 +70,9 @@ const documentSchema = {
   albumTitle: v.optional(v.string()), // Denormalized for display
   albumCoverUrl: v.optional(v.string()), // Denormalized cover photo URL
   albumPhotoCount: v.optional(v.number()), // Number of photos in the album
+  // Location sharing fields
+  latitude: v.optional(v.number()),
+  longitude: v.optional(v.number()),
 };
 
 export const messages = defineTable(documentSchema)
@@ -376,6 +379,83 @@ export const sendAlbumMessage = mutation({
 });
 
 /**
+ * Send a location message to another user.
+ */
+export const sendLocationMessage = mutation({
+  args: {
+    otherUserId: v.id("users"),
+    latitude: v.number(),
+    longitude: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) {
+      throw new Error("Not authenticated");
+    }
+
+    if (currentUserId === args.otherUserId) {
+      throw new Error("Cannot send message to yourself");
+    }
+
+    // Check if other user exists
+    const otherUser = await ctx.db.get(args.otherUserId);
+    if (!otherUser) {
+      throw new Error("User not found");
+    }
+
+    // Get or create conversation
+    const [participant1Id, participant2Id] =
+      currentUserId < args.otherUserId
+        ? [currentUserId, args.otherUserId]
+        : [args.otherUserId, currentUserId];
+
+    let conversation = await ctx.db
+      .query("conversations")
+      .withIndex("participants", (q) =>
+        q
+          .eq("participant1Id", participant1Id)
+          .eq("participant2Id", participant2Id)
+      )
+      .first();
+
+    if (!conversation) {
+      const conversationId = await ctx.db.insert("conversations", {
+        participant1Id,
+        participant2Id,
+      });
+      conversation = await ctx.db.get(conversationId);
+      if (!conversation) {
+        throw new Error("Failed to create conversation");
+      }
+    }
+
+    // Insert location message
+    const messageId = await ctx.db.insert("messages", {
+      conversationId: conversation._id,
+      senderId: currentUserId,
+      text: "",
+      read: false,
+      latitude: args.latitude,
+      longitude: args.longitude,
+    });
+
+    // Send push notification
+    const currentUser = await ctx.db.get(currentUserId);
+    const senderName = currentUser?.name ?? "Someone";
+
+    await sendNotification(ctx, {
+      userId: args.otherUserId,
+      title: senderName,
+      body: "Shared a location",
+      data: { type: "message", conversationId: conversation._id },
+      category: "messages",
+    });
+
+    return messageId;
+  },
+});
+
+/**
  * Edit a message. Only the sender can edit their own messages.
  */
 export const editMessage = mutation({
@@ -526,6 +606,8 @@ export const getMessages = query({
       read: message.read ?? false,
       viewOnce: message.viewOnce ?? false,
       viewOnceOpened: message.viewOnceOpened ?? false,
+      latitude: message.latitude,
+      longitude: message.longitude,
     }));
 
     return {
@@ -578,6 +660,8 @@ export const getMessage = query({
       read: message.read ?? false,
       viewOnce: message.viewOnce ?? false,
       viewOnceOpened: message.viewOnceOpened ?? false,
+      latitude: message.latitude,
+      longitude: message.longitude,
     };
   },
 });
@@ -641,6 +725,8 @@ export const getMessagesByUserId = query({
       albumTitle: message.albumTitle,
       albumCoverUrl: message.albumCoverUrl,
       albumPhotoCount: message.albumPhotoCount,
+      latitude: message.latitude,
+      longitude: message.longitude,
     }));
   },
 });

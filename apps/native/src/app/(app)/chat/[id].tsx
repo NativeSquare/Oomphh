@@ -22,6 +22,7 @@ import { Id } from "@packages/backend/convex/_generated/dataModel";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useMutation, useQuery } from "convex/react";
 import type { ImagePickerAsset } from "expo-image-picker";
+import * as Location from "expo-location";
 import { router, useLocalSearchParams } from "expo-router";
 import { ArrowLeft, EllipsisVertical } from "lucide-react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -79,6 +80,7 @@ export default function ChatDetail() {
 
   // Mutations
   const sendMessage = useMutation(api.table.messages.sendMessage);
+  const sendLocationMessage = useMutation(api.table.messages.sendLocationMessage);
   const sendAlbumMessage = useMutation(api.table.messages.sendAlbumMessage);
   const markMessagesAsRead = useMutation(api.table.messages.markMessagesAsRead);
   const openViewOncePhoto = useMutation(api.table.messages.openViewOncePhoto);
@@ -177,6 +179,8 @@ export default function ChatDetail() {
       albumTitle: msg.albumTitle,
       albumCoverUrl: msg.albumCoverUrl,
       albumPhotoCount: msg.albumPhotoCount,
+      latitude: msg.latitude,
+      longitude: msg.longitude,
     }));
   }, [messagesData]);
 
@@ -352,6 +356,32 @@ export default function ChatDetail() {
     }
   };
 
+  const handleLocationPress = async () => {
+    if (!otherUserId) return;
+
+    setError(null);
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setError("Location permission is required to share your location");
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      await sendLocationMessage({
+        otherUserId,
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    } catch (error) {
+      setError(getConvexErrorMessage(error));
+      console.error("Error sharing location:", error);
+    }
+  };
+
   const handleStopSharing = async (messageId: Id<"messages">) => {
     setError(null);
     try {
@@ -477,6 +507,8 @@ export default function ChatDetail() {
                       ? () => handleStopSharing(msg.id)
                       : undefined
                   }
+                  latitude={msg.latitude}
+                  longitude={msg.longitude}
                 />
               ))}
             </View>
@@ -525,7 +557,8 @@ export default function ChatDetail() {
         bottomSheetModalRef={uploadMediaBottomSheetRef}
         onImagesSelected={handleImagesSelected}
         onAlbumPress={handleAlbumPress}
-        options={["camera", "gallery", "album"]}
+        onLocationPress={handleLocationPress}
+        options={["camera", "gallery", "album", "location"]}
         allowsMultipleSelection
         cacheOnSelect
       />

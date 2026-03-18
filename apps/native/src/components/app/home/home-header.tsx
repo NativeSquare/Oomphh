@@ -8,7 +8,7 @@ import { Doc } from "@packages/backend/convex/_generated/dataModel";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "convex/react";
 import { useRouter } from "expo-router";
-import { ChevronDown, Heart, MapPin, Settings2 } from "lucide-react-native";
+import { ChevronDown, Circle, Heart, MapPin, Settings2 } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 
 export type SearchLocation = {
@@ -25,6 +25,8 @@ export type HomeHeaderProps = {
   onFilterPress?: () => void;
   showFavoritesOnly?: boolean;
   onFavoritesToggle?: () => void;
+  showOnlineOnly?: boolean;
+  onOnlineToggle?: () => void;
 };
 
 export function HomeHeader({
@@ -34,6 +36,8 @@ export function HomeHeader({
   onFilterPress,
   showFavoritesOnly,
   onFavoritesToggle,
+  showOnlineOnly,
+  onOnlineToggle,
 }: HomeHeaderProps) {
   const router = useRouter();
   const { capabilities } = useSubscription();
@@ -79,6 +83,18 @@ export function HomeHeader({
           </Text>
         </View>
         <Icon as={ChevronDown} size={16} />
+      </Button>
+      <Button
+        variant={showOnlineOnly ? "default" : "outline"}
+        size="icon"
+        onPress={onOnlineToggle}
+        className={showOnlineOnly ? "bg-green-500" : ""}
+      >
+        <Circle
+          size={20}
+          color={showOnlineOnly ? "#000" : "#FFF"}
+          fill={showOnlineOnly ? "#000" : "transparent"}
+        />
       </Button>
       <Button
         variant={showFavoritesOnly ? "default" : "outline"}

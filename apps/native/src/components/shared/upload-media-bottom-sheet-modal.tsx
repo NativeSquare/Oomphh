@@ -12,7 +12,7 @@ import { useSubscription } from "@/hooks/use-subscription";
 import { BottomSheetModal as GorhomBottomSheetModal } from "@gorhom/bottom-sheet";
 import type { CameraCapturedPicture } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
-import { Camera, Image, Images, LucideIcon } from "lucide-react-native";
+import { Camera, Image, Images, LucideIcon, MapPin } from "lucide-react-native";
 import * as React from "react";
 import { Alert, Dimensions, Keyboard, Linking, View } from "react-native";
 
@@ -21,7 +21,8 @@ interface UploadMediaBottomSheetModalProps {
   onImageSelected?: (image: ImagePicker.ImagePickerAsset) => void;
   onImagesSelected?: (images: ImagePicker.ImagePickerAsset[]) => void;
   onAlbumPress?: () => void;
-  options?: ("camera" | "gallery" | "album")[];
+  onLocationPress?: () => void;
+  options?: ("camera" | "gallery" | "album" | "location")[];
   allowsEditing?: boolean;
   allowsMultipleSelection?: boolean;
   aspect?: [number, number];
@@ -36,6 +37,7 @@ export function UploadMediaBottomSheetModal({
   onImageSelected,
   onImagesSelected,
   onAlbumPress,
+  onLocationPress,
   options = ["camera", "gallery", "album"],
   allowsEditing = false,
   allowsMultipleSelection = false,
@@ -171,7 +173,7 @@ export function UploadMediaBottomSheetModal({
   };
 
   const optionMap: Record<
-    "camera" | "gallery" | "album",
+    "camera" | "gallery" | "album" | "location",
     {
       icon: LucideIcon;
       label: string;
@@ -200,6 +202,17 @@ export function UploadMediaBottomSheetModal({
         }, 100);
       },
     },
+    location: {
+      icon: MapPin,
+      label: "Location",
+      onPress: () => {
+        Keyboard.dismiss();
+        bottomSheetModalRef.current?.dismiss();
+        setTimeout(() => {
+          onLocationPress?.();
+        }, 100);
+      },
+    },
   };
 
   const displayOptions = options.map((option) => optionMap[option]);
@@ -207,8 +220,9 @@ export function UploadMediaBottomSheetModal({
   const screenWidth = Dimensions.get("window").width;
   const padding = 32; // px-4 on each side (16px * 2)
   const gap = 12; // gap-3
-  const gapsTotal = (3 - 1) * gap; // 2 gaps for 3 items
-  const itemWidth = (screenWidth - padding - gapsTotal) / 3;
+  const columns = Math.min(displayOptions.length, 4);
+  const gapsTotal = (columns - 1) * gap;
+  const itemWidth = (screenWidth - padding - gapsTotal) / columns;
 
   return (
     <>

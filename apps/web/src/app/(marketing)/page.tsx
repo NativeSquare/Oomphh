@@ -1843,7 +1843,6 @@ export default function OomphLanding() {
         >
           {[
             { n: "Early access", l: "Now open — limited spots" },
-            { n: "Cosmic compatibility", l: "Zodiac-based matching" },
             { n: "Real-time", l: "Proximity radar" },
             { n: "Free to start", l: "Upgrade anytime" },
           ].map((s, i) => (
@@ -1928,28 +1927,16 @@ export default function OomphLanding() {
               delay={0.1}
             />
             <FeatureCard
-              icon="✨"
-              title="Personality Matching"
-              desc="Answer a few questions and let your personality shine. We surface compatibility based on who you really are — no hidden algorithms deciding who you see."
-              delay={0.2}
-            />
-            <FeatureCard
               icon="🔒"
               title="Privacy by Design"
               desc="Your location is never shared precisely. You control whether your profile is searchable, and all chats are end-to-end encrypted."
-              delay={0.3}
+              delay={0.2}
             />
             <FeatureCard
               icon="💬"
               title="Rich Conversations"
               desc="Text and chat — the easiest way to connect. Plus personally configured icebreakers when you don't know what to say."
-              delay={0.4}
-            />
-            <FeatureCard
-              icon="🎯"
-              title="Smart Filters"
-              desc="Dial in exactly what you're looking for. Age, interests, lifestyle — your call."
-              delay={0.6}
+              delay={0.3}
             />
           </div>
         </div>

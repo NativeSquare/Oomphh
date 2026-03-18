@@ -9,7 +9,7 @@ import { Text } from "@/components/ui/text";
 import type { Id } from "@packages/backend/convex/_generated/dataModel";
 import { Ban } from "lucide-react-native";
 import { useState } from "react";
-import { Dimensions, Image, Pressable, View } from "react-native";
+import { Dimensions, Image, Linking, Platform, Pressable, View } from "react-native";
 import ImageViewing from "react-native-image-viewing";
 import Svg, { Circle, Path, Text as SvgText } from "react-native-svg";
 
@@ -29,6 +29,9 @@ export type MessageBubbleProps = {
   albumPhotoCount?: number;
   onAlbumPress?: () => void;
   onStopSharing?: () => void;
+  // Location message fields
+  latitude?: number;
+  longitude?: number;
 };
 
 export function MessageBubble({
@@ -47,6 +50,8 @@ export function MessageBubble({
   albumPhotoCount,
   onAlbumPress,
   onStopSharing,
+  latitude,
+  longitude,
 }: MessageBubbleProps) {
   const [isViewerVisible, setIsViewerVisible] = useState(false);
   const [viewerImageIndex, setViewerImageIndex] = useState(0);
@@ -247,6 +252,75 @@ export function MessageBubble({
         className={`flex-col ${isOutgoing ? "items-end" : "items-start"} mb-3`}
       >
         {albumContent}
+      </View>
+    );
+  }
+
+  // Render location message
+  const isLocationMessage =
+    latitude !== undefined && longitude !== undefined;
+
+  if (isLocationMessage) {
+    const locationWidth = screenWidth * 0.6;
+    const staticMapUrl = `https://maps.geoapify.com/v1/staticmap?style=dark-matter&width=600&height=300&center=lonlat:${longitude},${latitude}&zoom=14.5&marker=lonlat:${longitude},${latitude};color:%23e56400;size:medium&apiKey=YOUR_API_KEY`;
+
+    const handleOpenInMaps = () => {
+      const scheme = Platform.select({
+        ios: `maps:0,0?q=${latitude},${longitude}`,
+        android: `geo:${latitude},${longitude}?q=${latitude},${longitude}`,
+      });
+      if (scheme) {
+        Linking.openURL(scheme);
+      }
+    };
+
+    return (
+      <View
+        className={`flex-col ${isOutgoing ? "items-end" : "items-start"} mb-3`}
+      >
+        <Pressable onPress={handleOpenInMaps}>
+          <View
+            className={`rounded-xl overflow-hidden ${
+              isOutgoing
+                ? "rounded-bl-xl rounded-tl-xl rounded-tr-xl"
+                : "rounded-br-xl rounded-tl-xl rounded-tr-xl"
+            }`}
+            style={{ width: locationWidth }}
+          >
+            {/* Map preview */}
+            <View
+              style={{ width: locationWidth, height: 140 }}
+              className="bg-[#1a1a1e] items-center justify-center"
+            >
+              <LocationPinIcon />
+              <Text className="text-white/70 text-xs mt-2">
+                {latitude.toFixed(4)}, {longitude.toFixed(4)}
+              </Text>
+            </View>
+
+            {/* Footer with timestamp */}
+            <View
+              className={`px-3 py-2 flex-row items-center justify-between ${
+                isOutgoing ? "bg-[#f7cfb0]" : "bg-[#26272b]"
+              }`}
+            >
+              <Text
+                className={`text-xs font-medium ${
+                  isOutgoing ? "text-[#26272b]" : "text-[#d1d1d6]"
+                }`}
+              >
+                Shared location
+              </Text>
+              <Text
+                className={`text-xs leading-[18px] ${
+                  isOutgoing ? "text-[#51525c]" : "text-[#70707b]"
+                }`}
+              >
+                {timestamp}
+              </Text>
+            </View>
+          </View>
+        </Pressable>
       </View>
     );
   }
@@ -572,6 +646,28 @@ function LockIcon() {
       <Path
         d="M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11"
         stroke="white"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+// Location pin icon for location messages
+function LocationPinIcon() {
+  return (
+    <Svg width={32} height={32} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z"
+        stroke="#e56400"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z"
+        stroke="#e56400"
         strokeWidth={2}
         strokeLinecap="round"
         strokeLinejoin="round"
