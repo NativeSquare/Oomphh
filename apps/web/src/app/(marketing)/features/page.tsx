@@ -29,7 +29,7 @@ const features: Array<{
     title: "Stories & connections",
     description:
       "Share moments through stories and albums. Swipe through profiles, like what resonates, and build real connections—not just matches in a void.",
-    images: ["/Screen-1.png", "/Taps.png"],
+    images: ["/Screen-1.png", "/Taps.png", "/Stories.png"],
   },
   {
     icon: Calendar,
@@ -43,7 +43,7 @@ const features: Array<{
     title: "Profiles & filters",
     description:
       "Age, vibe, what you're looking for—all in one place, one profile. No guesswork, no endless questionnaires. Set it once and explore.",
-    images: ["/Other%20User%20Profile.png"],
+    images: ["/Other%20User%20Profile.png", "/Settings.png"],
   },
   {
     icon: MessageCircle,

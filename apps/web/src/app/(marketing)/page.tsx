@@ -1195,7 +1195,7 @@ function PricingCard({
             cursor: "pointer",
           }}
         >
-          {popular ? "Join early access" : "Get started"}
+          {popular ? "Join the beta" : "Get started"}
         </button>
       </div>
     </div>
@@ -1283,8 +1283,10 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 // Shared heading style — applies SVG grain filter
 const HEADING_FILTER = { filter: "url(#textGrain)" };
 
-function scrollToWaitlist() {
-  document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" });
+const TESTFLIGHT_URL = "https://testflight.apple.com/join/p2vKqRSg";
+
+function openTestFlight() {
+  window.open(TESTFLIGHT_URL, "_blank", "noopener,noreferrer");
 }
 
 export default function OomphLanding() {
@@ -1662,8 +1664,7 @@ export default function OomphLanding() {
             }}
           >
             OOmphh shows you people nearby in real-time.
-            Personality-first matching, proximity,
-            and your own preferences — no algorithms deciding for you.
+            Proximity and your own preferences — no algorithms deciding for you.
           </p>
 
           <div
@@ -1676,8 +1677,10 @@ export default function OomphLanding() {
               animation: "fadeInUp 0.8s ease 0.5s both",
             }}
           >
-            <button
-              onClick={scrollToWaitlist}
+            <a
+              href="https://testflight.apple.com/join/p2vKqRSg"
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
                 background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
                 border: "none",
@@ -1694,10 +1697,11 @@ export default function OomphLanding() {
                 boxShadow: "0 8px 32px rgba(255,107,44,0.35)",
                 width: isMobile ? "100%" : "auto",
                 justifyContent: "center",
+                textDecoration: "none",
               }}
             >
-              Get early access <span>→</span>
-            </button>
+              Join the beta <span>→</span>
+            </a>
             <button
               onClick={() =>
                 document
@@ -1842,7 +1846,7 @@ export default function OomphLanding() {
           }}
         >
           {[
-            { n: "Early access", l: "Now open — limited spots" },
+            { n: "Open beta", l: "Join now on TestFlight" },
             { n: "Real-time", l: "Proximity radar" },
             { n: "Free to start", l: "Upgrade anytime" },
           ].map((s, i) => (
@@ -1940,77 +1944,6 @@ export default function OomphLanding() {
             />
           </div>
 
-          {/* Feature Screenshots */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: isMobile ? 24 : 60,
-              marginTop: isMobile ? 48 : 72,
-              flexDirection: isMobile ? "column" : "row",
-              alignItems: "center",
-            }}
-          >
-            {[
-              { src: "/Stories.png", label: "Stories", caption: "Share moments and see what others are up to nearby" },
-              { src: "/Settings.png", label: "Settings", caption: "Full control over your profile and preferences" },
-            ].map((item, i) => (
-              <div
-                key={item.label}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  animation: `fadeInUp 0.8s ease ${0.3 + i * 0.15}s both`,
-                }}
-              >
-                <div
-                  style={{
-                    borderRadius: 32,
-                    overflow: "hidden",
-                    border: "2px solid rgba(255,107,44,0.2)",
-                    boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(255,107,44,0.08)",
-                    width: isMobile ? 220 : 260,
-                  }}
-                >
-                  <img
-                    src={item.src}
-                    alt={item.label}
-                    style={{
-                      width: "100%",
-                      display: "block",
-                    }}
-                  />
-                </div>
-                <div
-                  style={{
-                    marginTop: 18,
-                    color: "#FF9A56",
-                    fontSize: 15,
-                    fontWeight: 700,
-                    fontFamily: FF_D,
-                    letterSpacing: "0.02em",
-                  }}
-                >
-                  {item.label}
-                </div>
-                <div
-                  style={{
-                    marginTop: 6,
-                    color: "rgba(255,255,255,0.4)",
-                    fontSize: 13,
-                    fontFamily: FF_B,
-                    fontWeight: 300,
-                    textAlign: "center",
-                    maxWidth: 220,
-                    lineHeight: 1.5,
-                  }}
-                >
-                  {item.caption}
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </SectionTexture>
 
@@ -2232,7 +2165,7 @@ export default function OomphLanding() {
                 "RSVP to 3 events",
               ]}
               delay={0.1}
-              onCtaClick={scrollToWaitlist}
+              onCtaClick={openTestFlight}
             />
             <PricingCard
               plan="Premium"
@@ -2249,7 +2182,7 @@ export default function OomphLanding() {
               ]}
               popular
               delay={0.2}
-              onCtaClick={scrollToWaitlist}
+              onCtaClick={openTestFlight}
             />
             <PricingCard
               plan="Unlimited"
@@ -2263,7 +2196,7 @@ export default function OomphLanding() {
                 "1 free boost per week",
               ]}
               delay={0.3}
-              onCtaClick={scrollToWaitlist}
+              onCtaClick={openTestFlight}
             />
           </div>
         </div>
@@ -2309,7 +2242,7 @@ export default function OomphLanding() {
             />
             <FAQItem
               question="When does OOmphh launch?"
-              answer="We're in closed beta right now. Join the waitlist to get early access — spots are limited and early adopters get premium features for free."
+              answer="We're in open beta right now! Download OOmphh on TestFlight and start connecting — early adopters get premium features for free."
             />
             <FAQItem
               question="Is OOmphh free to use?"
@@ -2366,63 +2299,31 @@ export default function OomphLanding() {
                 lineHeight: 1.7,
               }}
             >
-              Join the waitlist and be among the first to try OOmphh when we
-              launch in your area.
+              Join the beta and be among the first to experience OOmphh.
             </p>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const form = e.currentTarget;
-                const email = new FormData(form).get("email") as string;
-                if (email) {
-                  alert(`Thanks! We'll notify ${email} when OOmphh launches near you.`);
-                  form.reset();
-                }
-              }}
+            <a
+              href="https://testflight.apple.com/join/p2vKqRSg"
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
-                display: "flex",
+                display: "inline-flex",
+                alignItems: "center",
                 gap: 10,
-                justifyContent: "center",
-                maxWidth: 460,
-                margin: "0 auto",
+                background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
+                border: "none",
+                borderRadius: 18,
+                padding: "16px 36px",
+                color: "#fff",
+                fontSize: 16,
+                fontWeight: 600,
+                fontFamily: FF_B,
+                cursor: "pointer",
+                boxShadow: "0 8px 32px rgba(255,107,44,0.35)",
+                textDecoration: "none",
               }}
             >
-              <input
-                type="email"
-                name="email"
-                required
-                placeholder="your@email.com"
-                style={{
-                  flex: 1,
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  borderRadius: 16,
-                  padding: "14px 20px",
-                  color: "#fff",
-                  fontSize: 15,
-                  fontFamily: FF_B,
-                  outline: "none",
-                }}
-              />
-              <button
-                type="submit"
-                style={{
-                  background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
-                  border: "none",
-                  borderRadius: 16,
-                  padding: "14px 28px",
-                  color: "#fff",
-                  fontSize: 15,
-                  fontWeight: 600,
-                  fontFamily: FF_B,
-                  cursor: "pointer",
-                  boxShadow: "0 8px 32px rgba(255,107,44,0.35)",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                Join waitlist →
-              </button>
-            </form>
+              Join the beta on TestFlight →
+            </a>
             <p
               style={{
                 color: "rgba(255,255,255,0.25)",
@@ -2431,7 +2332,7 @@ export default function OomphLanding() {
                 fontWeight: 300,
               }}
             >
-              No spam. We'll only email you when OOmphh launches near you.
+              Available now on iOS via TestFlight.
             </p>
           </div>
         </div>
