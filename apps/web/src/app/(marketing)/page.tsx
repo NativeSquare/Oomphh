@@ -1929,7 +1929,7 @@ export default function OomphLanding() {
             <FeatureCard
               icon="🔒"
               title="Privacy by Design"
-              desc="Your location is never shared precisely. You control whether your profile is searchable, and all chats are end-to-end encrypted."
+              desc="You control whether your profile is searchable, and all chats are end-to-end encrypted."
               delay={0.2}
             />
             <FeatureCard
@@ -1938,6 +1938,78 @@ export default function OomphLanding() {
               desc="Text and chat — the easiest way to connect. Plus personally configured icebreakers when you don't know what to say."
               delay={0.3}
             />
+          </div>
+
+          {/* Feature Screenshots */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: isMobile ? 24 : 60,
+              marginTop: isMobile ? 48 : 72,
+              flexDirection: isMobile ? "column" : "row",
+              alignItems: "center",
+            }}
+          >
+            {[
+              { src: "/Stories.png", label: "Stories", caption: "Share moments and see what others are up to nearby" },
+              { src: "/Settings.png", label: "Settings", caption: "Full control over your profile and preferences" },
+            ].map((item, i) => (
+              <div
+                key={item.label}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  animation: `fadeInUp 0.8s ease ${0.3 + i * 0.15}s both`,
+                }}
+              >
+                <div
+                  style={{
+                    borderRadius: 32,
+                    overflow: "hidden",
+                    border: "2px solid rgba(255,107,44,0.2)",
+                    boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(255,107,44,0.08)",
+                    width: isMobile ? 220 : 260,
+                  }}
+                >
+                  <img
+                    src={item.src}
+                    alt={item.label}
+                    style={{
+                      width: "100%",
+                      display: "block",
+                    }}
+                  />
+                </div>
+                <div
+                  style={{
+                    marginTop: 18,
+                    color: "#FF9A56",
+                    fontSize: 15,
+                    fontWeight: 700,
+                    fontFamily: FF_D,
+                    letterSpacing: "0.02em",
+                  }}
+                >
+                  {item.label}
+                </div>
+                <div
+                  style={{
+                    marginTop: 6,
+                    color: "rgba(255,255,255,0.4)",
+                    fontSize: 13,
+                    fontFamily: FF_B,
+                    fontWeight: 300,
+                    textAlign: "center",
+                    maxWidth: 220,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {item.caption}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </SectionTexture>
@@ -2233,7 +2305,7 @@ export default function OomphLanding() {
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <FAQItem
               question="How does the proximity feature work?"
-              answer="OOmphh uses your approximate location to show people who are nearby. If someone is in your area, they'll appear. You can go invisible anytime, and we never share your exact position."
+              answer="OOmphh uses your precise location to show people who are nearby. If someone is in your area, they'll appear. You can go invisible anytime."
             />
             <FAQItem
               question="When does OOmphh launch?"
@@ -2245,7 +2317,7 @@ export default function OomphLanding() {
             />
             <FAQItem
               question="How is OOmphh different from Happn or Tinder?"
-              answer="Happn shows you people you crossed paths with. Tinder is swiping. OOmphh shows you everyone nearby and lets you filter on your own terms — plus personality-based compatibility so you can see who you're truly aligned with."
+              answer="Happn shows you people you crossed paths with. Tinder is swiping. OOmphh shows you everyone nearby and lets you filter on your own terms."
             />
           </div>
         </div>
