@@ -1,4 +1,5 @@
 import { ProfilePictureCarousel } from "@/components/app/profile/profile-picture-carousel";
+import { ReportBlockBottomSheet } from "@/components/app/report/report-block-bottom-sheet";
 import { BottomSheetModal } from "@/components/custom/bottom-sheet";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
@@ -25,6 +26,7 @@ import {
   Cake,
   ChevronLeft,
   Dumbbell,
+  EllipsisVertical,
   Globe,
   Heart,
   MapPin,
@@ -64,6 +66,7 @@ export default function UserProfile() {
   const { id } = useLocalSearchParams<{ id: Id<"users"> }>();
   const insets = useSafeAreaInsets();
   const bottomSheetRef = useRef<GorhomBottomSheetModal>(null);
+  const reportBlockRef = useRef<GorhomBottomSheetModal>(null);
   const currentUser = useQuery(api.table.users.currentUser);
   const user = useQuery(api.table.users.get, { id });
   const imageUrls = useQuery(api.storage.getImageUrls, {
@@ -260,6 +263,14 @@ export default function UserProfile() {
               onPress={handleMessagePress}
             >
               <Icon as={MessageCircle} size={20} className="text-white" />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="h-10 w-10 rounded-full bg-black/50"
+              onPress={() => reportBlockRef.current?.present()}
+            >
+              <Icon as={EllipsisVertical} size={20} className="text-white" />
             </Button>
           </View>
         </View>
@@ -459,6 +470,12 @@ export default function UserProfile() {
           )}
         </View>
       </BottomSheetModal>
+
+      <ReportBlockBottomSheet
+        bottomSheetModalRef={reportBlockRef}
+        userId={id}
+        userName={user.name ?? "this user"}
+      />
     </View>
   );
 }

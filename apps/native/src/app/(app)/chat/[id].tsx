@@ -6,6 +6,7 @@ import {
   type AppAlbum,
 } from "@/components/app/chat/select-album-modal";
 import { ViewOncePhotoViewer } from "@/components/app/chat/view-once-photo-viewer";
+import { ReportBlockBottomSheet } from "@/components/app/report/report-block-bottom-sheet";
 import { UploadMediaBottomSheetModal } from "@/components/shared/upload-media-bottom-sheet-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,7 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useMutation, useQuery } from "convex/react";
 import type { ImagePickerAsset } from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
-import { ArrowLeft } from "lucide-react-native";
+import { ArrowLeft, EllipsisVertical } from "lucide-react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -54,6 +55,7 @@ export default function ChatDetail() {
     disappearingPhotosSent < capabilities.maxDisappearingPhotos;
   const uploadMediaBottomSheetRef = useRef<BottomSheetModal>(null);
   const selectAlbumModalRef = useRef<BottomSheetModal>(null);
+  const reportBlockRef = useRef<BottomSheetModal>(null);
 
   const otherUserId = id as Id<"users"> | undefined;
 
@@ -410,6 +412,14 @@ export default function ChatDetail() {
               {userName}
             </Text>
           </Pressable>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-6"
+            onPress={() => reportBlockRef.current?.present()}
+          >
+            <Icon as={EllipsisVertical} size={20} className="text-white" />
+          </Button>
         </View>
       </View>
 
@@ -557,6 +567,14 @@ export default function ChatDetail() {
           doubleTapToZoomEnabled
         />
       ) : null}
+
+      {otherUserId && (
+        <ReportBlockBottomSheet
+          bottomSheetModalRef={reportBlockRef}
+          userId={otherUserId}
+          userName={user?.name ?? "this user"}
+        />
+      )}
     </View>
   );
 }
