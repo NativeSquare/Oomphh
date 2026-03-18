@@ -656,12 +656,6 @@ importers:
       '@react-email/components':
         specifier: 1.0.1
         version: 1.0.1(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      react:
-        specifier: ^18.0.0 || ^19.0.0
-        version: 19.2.3
-      react-dom:
-        specifier: ^18.0.0 || ^19.0.0
-        version: 19.2.3(react@19.2.3)
     devDependencies:
       '@react-email/preview-server':
         specifier: 5.0.7
@@ -675,6 +669,12 @@ importers:
       '@types/react-dom':
         specifier: 19.2.3
         version: 19.2.3(@types/react@19.2.7)
+      react:
+        specifier: 19.2.3
+        version: 19.2.3
+      react-dom:
+        specifier: 19.2.3
+        version: 19.2.3(react@19.2.3)
       react-email:
         specifier: 5.0.7
         version: 5.0.7
