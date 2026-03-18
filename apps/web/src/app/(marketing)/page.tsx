@@ -2158,7 +2158,8 @@ export default function OomphLanding() {
               price="0"
               features={[
                 "60 views per refresh",
-                "Unlimited taps",
+                "5 visible taps",
+                "5 stories",
                 "6 photos in cache",
                 "3 disappearing photos",
                 "1 album (3 photos)",
@@ -2176,7 +2177,10 @@ export default function OomphLanding() {
                 "Unlimited taps & messaging",
                 "Remote browsing (100 users)",
                 "20 stories & 20 photos in cache",
+                "6 disappearing photos",
                 "3 albums (5 photos each)",
+                "RSVP to 5 events",
+                "See event participants",
                 "Travel to 3 cities at once",
                 "2 free boosts per month",
               ]}
@@ -2192,6 +2196,7 @@ export default function OomphLanding() {
                 "Unlimited remote browsing",
                 "10 albums (10 photos each)",
                 "Unlimited travel & events",
+                "See event participants",
                 "Chat translation",
                 "1 free boost per week",
               ]}
@@ -2246,7 +2251,7 @@ export default function OomphLanding() {
             />
             <FAQItem
               question="Is OOmphh free to use?"
-              answer="Yes — the Freemium plan is completely free with 60 views, unlimited taps, and core features. Premium (€7/mo) and Unlimited (€20/mo) plans unlock more views, remote browsing, travel, and boosts."
+              answer="Yes — the Freemium plan is completely free with 60 views, 5 visible taps, and core features. Premium (€7/mo) and Unlimited (€20/mo) plans unlock more views, unlimited taps, remote browsing, travel, and boosts."
             />
             <FAQItem
               question="How is OOmphh different from Happn or Tinder?"

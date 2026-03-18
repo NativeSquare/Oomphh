@@ -23,6 +23,9 @@ export type SubscriptionCapabilities = {
   albumVisibilityOptions: AlbumVisibilityOption[];
   maxEventRSVPs: number;
   eventParticipantsVisible: boolean;
+  maxTravelCities: number;
+  freeBoostsPerMonth: number;
+  chatTranslation: boolean;
 };
 
 const ALL_VISIBILITY_OPTIONS: AlbumVisibilityOption[] = [
@@ -53,6 +56,9 @@ export const SUBSCRIPTION_CAPABILITIES: Record<
     albumVisibilityOptions: ["unlimited"],
     maxEventRSVPs: 3,
     eventParticipantsVisible: false,
+    maxTravelCities: 0,
+    freeBoostsPerMonth: 0,
+    chatTranslation: false,
   },
   premium: {
     gridLimit: 500,
@@ -70,6 +76,9 @@ export const SUBSCRIPTION_CAPABILITIES: Record<
     albumVisibilityOptions: ALL_VISIBILITY_OPTIONS,
     maxEventRSVPs: 5,
     eventParticipantsVisible: true,
+    maxTravelCities: 3,
+    freeBoostsPerMonth: 2,
+    chatTranslation: false,
   },
   unlimited: {
     gridLimit: Infinity,
@@ -87,5 +96,8 @@ export const SUBSCRIPTION_CAPABILITIES: Record<
     albumVisibilityOptions: ALL_VISIBILITY_OPTIONS,
     maxEventRSVPs: Infinity,
     eventParticipantsVisible: true,
+    maxTravelCities: Infinity,
+    freeBoostsPerMonth: 4,
+    chatTranslation: true,
   },
 };
