@@ -1,5 +1,12 @@
 import { DarkTheme, DefaultTheme, type Theme } from "@react-navigation/native";
 
+/** Logo gradient stops for use with LinearGradient */
+export const BRAND_GRADIENT = {
+  colors: ["#F0A830", "#E63B2E", "#4285F4"] as const,
+  start: { x: 0, y: 0 },
+  end: { x: 1, y: 1 },
+};
+
 export const THEME = {
   light: {
     background: "hsl(0 0% 3.9%)",
@@ -20,7 +27,7 @@ export const THEME = {
     border: "hsl(0 0% 14.9%)",
     input: "hsl(0 0% 14.9%)",
     input30: "hsl(0 0% 7%)",
-    ring: "hsl(300 0% 45%)",
+    ring: "hsl(3 78% 54%)",
     radius: "0.625rem",
     chart1: "hsl(220 70% 50%)",
     chart2: "hsl(160 60% 45%)",
@@ -29,7 +36,7 @@ export const THEME = {
     chart5: "hsl(340 75% 55%)",
     tabbar: "hsl(330 0% 9%)",
     tabbarForeground: "hsl(300 0% 98%)",
-    tabbarPrimary: "hsl(26 100% 45%)",
+    tabbarPrimary: "hsl(3 78% 54%)",
     tabbarPrimaryForeground: "hsl(300 0% 98%)",
     tabbarAccent: "hsl(320 0% 15%)",
     tabbarAccentForeground: "hsl(300 0% 98%)",
@@ -55,7 +62,7 @@ export const THEME = {
     border: "hsl(0 0% 14.9%)",
     input: "hsl(0 0% 14.9%)",
     input30: "hsl(0 0% 7%)",
-    ring: "hsl(300 0% 45%)",
+    ring: "hsl(3 78% 54%)",
     radius: "0.625rem",
     chart1: "hsl(220 70% 50%)",
     chart2: "hsl(160 60% 45%)",
@@ -64,7 +71,7 @@ export const THEME = {
     chart5: "hsl(340 75% 55%)",
     tabbar: "hsl(330 0% 9%)",
     tabbarForeground: "hsl(300 0% 98%)",
-    tabbarPrimary: "hsl(26 100% 45%)",
+    tabbarPrimary: "hsl(3 78% 54%)",
     tabbarPrimaryForeground: "hsl(300 0% 98%)",
     tabbarAccent: "hsl(320 0% 15%)",
     tabbarAccentForeground: "hsl(300 0% 98%)",

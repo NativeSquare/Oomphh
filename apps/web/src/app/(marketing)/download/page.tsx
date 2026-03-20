@@ -11,7 +11,7 @@ export default function DownloadPage() {
   return (
     <>
       <div
-        className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_120%_80%_at_50%_0%,oklch(0.65_0.19_47_/_0.15),transparent_60%)]"
+        className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_120%_80%_at_50%_0%,oklch(0.57_0.19_27_/_0.15),transparent_60%)]"
         aria-hidden
       />
 

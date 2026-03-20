@@ -26,6 +26,7 @@ export type SubscriptionCapabilities = {
   maxTravelCities: number;
   freeBoostsPerMonth: number;
   chatTranslation: boolean;
+  advancedFilters: boolean;
 };
 
 const ALL_VISIBILITY_OPTIONS: AlbumVisibilityOption[] = [
@@ -59,6 +60,7 @@ export const SUBSCRIPTION_CAPABILITIES: Record<
     maxTravelCities: 0,
     freeBoostsPerMonth: 0,
     chatTranslation: false,
+    advancedFilters: false,
   },
   premium: {
     gridLimit: 500,
@@ -79,6 +81,7 @@ export const SUBSCRIPTION_CAPABILITIES: Record<
     maxTravelCities: 3,
     freeBoostsPerMonth: 2,
     chatTranslation: false,
+    advancedFilters: true,
   },
   unlimited: {
     gridLimit: Infinity,
@@ -99,5 +102,6 @@ export const SUBSCRIPTION_CAPABILITIES: Record<
     maxTravelCities: Infinity,
     freeBoostsPerMonth: 4,
     chatTranslation: true,
+    advancedFilters: true,
   },
 };

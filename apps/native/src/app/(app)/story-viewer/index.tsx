@@ -119,6 +119,9 @@ export default function StoryViewer() {
   const currentStories = currentGroup?.stories ?? [];
   const currentStory = currentStories[storyIndex];
 
+  // Keep a ref to the latest advanceStory so the timer interval never calls a stale closure
+  const advanceStoryRef = React.useRef<() => void>(() => {});
+
   // Pause / resume helpers that properly track paused time
   const pauseTimer = React.useCallback(() => {
     if (!isPausedRef.current) {
@@ -157,7 +160,7 @@ export default function StoryViewer() {
 
       if (newProgress >= 1) {
         if (timerRef.current) clearInterval(timerRef.current);
-        advanceStory();
+        advanceStoryRef.current();
       }
     }, PROGRESS_INTERVAL);
   }, []);
@@ -176,6 +179,11 @@ export default function StoryViewer() {
       router.back();
     }
   }, [storyIndex, currentStories.length, userIndex, authorIds.length]);
+
+  // Keep the ref in sync with the latest advanceStory
+  React.useEffect(() => {
+    advanceStoryRef.current = advanceStory;
+  }, [advanceStory]);
 
   // Go back to previous story or previous user
   const goBackStory = React.useCallback(() => {

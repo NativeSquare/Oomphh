@@ -56,3 +56,14 @@ export const recordToken = mutation({
     return null;
   },
 });
+
+export const removeToken = mutation({
+  args: {},
+  returns: v.null(),
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    await pushNotifications.removeToken(ctx, { userId });
+    return null;
+  },
+});

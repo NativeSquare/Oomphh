@@ -332,24 +332,22 @@ export function MessageBubble({
         className={`flex-col ${isOutgoing ? "items-end" : "items-start"} mb-3`}
       >
         <View
-          className={`flex-row gap-4 items-center px-4 py-2.5 max-w-[80%] ${
+          className={`px-4 py-2.5 max-w-[80%] ${
             isOutgoing
-              ? "bg-[#f7cfb0] rounded-full"
-              : "bg-[#26272b] rounded-full"
+              ? "bg-[#f7cfb0] rounded-2xl"
+              : "bg-[#26272b] rounded-2xl"
           }`}
         >
-          <View className="flex-1">
-            <Text
-              className={`text-sm leading-5 ${
-                isOutgoing ? "text-[#26272b]" : "text-[#d1d1d6]"
-              }`}
-            >
-              {message}
-            </Text>
-          </View>
           <Text
-            className={`text-xs leading-[18px] shrink-0 ${
-              isOutgoing ? "text-[#51525c]" : "text-[#70707b]"
+            className={`text-sm leading-5 ${
+              isOutgoing ? "text-[#26272b]" : "text-[#d1d1d6]"
+            }`}
+          >
+            {message}
+          </Text>
+          <Text
+            className={`text-xs leading-[18px] mt-1 ${
+              isOutgoing ? "text-[#51525c] text-right" : "text-[#70707b]"
             }`}
           >
             {timestamp}
@@ -474,19 +472,17 @@ export function MessageBubble({
       >
         {renderImages()}
         {hasText && (
-          <View className="flex-row gap-4 items-center">
-            <View className="flex-1">
-              <Text
-                className={`text-sm leading-5 ${
-                  isOutgoing ? "text-[#26272b]" : "text-[#d1d1d6]"
-                }`}
-              >
-                {message}
-              </Text>
-            </View>
+          <View>
             <Text
-              className={`text-xs leading-[18px] shrink-0 ${
-                isOutgoing ? "text-[#51525c]" : "text-[#70707b]"
+              className={`text-sm leading-5 ${
+                isOutgoing ? "text-[#26272b]" : "text-[#d1d1d6]"
+              }`}
+            >
+              {message}
+            </Text>
+            <Text
+              className={`text-xs leading-[18px] mt-1 ${
+                isOutgoing ? "text-[#51525c] text-right" : "text-[#70707b]"
               }`}
             >
               {timestamp}

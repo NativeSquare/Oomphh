@@ -1,7 +1,7 @@
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
-import { ChevronRight } from "lucide-react-native";
+import { ChevronRight, Crown } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 
 export type PreferenceRowProps = {
@@ -9,6 +9,7 @@ export type PreferenceRowProps = {
   values?: string | string[];
   onPress: () => void;
   isLast?: boolean;
+  locked?: boolean;
 };
 
 export function PreferenceRow({
@@ -16,6 +17,7 @@ export function PreferenceRow({
   values,
   onPress,
   isLast,
+  locked,
 }: PreferenceRowProps) {
   const displayValue = Array.isArray(values)
     ? values.join(", ")
@@ -29,15 +31,21 @@ export function PreferenceRow({
         !isLast && "border-b border-[#2a2a2e]"
       )}
     >
-      <Text className="text-sm font-medium text-[#d1d1d6]">{label}</Text>
+      <Text className={cn("text-sm font-medium", locked ? "text-[#70707b]" : "text-[#d1d1d6]")}>{label}</Text>
       <View className="flex-row items-center gap-2 flex-1 justify-end ml-4">
-        <Text
-          className="text-sm text-muted-foreground text-right flex-shrink"
-          numberOfLines={1}
-        >
-          {displayValue}
-        </Text>
-        <Icon as={ChevronRight} size={16} className="text-muted-foreground" />
+        {locked ? (
+          <Icon as={Crown} size={16} className="text-yellow-500" />
+        ) : (
+          <>
+            <Text
+              className="text-sm text-muted-foreground text-right flex-shrink"
+              numberOfLines={1}
+            >
+              {displayValue}
+            </Text>
+            <Icon as={ChevronRight} size={16} className="text-muted-foreground" />
+          </>
+        )}
       </View>
     </Pressable>
   );

@@ -6,35 +6,31 @@ import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import {
   DATE_RANGES,
-  DISTANCE_RANGES,
   EVENT_FILTERS_STORAGE_KEY,
   EVENT_TYPES,
 } from "@/constants/events";
 import { BottomSheetModal as GorhomBottomSheetModal } from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import { Calendar, ChevronLeft, MapPin, Tag } from "lucide-react-native";
+import { Calendar, ChevronLeft, Tag } from "lucide-react-native";
 import React from "react";
 import { Pressable, ScrollView, View } from "react-native";
 
 export type EventFilterData = {
   eventType: string[];
   dateRange: string;
-  distance: string;
 };
 
 export default function EventFilters() {
   const defaultFilters: EventFilterData = {
     eventType: [],
     dateRange: "",
-    distance: "",
   };
 
   const [filters, setFilters] = React.useState<EventFilterData>(defaultFilters);
 
   const eventTypeSheetRef = React.useRef<GorhomBottomSheetModal>(null);
   const dateRangeSheetRef = React.useRef<GorhomBottomSheetModal>(null);
-  const distanceSheetRef = React.useRef<GorhomBottomSheetModal>(null);
 
   React.useEffect(() => {
     const loadFilters = async () => {
@@ -45,7 +41,6 @@ export default function EventFilters() {
           setFilters({
           eventType: parsed.eventType ?? [],
           dateRange: parsed.dateRange ?? "",
-          distance: parsed.distance ?? "",
           });
         }
       } catch (error) {
@@ -128,19 +123,6 @@ export default function EventFilters() {
               </View>
             </View>
 
-            {/* Distance Section */}
-            <View>
-              <PreferenceSectionHeader icon={MapPin} title="Distance" />
-              <View className="rounded-xl overflow-hidden">
-                <PreferenceRow
-                  label="Max Distance"
-                  values={filters.distance || undefined}
-                  onPress={() => distanceSheetRef.current?.present()}
-                  isLast
-                />
-              </View>
-            </View>
-
           </View>
         </View>
       </ScrollView>
@@ -183,19 +165,6 @@ export default function EventFilters() {
           setFilters({
             ...filters,
             dateRange: filters.dateRange === option ? "" : option,
-          })
-        }
-      />
-
-      <PreferenceSelectionSheet
-        bottomSheetRef={distanceSheetRef}
-        title="Max Distance"
-        options={[...DISTANCE_RANGES]}
-        selectedValues={filters.distance || undefined}
-        onSelect={(option) =>
-          setFilters({
-            ...filters,
-            distance: filters.distance === option ? "" : option,
           })
         }
       />

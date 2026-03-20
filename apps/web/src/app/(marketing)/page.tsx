@@ -81,7 +81,7 @@ function GrainFilters() {
 }
 
 function SectionTexture({
-  glowColor = "rgba(255,107,44,0.04)",
+  glowColor = "rgba(230,59,46,0.04)",
   glowPos = "50% 30%",
   children,
   style = {},
@@ -181,7 +181,7 @@ function ProximityRadar() {
         transition: "all 0.4s cubic-bezier(0.16,1,0.3,1)",
         transform: hov ? "translateY(-6px) scale(1.02)" : "none",
         boxShadow: hov
-          ? "0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,107,44,0.2), 0 0 40px rgba(255,107,44,0.08)"
+          ? "0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(230,59,46,0.2), 0 0 40px rgba(230,59,46,0.08)"
           : "0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)",
         position: "relative",
         overflow: "hidden",
@@ -217,7 +217,7 @@ function ProximityRadar() {
               width: r * 65,
               height: r * 65,
               borderRadius: "50%",
-              border: `1px solid rgba(255,107,44,${0.14 - r * 0.025})`,
+              border: `1px solid rgba(230,59,46,${0.14 - r * 0.025})`,
               transform: "translate(-50%,-50%)",
               animation: `radarPulse 3.5s ease-in-out ${r * 0.4}s infinite`,
             }}
@@ -233,7 +233,7 @@ function ProximityRadar() {
             transform: "translate(-50%,-50%)",
             borderRadius: "50%",
             background:
-              "conic-gradient(from 0deg, transparent 0%, rgba(255,107,44,0.18) 12%, transparent 25%)",
+              "conic-gradient(from 0deg, transparent 0%, rgba(230,59,46,0.18) 12%, transparent 25%)",
             animation: "radarSweep 3.5s linear infinite",
           }}
         />
@@ -246,9 +246,9 @@ function ProximityRadar() {
             width: 14,
             height: 14,
             borderRadius: "50%",
-            background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
+            background: "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)",
             boxShadow:
-              "0 0 16px rgba(255,107,44,0.6), 0 0 32px rgba(255,107,44,0.2)",
+              "0 0 16px rgba(230,59,46,0.6), 0 0 32px rgba(230,59,46,0.2)",
             zIndex: 3,
           }}
         />
@@ -264,7 +264,7 @@ function ProximityRadar() {
               borderRadius: "50%",
               overflow: "hidden",
               animation: `avatarPop 0.4s ease ${a.d + 0.3}s both, floatBubble 7s ease-in-out ${a.d}s infinite`,
-              border: "2px solid rgba(255,107,44,0.35)",
+              border: "2px solid rgba(230,59,46,0.35)",
               boxShadow: "0 2px 10px rgba(0,0,0,0.5)",
               zIndex: 2,
             }}
@@ -311,7 +311,7 @@ function ProximityRadar() {
             fontSize: 34,
             fontWeight: 700,
             fontFamily: FF_D,
-            background: "linear-gradient(135deg, #FF6B2C, #FFBE7B)",
+            background: "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             lineHeight: 1.1,
@@ -354,7 +354,7 @@ function ProximityRadar() {
               width: 26,
               height: 26,
               borderRadius: "50%",
-              background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
+              background: "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -437,7 +437,7 @@ function PhotoAvatar({
   );
 }
 
-function Sparkle({ size = 24, color = "#FF6B2C", style = {} }) {
+function Sparkle({ size = 24, color = "#E63B2E", style = {} }) {
   return (
     <svg
       width={size}
@@ -600,7 +600,7 @@ function ProfileScreen() {
               display: "inline-flex",
               alignItems: "center",
               gap: 5,
-              background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
+              background: "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)",
               borderRadius: 20,
               padding: "5px 13px",
               fontSize: 12,
@@ -660,8 +660,8 @@ function ProfileScreen() {
               style={{
                 padding: "4px 12px",
                 borderRadius: 20,
-                background: "rgba(255,107,44,0.15)",
-                color: "#FF9A56",
+                background: "rgba(230,59,46,0.15)",
+                color: "#4285F4",
                 fontSize: 11,
                 fontWeight: 600,
                 fontFamily: FF_B,
@@ -692,11 +692,11 @@ function ProfileScreen() {
               width: 54,
               height: 54,
               borderRadius: "50%",
-              background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
+              background: "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 4px 20px rgba(255,107,44,0.4)",
+              boxShadow: "0 4px 20px rgba(230,59,46,0.4)",
             }}
           >
             <HeartIcon size={22} />
@@ -781,7 +781,7 @@ function ChatScreen() {
         <div
           style={{
             alignSelf: "flex-end",
-            background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
+            background: "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)",
             borderRadius: "18px 18px 4px 18px",
             padding: "10px 14px",
             maxWidth: "78%",
@@ -824,7 +824,7 @@ function ChatScreen() {
               width: 28,
               height: 28,
               borderRadius: "50%",
-              background: "#FF6B2C",
+              background: "#E63B2E",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -847,7 +847,7 @@ function ChatScreen() {
                 style={{
                   width: "40%",
                   height: "100%",
-                  background: "#FF9A56",
+                  background: "#4285F4",
                   borderRadius: 2,
                 }}
               />
@@ -866,7 +866,7 @@ function ChatScreen() {
         <div
           style={{
             alignSelf: "flex-end",
-            background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
+            background: "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)",
             borderRadius: "18px 18px 4px 18px",
             padding: "10px 14px",
             color: "#fff",
@@ -903,7 +903,7 @@ function ChatScreen() {
             width: 38,
             height: 38,
             borderRadius: "50%",
-            background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
+            background: "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -935,9 +935,9 @@ function FeatureCard({
       onMouseLeave={() => setH(false)}
       style={{
         background: h
-          ? "linear-gradient(135deg, rgba(255,107,44,0.1), rgba(255,154,86,0.04))"
+          ? "linear-gradient(135deg, rgba(230,59,46,0.1), rgba(66,133,244,0.04))"
           : "rgba(255,255,255,0.02)",
-        border: `1px solid ${h ? "rgba(255,107,44,0.25)" : "rgba(255,255,255,0.05)"}`,
+        border: `1px solid ${h ? "rgba(230,59,46,0.25)" : "rgba(255,255,255,0.05)"}`,
         borderRadius: 24,
         padding: "32px 26px",
         transition: "all 0.4s cubic-bezier(0.16,1,0.3,1)",
@@ -966,7 +966,7 @@ function FeatureCard({
             height: 50,
             borderRadius: 16,
             background:
-              "linear-gradient(135deg, rgba(255,107,44,0.15), rgba(255,107,44,0.05))",
+              "linear-gradient(135deg, rgba(230,59,46,0.15), rgba(230,59,46,0.05))",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -1027,10 +1027,10 @@ function PricingCard({
       onMouseLeave={() => setH(false)}
       style={{
         background: popular
-          ? "linear-gradient(160deg, rgba(255,107,44,0.12), rgba(255,154,86,0.04))"
+          ? "linear-gradient(160deg, rgba(230,59,46,0.12), rgba(66,133,244,0.04))"
           : "rgba(255,255,255,0.02)",
         border: popular
-          ? "1px solid rgba(255,107,44,0.35)"
+          ? "1px solid rgba(230,59,46,0.35)"
           : "1px solid rgba(255,255,255,0.05)",
         borderRadius: 28,
         padding: "36px 28px",
@@ -1060,7 +1060,7 @@ function PricingCard({
             top: -13,
             left: "50%",
             transform: "translateX(-50%)",
-            background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
+            background: "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)",
             borderRadius: 20,
             padding: "5px 20px",
             fontSize: 12,
@@ -1077,7 +1077,7 @@ function PricingCard({
       <div style={{ position: "relative", zIndex: 1 }}>
         <div
           style={{
-            color: popular ? "#FF9A56" : "rgba(255,255,255,0.45)",
+            color: popular ? "#4285F4" : "rgba(255,255,255,0.45)",
             fontSize: 13,
             fontWeight: 600,
             textTransform: "uppercase",
@@ -1162,13 +1162,13 @@ function PricingCard({
                   height: 20,
                   borderRadius: "50%",
                   background: popular
-                    ? "rgba(255,107,44,0.2)"
+                    ? "rgba(230,59,46,0.2)"
                     : "rgba(255,255,255,0.05)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   fontSize: 10,
-                  color: popular ? "#FF9A56" : "rgba(255,255,255,0.35)",
+                  color: popular ? "#4285F4" : "rgba(255,255,255,0.35)",
                   flexShrink: 0,
                 }}
               >
@@ -1186,7 +1186,7 @@ function PricingCard({
             borderRadius: 16,
             border: popular ? "none" : "1px solid rgba(255,255,255,0.1)",
             background: popular
-              ? "linear-gradient(135deg, #FF6B2C, #FF9A56)"
+              ? "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)"
               : "transparent",
             color: "#fff",
             fontSize: 15,
@@ -1208,8 +1208,8 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
     <div
       onClick={() => setO(!o)}
       style={{
-        background: o ? "rgba(255,107,44,0.07)" : "rgba(255,255,255,0.02)",
-        border: `1px solid ${o ? "rgba(255,107,44,0.2)" : "rgba(255,255,255,0.05)"}`,
+        background: o ? "rgba(230,59,46,0.07)" : "rgba(255,255,255,0.02)",
+        border: `1px solid ${o ? "rgba(230,59,46,0.2)" : "rgba(255,255,255,0.05)"}`,
         borderRadius: 20,
         padding: "20px 24px",
         cursor: "pointer",
@@ -1225,7 +1225,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
       >
         <span
           style={{
-            color: o ? "#FF9A56" : "#fff",
+            color: o ? "#4285F4" : "#fff",
             fontSize: 15,
             fontWeight: 600,
             fontFamily: FF_B,
@@ -1240,7 +1240,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
             height: 32,
             borderRadius: "50%",
             background: o
-              ? "linear-gradient(135deg, #FF6B2C, #FF9A56)"
+              ? "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)"
               : "rgba(255,255,255,0.05)",
             display: "flex",
             alignItems: "center",
@@ -1330,7 +1330,7 @@ export default function OomphLanding() {
         @keyframes avatarPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0.35}}
         @keyframes driftSlow{0%,100%{transform:translate(0,0)}33%{transform:translate(15px,-10px)}66%{transform:translate(-10px,8px)}}
-        ::selection{background:rgba(255,107,44,0.3);color:#fff}
+        ::selection{background:rgba(230,59,46,0.3);color:#fff}
       `}</style>
 
       {/* ═══ HERO ═══ */}
@@ -1370,8 +1370,8 @@ export default function OomphLanding() {
             <defs>
               <linearGradient id="b1" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#FF3D1F" stopOpacity="0.8" />
-                <stop offset="50%" stopColor="#FF6B2C" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="#FF9A56" stopOpacity="0.4" />
+                <stop offset="50%" stopColor="#E63B2E" stopOpacity="0.6" />
+                <stop offset="100%" stopColor="#4285F4" stopOpacity="0.4" />
               </linearGradient>
             </defs>
             <path
@@ -1393,9 +1393,9 @@ export default function OomphLanding() {
           >
             <defs>
               <linearGradient id="b2" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#FFBE7B" stopOpacity="0.5" />
-                <stop offset="40%" stopColor="#FF9A56" stopOpacity="0.65" />
-                <stop offset="100%" stopColor="#FF6B2C" stopOpacity="0.75" />
+                <stop offset="0%" stopColor="#F0A830" stopOpacity="0.5" />
+                <stop offset="40%" stopColor="#E63B2E" stopOpacity="0.65" />
+                <stop offset="100%" stopColor="#4285F4" stopOpacity="0.75" />
               </linearGradient>
             </defs>
             <path
@@ -1412,7 +1412,7 @@ export default function OomphLanding() {
               height: 600,
               borderRadius: "50%",
               background:
-                "radial-gradient(circle, rgba(255,107,44,0.06) 0%, transparent 60%)",
+                "radial-gradient(circle, rgba(230,59,46,0.06) 0%, transparent 60%)",
               filter: "blur(80px)",
               animation: "pulseGlow 8s ease-in-out infinite",
             }}
@@ -1439,7 +1439,7 @@ export default function OomphLanding() {
               height: 350,
               borderRadius: "50%",
               background:
-                "radial-gradient(circle, rgba(255,190,123,0.05) 0%, transparent 60%)",
+                "radial-gradient(circle, rgba(240,168,48,0.05) 0%, transparent 60%)",
               filter: "blur(60px)",
               animation: "pulseGlow 10s ease-in-out 3s infinite",
             }}
@@ -1470,7 +1470,7 @@ export default function OomphLanding() {
         />
         <StarDecor
           size={28}
-          color="rgba(255,190,123,0.18)"
+          color="rgba(240,168,48,0.18)"
           style={{
             position: "absolute",
             bottom: "28%",
@@ -1481,7 +1481,7 @@ export default function OomphLanding() {
         />
         <StarDecor
           size={34}
-          color="rgba(255,107,44,0.14)"
+          color="rgba(230,59,46,0.14)"
           style={{
             position: "absolute",
             bottom: "32%",
@@ -1492,12 +1492,12 @@ export default function OomphLanding() {
         />
         <Sparkle
           size={16}
-          color="rgba(255,190,123,0.22)"
+          color="rgba(240,168,48,0.22)"
           style={{ position: "absolute", top: "35%", left: "22%", zIndex: 2 }}
         />
         <Sparkle
           size={14}
-          color="rgba(255,107,44,0.2)"
+          color="rgba(230,59,46,0.2)"
           style={{ position: "absolute", top: "45%", right: "20%", zIndex: 2 }}
         />
 
@@ -1611,7 +1611,7 @@ export default function OomphLanding() {
               animation: "fadeInUp 0.8s ease 0.1s both",
             }}
           >
-            <Sparkle size={12} color="#FF9A56" />
+            <Sparkle size={12} color="#4285F4" />
             <span
               style={{
                 color: "rgba(255,255,255,0.55)",
@@ -1632,15 +1632,14 @@ export default function OomphLanding() {
               letterSpacing: "-0.03em",
               marginBottom: isMobile ? 16 : 22,
               animation: "fadeInUp 0.8s ease 0.2s both",
-              ...HEADING_FILTER,
             }}
           >
-            Date people
+            <span style={HEADING_FILTER}>Date people</span>
             <br />
             <span
               style={{
                 background:
-                  "linear-gradient(135deg, #FF6B2C 0%, #FFBE7B 40%, #FF6B2C 80%)",
+                  "linear-gradient(135deg, #F0A830 0%, #E63B2E 40%, #4285F4 80%)",
                 backgroundSize: "200% 200%",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
@@ -1649,7 +1648,7 @@ export default function OomphLanding() {
             >
               around you
             </span>
-            .
+            <span style={HEADING_FILTER}>.</span>
           </h1>
 
           <p
@@ -1682,7 +1681,7 @@ export default function OomphLanding() {
               target="_blank"
               rel="noopener noreferrer"
               style={{
-                background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
+                background: "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)",
                 border: "none",
                 borderRadius: 18,
                 padding: isMobile ? "14px 28px" : "15px 34px",
@@ -1694,7 +1693,7 @@ export default function OomphLanding() {
                 display: "flex",
                 alignItems: "center",
                 gap: 10,
-                boxShadow: "0 8px 32px rgba(255,107,44,0.35)",
+                boxShadow: "0 8px 32px rgba(230,59,46,0.35)",
                 width: isMobile ? "100%" : "auto",
                 justifyContent: "center",
                 textDecoration: "none",
@@ -1800,11 +1799,11 @@ export default function OomphLanding() {
               width: 50,
               height: 50,
               borderRadius: "50%",
-              background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
+              background: "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 8px 28px rgba(255,107,44,0.4)",
+              boxShadow: "0 8px 28px rgba(230,59,46,0.4)",
               animation: "floatBubble 5s ease-in-out infinite",
               zIndex: 5,
             }}
@@ -1828,7 +1827,7 @@ export default function OomphLanding() {
 
       {/* ═══ SOCIAL PROOF ═══ */}
       <SectionTexture
-        glowColor="rgba(255,107,44,0.05)"
+        glowColor="rgba(230,59,46,0.05)"
         glowPos="50% 50%"
         style={{
           borderTop: "1px solid rgba(255,255,255,0.04)",
@@ -1862,7 +1861,7 @@ export default function OomphLanding() {
                   fontSize: 26,
                   fontWeight: 700,
                   fontFamily: FF_D,
-                  background: "linear-gradient(135deg, #FF6B2C, #FFBE7B)",
+                  background: "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   lineHeight: 1.2,
@@ -1883,7 +1882,7 @@ export default function OomphLanding() {
       {/* ═══ FEATURES ═══ */}
       <SectionTexture
         id="features"
-        glowColor="rgba(255,107,44,0.03)"
+        glowColor="rgba(230,59,46,0.03)"
         glowPos="50% 20%"
         style={{ position: "relative", zIndex: 1 }}
       >
@@ -1893,7 +1892,7 @@ export default function OomphLanding() {
           <div style={{ textAlign: "center", marginBottom: 60 }}>
             <div
               style={{
-                color: "#FF9A56",
+                color: "#4285F4",
                 fontSize: 13,
                 fontWeight: 600,
                 textTransform: "uppercase",
@@ -1913,7 +1912,7 @@ export default function OomphLanding() {
                 ...HEADING_FILTER,
               }}
             >
-              Built for<span style={{ color: "#FF6B2C" }}> real life</span>{" "}
+              Built for<span style={{ color: "#E63B2E" }}> real life</span>{" "}
               dating
             </h2>
           </div>
@@ -1949,7 +1948,7 @@ export default function OomphLanding() {
 
       {/* ═══ HOW IT WORKS ═══ */}
       <SectionTexture
-        glowColor="rgba(255,154,86,0.04)"
+        glowColor="rgba(66,133,244,0.04)"
         glowPos="30% 50%"
         style={{ position: "relative", zIndex: 1 }}
       >
@@ -1966,7 +1965,7 @@ export default function OomphLanding() {
           <div style={{ flex: 1 }}>
             <div
               style={{
-                color: "#FF9A56",
+                color: "#4285F4",
                 fontSize: 13,
                 fontWeight: 600,
                 textTransform: "uppercase",
@@ -1984,14 +1983,13 @@ export default function OomphLanding() {
                 fontFamily: FF_D,
                 lineHeight: 1.15,
                 marginBottom: 44,
-                ...HEADING_FILTER,
               }}
             >
-              From download to
+              <span style={HEADING_FILTER}>From download to</span>
               <br />
               <span
                 style={{
-                  background: "linear-gradient(135deg, #FF6B2C, #FFBE7B)",
+                  background: "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
@@ -2026,7 +2024,7 @@ export default function OomphLanding() {
                       minWidth: 52,
                       height: 52,
                       borderRadius: 16,
-                      background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
+                      background: "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -2080,7 +2078,7 @@ export default function OomphLanding() {
                 height: 340,
                 borderRadius: "50%",
                 background:
-                  "radial-gradient(circle, rgba(255,107,44,0.08) 0%, transparent 70%)",
+                  "radial-gradient(circle, rgba(230,59,46,0.08) 0%, transparent 70%)",
                 filter: "blur(40px)",
               }}
             />
@@ -2099,7 +2097,7 @@ export default function OomphLanding() {
 
       {/* ═══ PRICING ═══ */}
       <SectionTexture
-        glowColor="rgba(255,107,44,0.04)"
+        glowColor="rgba(230,59,46,0.04)"
         glowPos="50% 30%"
         style={{ position: "relative", zIndex: 1 }}
       >
@@ -2109,7 +2107,7 @@ export default function OomphLanding() {
           <div style={{ textAlign: "center", marginBottom: 60 }}>
             <div
               style={{
-                color: "#FF9A56",
+                color: "#4285F4",
                 fontSize: 13,
                 fontWeight: 600,
                 textTransform: "uppercase",
@@ -2209,7 +2207,7 @@ export default function OomphLanding() {
 
       {/* ═══ FAQ ═══ */}
       <SectionTexture
-        glowColor="rgba(255,107,44,0.03)"
+        glowColor="rgba(230,59,46,0.03)"
         glowPos="50% 30%"
         style={{ position: "relative", zIndex: 1 }}
       >
@@ -2217,7 +2215,7 @@ export default function OomphLanding() {
           <div style={{ textAlign: "center", marginBottom: 60 }}>
             <div
               style={{
-                color: "#FF9A56",
+                color: "#4285F4",
                 fontSize: 13,
                 fontWeight: 600,
                 textTransform: "uppercase",
@@ -2264,7 +2262,7 @@ export default function OomphLanding() {
       {/* ═══ CTA ═══ */}
       <SectionTexture
         id="waitlist"
-        glowColor="rgba(255,107,44,0.06)"
+        glowColor="rgba(230,59,46,0.06)"
         glowPos="50% 50%"
         style={{ position: "relative", zIndex: 1 }}
       >
@@ -2278,21 +2276,20 @@ export default function OomphLanding() {
                 lineHeight: 1.08,
                 letterSpacing: "-0.02em",
                 marginBottom: 18,
-                ...HEADING_FILTER,
               }}
             >
-              Your person might be
+              <span style={HEADING_FILTER}>Your person might be</span>
               <br />
               <span
                 style={{
-                  background: "linear-gradient(135deg, #FF6B2C, #FFBE7B)",
+                  background: "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
               >
                 around the corner
               </span>
-              .
+              <span style={HEADING_FILTER}>.</span>
             </h2>
             <p
               style={{
@@ -2314,7 +2311,7 @@ export default function OomphLanding() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 10,
-                background: "linear-gradient(135deg, #FF6B2C, #FF9A56)",
+                background: "linear-gradient(135deg, #F0A830, #E63B2E, #4285F4)",
                 border: "none",
                 borderRadius: 18,
                 padding: "16px 36px",
@@ -2323,7 +2320,7 @@ export default function OomphLanding() {
                 fontWeight: 600,
                 fontFamily: FF_B,
                 cursor: "pointer",
-                boxShadow: "0 8px 32px rgba(255,107,44,0.35)",
+                boxShadow: "0 8px 32px rgba(230,59,46,0.35)",
                 textDecoration: "none",
               }}
             >

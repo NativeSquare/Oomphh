@@ -160,13 +160,16 @@ function calculateDistance(
  * Falls back to the current user's location when no explicit coordinates are provided.
  * If no location is available at all, sorts by date (soonest first).
  */
+// Default radius (in meters) applied when a city/location is explicitly searched.
+// This ensures city filtering actually restricts results to that area.
+const DEFAULT_CITY_RADIUS = 30_000; // 30 km
+
 export const getEvents = query({
   args: {
     eventType: v.optional(v.array(v.string())),
     dateRange: v.optional(v.string()),
     searchLatitude: v.optional(v.number()),
     searchLongitude: v.optional(v.number()),
-    maxDistance: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const currentUserId = await getAuthUserId(ctx);
@@ -175,6 +178,9 @@ export const getEvents = query({
     // Resolve the search origin: explicit search location > user's current location
     let searchLat = args.searchLatitude;
     let searchLng = args.searchLongitude;
+    // When the user explicitly searched for a city, apply a radius filter
+    const hasExplicitSearch =
+      args.searchLatitude !== undefined && args.searchLongitude !== undefined;
     if (searchLat === undefined || searchLng === undefined) {
       const userGeo = await getGeospatial().get(ctx, currentUserId);
       if (userGeo) {
@@ -344,8 +350,10 @@ export const getEvents = query({
         ),
       }));
 
-      const filtered = args.maxDistance
-        ? withDistance.filter((e) => e.distance <= args.maxDistance!)
+      // When a city was explicitly searched, filter to events within its radius.
+      // When using the user's own location, just sort by proximity (no cutoff).
+      const filtered = hasExplicitSearch
+        ? withDistance.filter((e) => e.distance <= DEFAULT_CITY_RADIUS)
         : withDistance;
 
       return filtered.sort((a, b) => a.distance - b.distance);
@@ -405,6 +413,11 @@ export const getEvent = query({
 /**
  * Join an event.
  */
+// Hard RSVP caps per tier.  The backend doesn't know the user's RevenueCat
+// tier yet, so we enforce the most generous limit here as a safety net.
+// The client-side check enforces the correct per-tier limit.
+const MAX_RSVP_HARD_CAP = 5; // premium limit — free (3) is enforced client-side
+
 export const joinEvent = mutation({
   args: {
     eventId: v.id("events"),
@@ -430,6 +443,27 @@ export const joinEvent = mutation({
 
     if (existing) {
       throw new Error("Already joined this event");
+    }
+
+    // Server-side RSVP cap — count upcoming events the user has joined
+    const userRsvps = await ctx.db
+      .query("eventAttendees")
+      .withIndex("userId", (q) => q.eq("userId", currentUserId))
+      .collect();
+
+    const now = Date.now();
+    let upcomingCount = 0;
+    for (const rsvp of userRsvps) {
+      const ev = await ctx.db.get(rsvp.eventId);
+      if (ev && ev.date >= now) {
+        upcomingCount++;
+      }
+    }
+
+    if (upcomingCount >= MAX_RSVP_HARD_CAP) {
+      throw new Error(
+        "You have reached the maximum number of event RSVPs on your current plan. Upgrade to join more.",
+      );
     }
 
     // Check max attendees limit

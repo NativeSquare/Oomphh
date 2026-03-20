@@ -16,6 +16,7 @@ import { useMutation, useQuery } from "convex/react";
 import { router } from "expo-router";
 import React from "react";
 import { Alert, ScrollView, View } from "react-native";
+import { useSubscription } from "@/hooks/use-subscription";
 import { EventFilterData } from "../event-filters";
 
 function formatEventDate(timestamp: number): string {
@@ -41,7 +42,6 @@ function formatEventDate(timestamp: number): string {
 const defaultFilters: EventFilterData = {
   eventType: [],
   dateRange: "",
-  distance: "",
 };
 
 export default function Events() {
@@ -57,7 +57,6 @@ export default function Events() {
         const next: EventFilterData = {
           eventType: parsed.eventType ?? [],
           dateRange: parsed.dateRange ?? "",
-          distance: parsed.distance ?? "",
         };
         setFilters((prev) => {
           if (JSON.stringify(prev) === JSON.stringify(next)) return prev;
@@ -105,7 +104,6 @@ export default function Events() {
     dateRange?: string;
     searchLatitude?: number;
     searchLongitude?: number;
-    maxDistance?: number;
   } = {};
 
   if (filters.eventType.length > 0) {
@@ -120,19 +118,13 @@ export default function Events() {
     queryFilters.searchLongitude = searchLocation.longitude;
   }
 
-  if (filters.distance && filters.distance !== "Any Distance") {
-    const km = parseInt(filters.distance, 10);
-    if (!isNaN(km)) {
-      queryFilters.maxDistance = km * 1000; // convert km to meters
-    }
-  }
-
   const hasActiveFilters =
     filters.eventType.length > 0 ||
-    (filters.dateRange !== "" && filters.dateRange !== "Any Time") ||
-    (filters.distance !== "" && filters.distance !== "Any Distance");
+    (filters.dateRange !== "" && filters.dateRange !== "Any Time");
 
+  const { capabilities } = useSubscription();
   const events = useQuery(api.table.events.getEvents, queryFilters);
+  const myRSVPCount = useQuery(api.table.events.getMyRSVPCount);
   const joinEvent = useMutation(api.table.events.joinEvent);
   const leaveEvent = useMutation(api.table.events.leaveEvent);
 
@@ -141,6 +133,18 @@ export default function Events() {
   };
 
   const handleJoinPress = async (eventId: Id<"events">, hasJoined: boolean) => {
+    if (!hasJoined && (myRSVPCount ?? 0) >= capabilities.maxEventRSVPs) {
+      Alert.alert(
+        "RSVP Limit Reached",
+        `You can RSVP to up to ${capabilities.maxEventRSVPs} events on your current plan. Upgrade to join more.`,
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Upgrade", onPress: () => router.push("/paywall" as any) },
+        ],
+      );
+      return;
+    }
+
     try {
       if (hasJoined) {
         await leaveEvent({ eventId });

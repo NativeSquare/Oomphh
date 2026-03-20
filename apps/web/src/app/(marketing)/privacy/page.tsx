@@ -1,7 +1,7 @@
 export default function PrivacyPage() {
   return (
     <div className="mx-auto max-w-3xl px-5 pb-20 pt-32 sm:px-8 lg:px-12">
-      <div className="mb-4 font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-[#FF9A56]">
+      <div className="mb-4 font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-[#E63B2E]">
         Legal
       </div>
       <h1 className="mb-2 text-[clamp(36px,4.5vw,56px)] font-light leading-[1.1] tracking-[-0.03em] text-white/[0.92]">
@@ -137,7 +137,7 @@ export default function PrivacyPage() {
             us at:{" "}
             <a
               href="mailto:info@oomphh.cz"
-              className="text-[#FF9A56] transition-opacity hover:opacity-80"
+              className="text-[#E63B2E] transition-opacity hover:opacity-80"
             >
               info@oomphh.cz
             </a>

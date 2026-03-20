@@ -8,6 +8,7 @@ import { BottomSheetModal } from "@/components/custom/bottom-sheet";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { useSubscription } from "@/hooks/use-subscription";
 import { cmToFeetInches, kgToLbs } from "@/utils/measurements";
 import { api } from "@packages/backend/convex/_generated/api";
 import { BottomSheetModal as GorhomBottomSheetModal } from "@gorhom/bottom-sheet";
@@ -96,6 +97,8 @@ const RELATIONSHIP_STATUSES = [
 export default function Filters() {
   const user = useQuery(api.table.users.currentUser);
   const measurementSystem = user?.measurementSystem ?? "metric";
+  const { capabilities } = useSubscription();
+  const filtersLocked = !capabilities.advancedFilters;
 
   const defaultFilters: FilterData = {
     minAge: DEFAULT_MIN_AGE,
@@ -246,22 +249,25 @@ export default function Filters() {
               <View className="rounded-xl overflow-hidden">
                 <PreferenceRow
                   label="Looking For"
+                  locked={filtersLocked}
                   values={
-                    filters.lookingFor.length > 0
+                    !filtersLocked && filters.lookingFor.length > 0
                       ? filters.lookingFor
                       : undefined
                   }
-                  onPress={() => lookingForSheetRef.current?.present()}
+                  onPress={() => filtersLocked ? router.push("/paywall" as any) : lookingForSheetRef.current?.present()}
                 />
                 <PreferenceRow
                   label="Position"
-                  values={filters.position || undefined}
-                  onPress={() => positionSheetRef.current?.present()}
+                  locked={filtersLocked}
+                  values={!filtersLocked ? (filters.position || undefined) : undefined}
+                  onPress={() => filtersLocked ? router.push("/paywall" as any) : positionSheetRef.current?.present()}
                 />
                 <PreferenceRow
                   label="Relationship Status"
-                  values={filters.relationshipStatus || undefined}
-                  onPress={() => relationshipStatusSheetRef.current?.present()}
+                  locked={filtersLocked}
+                  values={!filtersLocked ? (filters.relationshipStatus || undefined) : undefined}
+                  onPress={() => filtersLocked ? router.push("/paywall" as any) : relationshipStatusSheetRef.current?.present()}
                   isLast
                 />
               </View>
@@ -273,13 +279,15 @@ export default function Filters() {
               <View className="rounded-xl overflow-hidden">
                 <PreferenceRow
                   label="Body Type"
-                  values={filters.bodyType || undefined}
-                  onPress={() => bodyTypeSheetRef.current?.present()}
+                  locked={filtersLocked}
+                  values={!filtersLocked ? (filters.bodyType || undefined) : undefined}
+                  onPress={() => filtersLocked ? router.push("/paywall" as any) : bodyTypeSheetRef.current?.present()}
                 />
                 <PreferenceRow
                   label="Ethnicity"
-                  values={filters.ethnicity || undefined}
-                  onPress={() => ethnicitySheetRef.current?.present()}
+                  locked={filtersLocked}
+                  values={!filtersLocked ? (filters.ethnicity || undefined) : undefined}
+                  onPress={() => filtersLocked ? router.push("/paywall" as any) : ethnicitySheetRef.current?.present()}
                   isLast
                 />
               </View>
@@ -291,8 +299,9 @@ export default function Filters() {
               <View className="rounded-xl overflow-hidden">
                 <PreferenceRow
                   label="Sexual Orientation"
-                  values={filters.orientation || undefined}
-                  onPress={() => orientationSheetRef.current?.present()}
+                  locked={filtersLocked}
+                  values={!filtersLocked ? (filters.orientation || undefined) : undefined}
+                  onPress={() => filtersLocked ? router.push("/paywall" as any) : orientationSheetRef.current?.present()}
                   isLast
                 />
               </View>

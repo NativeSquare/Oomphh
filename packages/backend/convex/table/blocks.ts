@@ -130,6 +130,22 @@ export const getBlockedUsers = query({
       .withIndex("by_blocker", (q) => q.eq("blockerId", userId))
       .collect();
 
-    return blockedEntries.map((entry) => entry.blockedUserId);
+    const users = await Promise.all(
+      blockedEntries.map(async (entry) => {
+        const user = await ctx.db.get(entry.blockedUserId);
+        if (!user) return null;
+        const profilePictureUrl =
+          user.profilePictures?.[0]
+            ? await ctx.storage.getUrl(user.profilePictures[0])
+            : null;
+        return {
+          _id: user._id,
+          name: user.name ?? "Unknown",
+          profilePictureUrl,
+        };
+      }),
+    );
+
+    return users.filter((u) => u !== null);
   },
 });

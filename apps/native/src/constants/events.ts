@@ -21,14 +21,5 @@ export const DATE_RANGES = [
 ] as const;
 
 
-export const DISTANCE_RANGES = [
-  "5 km",
-  "10 km",
-  "25 km",
-  "50 km",
-  "100 km",
-  "Any Distance",
-] as const;
-
 export const EVENT_FILTERS_STORAGE_KEY = "event_filters";
 export const EVENT_SEARCH_LOCATION_STORAGE_KEY = "event_search_location";

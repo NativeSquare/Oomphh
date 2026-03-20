@@ -34,6 +34,8 @@ const DEFAULT_MAX_WEIGHT = 150;
 
 export default function Home() {
   const user = useQuery(api.table.users.currentUser);
+  const { capabilities } = useSubscription();
+  const advancedFiltersAllowed = capabilities.advancedFilters;
   const defaultFilters: FilterData = {
     minAge: DEFAULT_MIN_AGE,
     maxAge: DEFAULT_MAX_AGE,
@@ -117,13 +119,15 @@ export default function Home() {
 
   // Check if filters are active (non-default)
   const hasActiveFilters = useMemo(() => {
-    return (
+    const hasFreeFilters =
       filters.minAge !== DEFAULT_MIN_AGE ||
       filters.maxAge !== DEFAULT_MAX_AGE ||
       filters.minHeight !== DEFAULT_MIN_HEIGHT ||
       filters.maxHeight !== DEFAULT_MAX_HEIGHT ||
       filters.minWeight !== DEFAULT_MIN_WEIGHT ||
-      filters.maxWeight !== DEFAULT_MAX_WEIGHT ||
+      filters.maxWeight !== DEFAULT_MAX_WEIGHT;
+
+    const hasPremiumFilters = advancedFiltersAllowed && (
       filters.lookingFor.length > 0 ||
       filters.orientation !== "" ||
       filters.position !== "" ||
@@ -131,7 +135,9 @@ export default function Home() {
       filters.ethnicity !== "" ||
       filters.relationshipStatus !== ""
     );
-  }, [filters]);
+
+    return hasFreeFilters || hasPremiumFilters;
+  }, [filters, advancedFiltersAllowed]);
 
   const favoriteIds = useMemo(() => {
     if (!favorites) return new Set<string>();
@@ -180,28 +186,31 @@ export default function Home() {
       }
     }
 
-    if (filters.lookingFor.length > 0) {
-      labels.push(...filters.lookingFor);
-    }
+    // Only show premium filter labels if user has advanced filters
+    if (advancedFiltersAllowed) {
+      if (filters.lookingFor.length > 0) {
+        labels.push(...filters.lookingFor);
+      }
 
-    if (filters.orientation) {
-      labels.push(filters.orientation);
-    }
+      if (filters.orientation) {
+        labels.push(filters.orientation);
+      }
 
-    if (filters.position) {
-      labels.push(filters.position);
-    }
+      if (filters.position) {
+        labels.push(filters.position);
+      }
 
-    if (filters.bodyType) {
-      labels.push(filters.bodyType);
-    }
+      if (filters.bodyType) {
+        labels.push(filters.bodyType);
+      }
 
-    if (filters.ethnicity) {
-      labels.push(filters.ethnicity);
-    }
+      if (filters.ethnicity) {
+        labels.push(filters.ethnicity);
+      }
 
-    if (filters.relationshipStatus) {
-      labels.push(filters.relationshipStatus);
+      if (filters.relationshipStatus) {
+        labels.push(filters.relationshipStatus);
+      }
     }
 
     if (showFavoritesOnly) {
@@ -213,7 +222,7 @@ export default function Home() {
     }
 
     return labels;
-  }, [filters, measurementSystem, showFavoritesOnly, showOnlineOnly]);
+  }, [filters, measurementSystem, showFavoritesOnly, showOnlineOnly, advancedFiltersAllowed]);
 
   const handleClearAll = async () => {
     setFilters(defaultFilters);
@@ -230,9 +239,12 @@ export default function Home() {
   };
 
   // Build filters object with only non-default values
+  // Premium-only filters (lookingFor, orientation, position, bodyType, ethnicity, relationshipStatus)
+  // are excluded for free users
   const activeFiltersForQuery = useMemo(() => {
     const result: Partial<FilterData> = {};
 
+    // Free filters: age, height, weight
     if (filters.minAge !== DEFAULT_MIN_AGE) result.minAge = filters.minAge;
     if (filters.maxAge !== DEFAULT_MAX_AGE) result.maxAge = filters.maxAge;
     if (filters.minHeight !== DEFAULT_MIN_HEIGHT)
@@ -243,16 +255,20 @@ export default function Home() {
       result.minWeight = filters.minWeight;
     if (filters.maxWeight !== DEFAULT_MAX_WEIGHT)
       result.maxWeight = filters.maxWeight;
-    if (filters.lookingFor.length > 0) result.lookingFor = filters.lookingFor;
-    if (filters.orientation) result.orientation = filters.orientation;
-    if (filters.position) result.position = filters.position;
-    if (filters.bodyType) result.bodyType = filters.bodyType;
-    if (filters.ethnicity) result.ethnicity = filters.ethnicity;
-    if (filters.relationshipStatus)
-      result.relationshipStatus = filters.relationshipStatus;
+
+    // Premium filters: only include if user has advanced filters capability
+    if (advancedFiltersAllowed) {
+      if (filters.lookingFor.length > 0) result.lookingFor = filters.lookingFor;
+      if (filters.orientation) result.orientation = filters.orientation;
+      if (filters.position) result.position = filters.position;
+      if (filters.bodyType) result.bodyType = filters.bodyType;
+      if (filters.ethnicity) result.ethnicity = filters.ethnicity;
+      if (filters.relationshipStatus)
+        result.relationshipStatus = filters.relationshipStatus;
+    }
 
     return Object.keys(result).length > 0 ? result : undefined;
-  }, [filters]);
+  }, [filters, advancedFiltersAllowed]);
 
   if (!user?._id) return <View className="flex-1 bg-background" />;
 

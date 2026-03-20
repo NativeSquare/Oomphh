@@ -9,11 +9,11 @@ import { FeedbackSchema } from "@/validation/feedback";
 import { api } from "@packages/backend/convex/_generated/api";
 import { Id } from "@packages/backend/convex/_generated/dataModel";
 import { BottomSheetModal as GorhomBottomSheetModal } from "@gorhom/bottom-sheet";
-import { useAction } from "convex/react";
+import { useMutation } from "convex/react";
 import { router } from "expo-router";
 import { ChevronLeft } from "lucide-react-native";
 import React from "react";
-import { ActivityIndicator, Pressable, ScrollView, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, ScrollView, View } from "react-native";
 import z from "zod";
 
 export type FeedbackFormData = {
@@ -31,7 +31,7 @@ export default function SendFeedback() {
     type?: string;
     feedbackText?: string;
   }>({});
-  const sendFeedback = useAction(api.table.feedback.sendFeedback);
+  const sendFeedback = useMutation(api.table.feedback.sendFeedback);
 
   const handleSubmit = async () => {
     setError(null);
@@ -63,7 +63,11 @@ export default function SendFeedback() {
         feedbackText: formData?.feedbackText,
         feedbackImages: formData?.feedbackImages,
       });
-      router.dismissTo("/profile");
+      Alert.alert(
+        "Thank you!",
+        "Your feedback has been sent successfully.",
+        [{ text: "OK", onPress: () => router.dismissTo("/profile") }],
+      );
     } catch (err) {
       setError(getConvexErrorMessage(err));
     } finally {

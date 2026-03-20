@@ -35,8 +35,8 @@ export function SiteHeader() {
               className={cn(
                 "text-sm font-medium transition-colors duration-300",
                 pathname === link.href
-                  ? "text-[#FF9A56]"
-                  : "text-white/55 hover:text-[#FF9A56]",
+                  ? "text-[#E63B2E]"
+                  : "text-white/55 hover:text-[#E63B2E]",
               )}
             >
               {link.label}
@@ -45,7 +45,7 @@ export function SiteHeader() {
         </nav>
         <Link
           href="/download"
-          className="rounded-[14px] bg-gradient-to-br from-[#FF6B2C] to-[#FF9A56] px-4 py-2 text-xs font-semibold text-white shadow-[0_4px_16px_rgba(255,107,44,0.3)] sm:px-6 sm:py-2.5 sm:text-sm"
+          className="rounded-[14px] bg-gradient-to-br from-[#F0A830] via-[#E63B2E] to-[#4285F4] px-4 py-2 text-xs font-semibold text-white shadow-[0_4px_16px_rgba(230,59,46,0.3)] sm:px-6 sm:py-2.5 sm:text-sm"
         >
           Download app
         </Link>

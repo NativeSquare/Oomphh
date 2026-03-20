@@ -13,9 +13,11 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { api } from "@packages/backend/convex/_generated/api";
 import { BottomSheetModal as GorhomBottomSheetModal } from "@gorhom/bottom-sheet";
 import { useMutation, useQuery } from "convex/react";
+import { Image as ExpoImage } from "expo-image";
 import { router } from "expo-router";
 import * as Linking from "expo-linking";
 import {
+  Ban,
   Bell,
   CalendarDays,
   File,
@@ -35,6 +37,7 @@ export default function Profile() {
   const { signOut } = useAuthActions();
   const deleteUser = useMutation(api.table.users.del);
   const patchUser = useMutation(api.table.users.patch);
+  const removeToken = useMutation(api.pushNotifications.removeToken);
   const user = useQuery(api.table.users.currentUser);
   const deleteAccountBottomSheetRef =
     React.useRef<GorhomBottomSheetModal>(null);
@@ -58,9 +61,16 @@ export default function Profile() {
     deleteUser({ id: user._id });
   }, []);
 
-  const handleLogout = React.useCallback(() => {
+  const handleLogout = React.useCallback(async () => {
+    // Unregister push token so the logged-out user stops receiving notifications
+    try {
+      await removeToken();
+    } catch {}
+    // Clear image cache so the next user doesn't see stale profile pictures
+    await ExpoImage.clearDiskCache();
+    await ExpoImage.clearMemoryCache();
     signOut();
-  }, [signOut]);
+  }, [signOut, removeToken]);
 
   const settingsItems: SettingItem[] = [
     {
@@ -77,6 +87,11 @@ export default function Profile() {
       label: "Notifications",
       icon: Bell,
       onPress: () => router.push("/notifications"),
+    },
+    {
+      label: "Blocked Users",
+      icon: Ban,
+      onPress: () => router.push("/blocked-users"),
     },
     {
       label: "Cached Pictures",

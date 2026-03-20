@@ -20,11 +20,9 @@ export function EventMessageBubble({
   if (isOutgoing) {
     return (
       <View className="flex-col items-end mb-3">
-        <View className="flex-row gap-4 items-center px-4 py-2.5 max-w-[80%] bg-[#f7cfb0] rounded-full">
-          <View className="flex-1">
-            <Text className="text-sm leading-5 text-[#26272b]">{message}</Text>
-          </View>
-          <Text className="text-xs leading-[18px] shrink-0 text-[#51525c]">
+        <View className="px-4 py-2.5 max-w-[80%] bg-[#f7cfb0] rounded-2xl">
+          <Text className="text-sm leading-5 text-[#26272b]">{message}</Text>
+          <Text className="text-xs leading-[18px] mt-1 text-[#51525c] text-right">
             {timestamp}
           </Text>
         </View>
@@ -54,13 +52,11 @@ export function EventMessageBubble({
           </Text>
 
           {/* Message bubble */}
-          <View className="flex-row gap-4 items-center px-4 py-2.5 bg-[#26272b] rounded-full self-start">
-            <View className="flex-1">
-              <Text className="text-sm leading-5 text-[#d1d1d6]">
-                {message}
-              </Text>
-            </View>
-            <Text className="text-xs leading-[18px] shrink-0 text-[#70707b]">
+          <View className="px-4 py-2.5 max-w-[80%] bg-[#26272b] rounded-2xl self-start">
+            <Text className="text-sm leading-5 text-[#d1d1d6]">
+              {message}
+            </Text>
+            <Text className="text-xs leading-[18px] mt-1 text-[#70707b]">
               {timestamp}
             </Text>
           </View>
