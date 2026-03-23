@@ -6,7 +6,10 @@ import Purchases, {
   type PurchasesOffering,
 } from "react-native-purchases";
 
-const API_KEY = process.env.EXPO_PUBLIC_REVENUECAT_API_KEY!;
+const API_KEY =
+  Platform.OS === "ios"
+    ? process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY!
+    : process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY!;
 
 const PREMIUM_ENTITLEMENT_ID = "Premium";
 const UNLIMITED_ENTITLEMENT_ID = "Unlimited";

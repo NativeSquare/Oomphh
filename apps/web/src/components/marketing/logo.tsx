@@ -1,1 +1,1 @@
-export const LOGO_SRC = "/oomphh-logo.png";
+export const LOGO_SRC = "/logo.png";

@@ -10,7 +10,7 @@ const footerColumns: { title: string; links: FooterLink[] }[] = [
     links: [
       { label: "Features", href: "/features" },
       { label: "How it works", href: "/how-it-works" },
-      { label: "Download", href: "/download" },
+      { label: "Download", href: "/" },
     ],
   },
   {
@@ -40,8 +40,7 @@ export function SiteFooter() {
             <img
               src={LOGO_SRC}
               alt="OOmphh"
-              className="h-6 object-contain"
-              style={{ mixBlendMode: "lighten" }}
+              className="h-7 w-7 object-contain"
             />
           </div>
           <p className="text-[12.5px] font-light leading-[1.7] text-white/30">

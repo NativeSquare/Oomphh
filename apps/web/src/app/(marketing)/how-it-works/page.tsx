@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Compass, MessageCircle, Coffee } from "lucide-react";
+import { PricingSection } from "@/components/marketing/pricing-section";
 
 const steps = [
   {
@@ -76,12 +77,17 @@ export default function HowItWorksPage() {
             ))}
           </div>
 
+        </div>
+
+        <PricingSection />
+
+        <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <div className="mt-24 text-center">
             <p className="text-muted-foreground">
               Ready to get started?
             </p>
             <Button size="lg" className="mt-6 gap-2" asChild>
-              <Link href="/download">Download the app</Link>
+              <Link href="/">Download the app</Link>
             </Button>
           </div>
         </div>

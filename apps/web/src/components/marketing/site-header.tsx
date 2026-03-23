@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import { LOGO_SRC } from "./logo";
 
 const navLinks = [
-  { href: "/", label: "Home" },
   { href: "/features", label: "Features" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/about", label: "About" },
@@ -23,8 +22,7 @@ export function SiteHeader() {
           <img
             src={LOGO_SRC}
             alt="OOmphh"
-            className="h-7 object-contain sm:h-8"
-            style={{ mixBlendMode: "lighten" }}
+            className="h-8 w-8 object-contain sm:h-9 sm:w-9"
           />
         </Link>
         <nav className="hidden items-center gap-8 sm:flex">
@@ -44,7 +42,7 @@ export function SiteHeader() {
           ))}
         </nav>
         <Link
-          href="/download"
+          href="/"
           className="rounded-[14px] bg-gradient-to-br from-[#F0A830] via-[#E63B2E] to-[#4285F4] px-4 py-2 text-xs font-semibold text-white shadow-[0_4px_16px_rgba(230,59,46,0.3)] sm:px-6 sm:py-2.5 sm:text-sm"
         >
           Download app
