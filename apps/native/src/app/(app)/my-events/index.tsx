@@ -82,7 +82,7 @@ export default function MyEvents() {
         {/* Content */}
         {isLoading ? (
           <View className="items-center py-10">
-            <ActivityIndicator size="large" color="#e56400" />
+            <ActivityIndicator size="large" color="#E63B2E" />
           </View>
         ) : events.length === 0 ? (
           <View className="items-center py-10">

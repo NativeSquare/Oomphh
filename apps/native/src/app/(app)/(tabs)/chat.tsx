@@ -212,7 +212,7 @@ export default function Chat() {
             }}
             className={`h-[35px] px-3 py-1.5 rounded-[18px] ${
               activeTab === "Album"
-                ? "bg-[#e56400]"
+                ? "bg-primary"
                 : "bg-[#131316] border border-[#1a1a1e]"
             }`}
           >

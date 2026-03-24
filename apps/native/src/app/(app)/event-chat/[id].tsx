@@ -67,7 +67,7 @@ export default function EventChat() {
   if (event === undefined || messages === undefined) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#e56400" />
+        <ActivityIndicator size="large" color="#E63B2E" />
       </View>
     );
   }

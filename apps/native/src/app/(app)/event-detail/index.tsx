@@ -127,7 +127,7 @@ function EventDetail() {
   if (event === undefined) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#e56400" />
+        <ActivityIndicator size="large" color="#E63B2E" />
       </View>
     );
   }
@@ -246,8 +246,8 @@ function EventDetail() {
                   onPress={() => router.push("/paywall" as any)}
                   className="flex-row items-center gap-2 rounded-xl bg-secondary/30 px-3 py-3"
                 >
-                  <Icon as={Crown} size={18} className="text-[#e56400]" />
-                  <Text className="text-sm text-[#e56400]">
+                  <Icon as={Crown} size={18} className="text-primary" />
+                  <Text className="text-sm text-primary">
                     Upgrade to see attendees
                   </Text>
                 </Pressable>
@@ -411,18 +411,18 @@ function EventDetail() {
           </Button>
         ) : (
           <Button
-            className={`w-full ${event.hasJoined ? "bg-[#1a1a1e] border border-[#e56400]" : "bg-[#e56400]"}`}
+            className={`w-full ${event.hasJoined ? "bg-[#1a1a1e] border border-primary" : "bg-primary"}`}
             onPress={handleJoinLeave}
             disabled={isJoining}
           >
             {isJoining ? (
               <ActivityIndicator
                 size="small"
-                color={event.hasJoined ? "#e56400" : "#000"}
+                color={event.hasJoined ? "#E63B2E" : "#000"}
               />
             ) : (
               <Text
-                className={`text-base font-medium text-center ${event.hasJoined ? "text-[#e56400]" : "text-black"}`}
+                className={`text-base font-medium text-center ${event.hasJoined ? "text-primary" : "text-black"}`}
               >
                 {event.hasJoined ? "Leave Event" : "Join"}
               </Text>

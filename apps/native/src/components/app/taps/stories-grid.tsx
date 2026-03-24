@@ -118,7 +118,7 @@ export function StoriesGrid({ user }: StoriesGridProps) {
         <Text className="text-muted-foreground">No stories nearby</Text>
         <Pressable
           onPress={handleAddStoryPress}
-          className="flex-row items-center gap-2 rounded-full bg-[#e56400] px-5 py-2.5"
+          className="flex-row items-center gap-2 rounded-full bg-primary px-5 py-2.5"
         >
           <Plus size={18} color="#000" />
           <Text className="text-sm font-medium text-black">Add Story</Text>
@@ -144,7 +144,7 @@ export function StoriesGrid({ user }: StoriesGridProps) {
       {/* Add story button */}
       <Pressable
         onPress={handleAddStoryPress}
-        className="mb-2 flex-row items-center gap-2 self-start rounded-full bg-[#e56400] px-4 py-2"
+        className="mb-2 flex-row items-center gap-2 self-start rounded-full bg-primary px-4 py-2"
       >
         {isUploading ? (
           <ActivityIndicator size="small" color="#000" />
@@ -158,7 +158,7 @@ export function StoriesGrid({ user }: StoriesGridProps) {
         <View className="flex-row gap-1.5">
           <View
             style={{ width: itemWidth }}
-            className="relative aspect-square overflow-hidden rounded-xl border-2 border-[#E56400]"
+            className="relative aspect-square overflow-hidden rounded-xl border-2 border-primary"
           >
             <RNImage
               source={{ uri: pendingImageUri }}
@@ -166,7 +166,7 @@ export function StoriesGrid({ user }: StoriesGridProps) {
               resizeMode="cover"
             />
             <View className="absolute inset-0 items-center justify-center bg-black/50">
-              <ActivityIndicator size="large" color="#E56400" />
+              <ActivityIndicator size="large" color="#E63B2E" />
               <Text className="mt-2 text-xs font-medium text-white">
                 Uploading...
               </Text>
@@ -195,7 +195,7 @@ export function StoriesGrid({ user }: StoriesGridProps) {
                 onPress={() => handleStoryPress(group.authorId)}
                 style={{
                   width: itemWidth,
-                  borderColor: hasUnviewed ? "#E56400" : "#52525b",
+                  borderColor: hasUnviewed ? "#E63B2E" : "#52525b",
                 }}
                 className="relative aspect-square rounded-xl border-2"
               >
@@ -254,7 +254,7 @@ export function StoriesGrid({ user }: StoriesGridProps) {
                   </View>
                   {isUploadingToThisGroup && (
                     <View className="absolute inset-0 items-center justify-center rounded-[10px] bg-black/50">
-                      <ActivityIndicator size="large" color="#E56400" />
+                      <ActivityIndicator size="large" color="#E63B2E" />
                       <Text className="mt-2 text-xs font-medium text-white">
                         Uploading...
                       </Text>

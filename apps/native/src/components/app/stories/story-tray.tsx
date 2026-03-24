@@ -106,7 +106,7 @@ export function StoryTray({ user, searchLocation }: StoryTrayProps) {
             <View>
               {isUploading && (
                 <View className="absolute inset-0 z-10 items-center justify-center rounded-full">
-                  <ActivityIndicator size="small" color="#E56400" />
+                  <ActivityIndicator size="small" color="#E63B2E" />
                 </View>
               )}
               <StoryAvatar

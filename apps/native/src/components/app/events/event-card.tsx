@@ -75,13 +75,13 @@ export function EventCard({
           onPress={onJoinPress}
           className={`rounded-full px-5 py-1.5 active:opacity-70 ${
             hasJoined
-              ? "bg-[#e56400] border border-[#e56400]"
-              : "border border-[#e56400]"
+              ? "bg-primary border border-primary"
+              : "border border-primary"
           }`}
         >
           <Text
             className={`text-sm font-medium ${
-              hasJoined ? "text-black" : "text-[#e56400]"
+              hasJoined ? "text-black" : "text-primary"
             }`}
           >
             {hasJoined ? "Joined" : "Join"}

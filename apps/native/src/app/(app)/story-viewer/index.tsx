@@ -489,8 +489,8 @@ export default function StoryViewer() {
                 onPress={() => router.push("/paywall" as any)}
                 className="flex-1 flex-row items-center justify-center gap-2 rounded-full border border-white/30 bg-black/40 px-4 py-3"
               >
-                <Crown size={16} color="#e56400" />
-                <Text className="text-sm font-medium text-[#e56400]">
+                <Crown size={16} color="#E63B2E" />
+                <Text className="text-sm font-medium text-primary">
                   Upgrade to message from stories
                 </Text>
               </Pressable>
@@ -524,7 +524,7 @@ export default function StoryViewer() {
                     onPress={handleSendMessage}
                     hitSlop={8}
                     disabled={isSending}
-                    className="ml-2 rounded-full bg-[#e56400] p-1.5"
+                    className="ml-2 rounded-full bg-primary p-1.5"
                   >
                     {isSending ? (
                       <ActivityIndicator size={16} color="#fff" />
@@ -543,7 +543,7 @@ export default function StoryViewer() {
               <Heart
                 size={26}
                 color="#fff"
-                fill={isLiked ? "#e56400" : "transparent"}
+                fill={isLiked ? "#E63B2E" : "transparent"}
                 strokeWidth={isLiked ? 0 : 2}
               />
             </Pressable>

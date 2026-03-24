@@ -373,11 +373,11 @@ export default function CreateEvent() {
                         <Icon
                           as={CloudUpload}
                           size={22}
-                          className="text-[#e56400]"
+                          className="text-primary"
                         />
                       </View>
                       <View className="flex-row items-center gap-1">
-                        <Text className="text-sm font-semibold text-[#e56400]">
+                        <Text className="text-sm font-semibold text-primary">
                           Click to upload
                         </Text>
                         <Text className="text-xs text-muted-foreground">
@@ -437,7 +437,7 @@ export default function CreateEvent() {
         {/* Footer */}
         <View className="w-full max-w-md self-center px-4 pb-4 mb-safe">
           <Button
-            className="w-full bg-[#e56400]"
+            className="w-full bg-primary"
             disabled={!isFormValid || isBusy}
             onPress={handleCreate}
           >

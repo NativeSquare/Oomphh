@@ -52,8 +52,8 @@ export function AlbumPhotoItem({
             checked={isSelected}
             onCheckedChange={() => onSelect(photoId)}
             className="bg-[#131316] border border-[#1a1a1e] rounded-full size-4"
-            checkedClassName="bg-[#e56400] border-[#e56400]"
-            indicatorClassName="bg-[#e56400]"
+            checkedClassName="bg-primary border-primary"
+            indicatorClassName="bg-primary"
             iconClassName="text-black"
           />
         </View>

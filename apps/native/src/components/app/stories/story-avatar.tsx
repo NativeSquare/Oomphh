@@ -6,7 +6,7 @@ import { Pressable, View } from "react-native";
 export type StoryAvatarProps = {
   name: string;
   avatarUrl: string | null;
-  /** Show the orange ring around the avatar (indicates active stories) */
+  /** Show the red/primary ring around the avatar (indicates active stories) */
   hasStoryRing?: boolean;
   /** Show the "+" icon overlay (for create story button) */
   showAddIcon?: boolean;
@@ -29,7 +29,7 @@ export function StoryAvatar({
         className="items-center justify-center"
         style={{ width: 72, height: 72 }}
       >
-        {/* Orange ring wrapper */}
+        {/* Primary red ring wrapper */}
         <View
           className="items-center justify-center rounded-full"
           style={
@@ -38,7 +38,7 @@ export function StoryAvatar({
                   width: 72,
                   height: 72,
                   borderWidth: 2,
-                  borderColor: "#E56400",
+                  borderColor: "#E63B2E",
                 }
               : {
                   width: 72,

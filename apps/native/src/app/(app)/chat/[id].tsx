@@ -578,7 +578,7 @@ export default function ChatDetail() {
       {/* Album Carousel Viewer */}
       {albumViewerState.isLoading ? (
         <View className="absolute inset-0 bg-black items-center justify-center z-50">
-          <ActivityIndicator size="large" color="#e56400" />
+          <ActivityIndicator size="large" color="#E63B2E" />
           <Text className="text-white mt-4">Loading album...</Text>
         </View>
       ) : albumViewerState.isOpen && albumViewerState.photos.length > 0 ? (

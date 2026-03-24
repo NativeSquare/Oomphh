@@ -161,8 +161,8 @@ export default function FirstSentences() {
                 onPress={handleOpenAdd}
                 className="flex-row items-center gap-1 self-end"
               >
-                <Icon as={Plus} size={18} className="text-[#e56400]" />
-                <Text className="text-xs leading-[18px] text-[#e56400]">
+                <Icon as={Plus} size={18} className="text-primary" />
+                <Text className="text-xs leading-[18px] text-primary">
                   Add sentence
                 </Text>
               </Pressable>

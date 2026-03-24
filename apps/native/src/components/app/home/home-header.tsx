@@ -100,7 +100,7 @@ export function HomeHeader({
         variant={showFavoritesOnly ? "default" : "outline"}
         size="icon"
         onPress={onFavoritesToggle}
-        className={showFavoritesOnly ? "bg-[#e56400]" : ""}
+        className={showFavoritesOnly ? "bg-primary" : ""}
       >
         <Heart
           size={20}

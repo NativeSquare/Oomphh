@@ -116,7 +116,7 @@ export default function Taps() {
                 <View className="py-3 px-2">
                   <Text
                     className={`text-sm font-medium leading-5 ${
-                      activeTab === tab ? "text-[#e56400]" : "text-[#70707b]"
+                      activeTab === tab ? "text-primary" : "text-[#70707b]"
                     }`}
                     numberOfLines={1}
                   >
@@ -125,7 +125,7 @@ export default function Taps() {
                 </View>
                 <View
                   className={`h-[2px] w-full ${
-                    activeTab === tab ? "bg-[#e56400]" : "bg-[#26272b]"
+                    activeTab === tab ? "bg-primary" : "bg-[#26272b]"
                   }`}
                 />
               </Pressable>
@@ -227,9 +227,9 @@ export default function Taps() {
                       <Icon
                         as={Crown}
                         size={20}
-                        className="text-[#e56400]"
+                        className="text-primary"
                       />
-                      <Text className="text-sm font-medium text-[#e56400]">
+                      <Text className="text-sm font-medium text-primary">
                         Upgrade to see all {filteredTaps.length} taps
                       </Text>
                     </Pressable>
@@ -326,9 +326,9 @@ export default function Taps() {
                       <Icon
                         as={Crown}
                         size={20}
-                        className="text-[#e56400]"
+                        className="text-primary"
                       />
-                      <Text className="text-sm font-medium text-[#e56400]">
+                      <Text className="text-sm font-medium text-primary">
                         Upgrade to see all {filteredViews.length} views
                       </Text>
                     </Pressable>
@@ -414,7 +414,7 @@ export default function Taps() {
                             <Icon
                               as={Heart}
                               size={12}
-                              className="text-[#e56400]"
+                              className="text-primary"
                             />
                           </View>
                         </View>
@@ -423,7 +423,7 @@ export default function Taps() {
                           <Icon
                             as={Heart}
                             size={16}
-                            className="text-[#e56400]"
+                            className="text-primary"
                           />
                         </View>
                       )}

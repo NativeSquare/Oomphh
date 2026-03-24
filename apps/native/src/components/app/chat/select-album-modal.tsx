@@ -134,7 +134,7 @@ export function SelectAlbumModal({
         <View className="flex-col gap-2 relative">
           {/* Selection checkbox */}
           {isSelected && (
-            <View className="absolute top-[-6px] right-[-6px] z-10 bg-[#e56400] rounded-full size-4 items-center justify-center">
+            <View className="absolute top-[-6px] right-[-6px] z-10 bg-primary rounded-full size-4 items-center justify-center">
               <Icon as={Check} size={12} className="text-black" />
             </View>
           )}
@@ -244,7 +244,7 @@ export function SelectAlbumModal({
             {/* Albums list */}
             {albums === undefined ? (
               <View className="flex-1 items-center justify-center">
-                <ActivityIndicator size="large" color="#e56400" />
+                <ActivityIndicator size="large" color="#E63B2E" />
               </View>
             ) : filteredAlbums.length === 0 ? (
               <View className="flex-1 items-center justify-center px-5">

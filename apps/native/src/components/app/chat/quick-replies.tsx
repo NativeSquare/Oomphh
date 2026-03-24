@@ -17,9 +17,9 @@ export function QuickReplies({ replies, onReplySelect }: QuickRepliesProps) {
             <Pressable
               key={index}
               onPress={() => onReplySelect(reply)}
-              className="border border-[#e56400] rounded-lg px-3 py-1 active:opacity-70"
+              className="border border-primary rounded-lg px-3 py-1 active:opacity-70"
             >
-              <Text className="text-base leading-6 text-[#e56400]">
+              <Text className="text-base leading-6 text-primary">
                 {reply}
               </Text>
             </Pressable>
@@ -29,9 +29,9 @@ export function QuickReplies({ replies, onReplySelect }: QuickRepliesProps) {
       {replies.length > 3 && (
         <Pressable
           onPress={() => onReplySelect(replies[3])}
-          className="border border-[#e56400] rounded-lg px-3 py-1 self-start active:opacity-70"
+          className="border border-primary rounded-lg px-3 py-1 self-start active:opacity-70"
         >
-          <Text className="text-base leading-6 text-[#e56400]">
+          <Text className="text-base leading-6 text-primary">
             {replies[3]}
           </Text>
         </Pressable>

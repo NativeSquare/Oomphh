@@ -133,7 +133,7 @@ export default function PaywallScreen() {
   if (!isReady) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#e56400" />
+        <ActivityIndicator size="large" color="#E63B2E" />
       </View>
     );
   }
@@ -190,7 +190,7 @@ export default function PaywallScreen() {
                 <Ionicons
                   name="checkmark-circle-outline"
                   size={22}
-                  color="#e56400"
+                  color="#E63B2E"
                 />
                 <Text className="text-[15px] text-white">{feature}</Text>
               </View>
@@ -207,7 +207,7 @@ export default function PaywallScreen() {
                     key={period}
                     onPress={() => setBillingPeriod(period)}
                     className={`flex-1 items-center py-2.5 rounded-lg ${
-                      isActive ? "bg-[#e56400]" : ""
+                      isActive ? "bg-primary" : ""
                     }`}
                   >
                     <Text
@@ -233,7 +233,7 @@ export default function PaywallScreen() {
                   onPress={() => setSelectedPlan(plan.id)}
                   className={`flex-row items-center rounded-2xl border-2 px-4 py-3.5 ${
                     isSelected
-                      ? "border-[#e56400] bg-[#e56400]/10"
+                      ? "border-primary bg-primary/10"
                       : "border-border bg-secondary/30"
                   }`}
                 >
@@ -241,12 +241,12 @@ export default function PaywallScreen() {
                   <View
                     className={`size-6 items-center justify-center rounded-full border-2 mr-3 ${
                       isSelected
-                        ? "border-[#e56400]"
+                        ? "border-primary"
                         : "border-muted-foreground"
                     }`}
                   >
                     {isSelected && (
-                      <View className="size-3.5 rounded-full bg-[#e56400]" />
+                      <View className="size-3.5 rounded-full bg-primary" />
                     )}
                   </View>
 
@@ -275,7 +275,7 @@ export default function PaywallScreen() {
           <Pressable
             onPress={handlePurchase}
             disabled={isPurchasing}
-            className="h-14 rounded-full bg-[#e56400] items-center justify-center active:opacity-80"
+            className="h-14 rounded-full bg-primary items-center justify-center active:opacity-80"
           >
             {isPurchasing ? (
               <ActivityIndicator color="white" />

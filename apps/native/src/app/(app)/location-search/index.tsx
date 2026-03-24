@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   markerIconContainer: {
-    backgroundColor: "rgb(249, 115, 22)", // orange-500
+    backgroundColor: "#E63B2E", // primary red
     borderRadius: 9999,
     padding: 8,
   },
@@ -456,6 +456,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 12,
     borderLeftColor: "transparent",
     borderRightColor: "transparent",
-    borderTopColor: "rgb(249, 115, 22)", // orange-500
+    borderTopColor: "#E63B2E", // primary red
   },
 });

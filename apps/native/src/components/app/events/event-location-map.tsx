@@ -81,10 +81,10 @@ export function EventLocationMap({
       >
         <Marker coordinate={{ latitude, longitude }}>
           <View className="items-center">
-            <View className="bg-[#e56400] rounded-full p-1.5">
+            <View className="bg-primary rounded-full p-1.5">
               <MapPin size={16} color="#fff" />
             </View>
-            <View className="w-2 h-2 bg-[#e56400] rounded-full mt-0.5 opacity-40" />
+            <View className="w-2 h-2 bg-primary rounded-full mt-0.5 opacity-40" />
           </View>
         </Marker>
       </MapView>

@@ -102,7 +102,7 @@ export function SubscriptionPlanCard() {
             className="active:opacity-80 overflow-hidden rounded-xl"
           >
             <LinearGradient
-              colors={["#e56400", "#c45500"]}
+              colors={["#E63B2E", "#C42A1F"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={{
@@ -129,25 +129,25 @@ export function SubscriptionPlanCard() {
       <LinearGradient
         colors={
           isPremium
-            ? ["#1a1400", "#1a1000", "#131316"]
-            : ["#2a1500", "#1c0e00", "#131316"]
+            ? ["#1a0a08", "#1a0806", "#131316"]
+            : ["#2a0e0c", "#1c0806", "#131316"]
         }
         start={{ x: 0, y: 0 }}
         end={{ x: 0.5, y: 1 }}
       >
-        <View className="border border-[#e56400]/25 rounded-2xl">
+        <View className="border border-primary/25 rounded-2xl">
           <View className="p-5 gap-4">
             {/* Plan name + price */}
             <View className="flex-row items-start justify-between">
               <View className="flex-row items-center gap-3 flex-1">
                 <View
                   className="size-11 rounded-full items-center justify-center"
-                  style={{ backgroundColor: "rgba(229, 100, 0, 0.15)" }}
+                  style={{ backgroundColor: "rgba(230, 59, 46, 0.15)" }}
                 >
                   <Icon
                     as={PLAN_ICON[tier]}
                     size={22}
-                    color="#e56400"
+                    color="#E63B2E"
                   />
                 </View>
                 <View>
@@ -182,7 +182,7 @@ export function SubscriptionPlanCard() {
                   className="flex-1 py-3 rounded-xl items-center justify-center active:opacity-80 overflow-hidden"
                 >
                   <LinearGradient
-                    colors={["#e56400", "#c45500"]}
+                    colors={["#E63B2E", "#C42A1F"]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                     style={{
