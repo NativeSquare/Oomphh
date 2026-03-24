@@ -64,22 +64,33 @@ export function useSubscription() {
 
   const findPackage = (id: string) =>
     currentOffering?.availablePackages?.find(
-      (pkg) => pkg.product.identifier === id,
+      (pkg) => pkg.identifier === id,
     ) ?? null;
 
-  const premiumPackage = findPackage("com.oomphh.premium_monthly");
-  const unlimitedPackage = findPackage("com.oomphh.unlimited_monthly");
+  if (__DEV__ && currentOffering) {
+    console.log(
+      "[Paywall] All available packages:",
+      currentOffering.availablePackages?.map((pkg) => ({
+        packageId: pkg.identifier,
+        productId: pkg.product.identifier,
+        price: pkg.product.priceString,
+      })),
+    );
+  }
+
+  const premiumPackage = findPackage("premium_monthly");
+  const unlimitedPackage = findPackage("unlimited_monthly");
 
   const packages = {
     premium: {
       monthly: premiumPackage,
-      quarterly: findPackage("com.oomphh.premium_quarterly"),
-      annually: findPackage("com.oomphh.premium_annually"),
+      quarterly: findPackage("premium_quarterly"),
+      annually: findPackage("premium_annually"),
     },
     unlimited: {
       monthly: unlimitedPackage,
-      quarterly: findPackage("com.oomphh.unlimited_quarterly"),
-      annually: findPackage("com.oomphh.unlimited_annually"),
+      quarterly: findPackage("unlimited_quarterly"),
+      annually: findPackage("unlimited_annually"),
     },
   };
 
