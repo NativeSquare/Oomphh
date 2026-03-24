@@ -74,6 +74,7 @@ export default function PaywallScreen() {
   const insets = useSafeAreaInsets();
   const {
     isReady,
+    tier,
     packages,
     purchasePackage,
     restorePurchases,
@@ -129,6 +130,7 @@ export default function PaywallScreen() {
   };
 
   const selectedPlanData = plans.find((p) => p.id === selectedPlan);
+  const isCurrentPlan = tier !== "free" && selectedPlan === tier;
 
   if (!isReady) {
     return (
@@ -227,6 +229,7 @@ export default function PaywallScreen() {
           <View className="gap-3 mb-8">
             {plans.map((plan) => {
               const isSelected = selectedPlan === plan.id;
+              const isCurrent = tier !== "free" && plan.id === tier;
               return (
                 <Pressable
                   key={plan.id}
@@ -251,9 +254,18 @@ export default function PaywallScreen() {
                   </View>
 
                   {/* Plan name */}
-                  <Text className="text-[15px] font-semibold text-white flex-1">
-                    {plan.name}
-                  </Text>
+                  <View className="flex-1 flex-row items-center gap-2">
+                    <Text className="text-[15px] font-semibold text-white">
+                      {plan.name}
+                    </Text>
+                    {isCurrent && (
+                      <View className="rounded-full bg-muted-foreground/20 px-2.5 py-0.5">
+                        <Text className="text-[11px] font-semibold text-muted-foreground">
+                          Current Plan
+                        </Text>
+                      </View>
+                    )}
+                  </View>
 
                   {/* Price */}
                   {plan.price !== "Free" && (
@@ -274,16 +286,22 @@ export default function PaywallScreen() {
           {/* Subscribe Button */}
           <Pressable
             onPress={handlePurchase}
-            disabled={isPurchasing}
-            className="h-14 rounded-full bg-primary items-center justify-center active:opacity-80"
+            disabled={isPurchasing || isCurrentPlan}
+            className={`h-14 rounded-full items-center justify-center active:opacity-80 ${
+              isCurrentPlan ? "bg-secondary/50" : "bg-primary"
+            }`}
           >
             {isPurchasing ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text className="text-base font-bold text-white">
-                {selectedPlanData?.trial
-                  ? `Start Free Trial`
-                  : `Subscribe — ${selectedPlanData?.price ?? ""}${selectedPlanData ? ` ${selectedPlanData.period}` : ""}`}
+              <Text
+                className={`text-base font-bold ${isCurrentPlan ? "text-muted-foreground" : "text-white"}`}
+              >
+                {isCurrentPlan
+                  ? "Current Plan"
+                  : selectedPlanData?.trial
+                    ? `Start Free Trial`
+                    : `Subscribe — ${selectedPlanData?.price ?? ""}${selectedPlanData ? ` ${selectedPlanData.period}` : ""}`}
               </Text>
             )}
           </Pressable>
