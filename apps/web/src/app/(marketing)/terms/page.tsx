@@ -8,7 +8,7 @@ export default function TermsPage() {
         Terms of Service
       </h1>
       <p className="mb-12 text-sm font-light text-white/25">
-        Last updated: February 2026
+        Last updated: March 2026
       </p>
 
       <div className="space-y-10">
@@ -22,10 +22,14 @@ export default function TermsPage() {
 
         <LegalSection title="2. Description of Service">
           <p>
-            Oomphh is a personality-first dating platform that connects you
-            with compatible people nearby. Our matching system analyzes your
-            personality profile, interests, and preferences to help you find
-            meaningful connections in real life.
+            Oomphh is an online dating portal targeted towards Gay, bisexual,
+            trans, non-binary and queer people. You browse nearby users, use
+            filters and may use some features like horoscope matching (still to
+            be launched) as a premium service. The horoscope matching is
+            intended purely to be consumed in a playful manner depending on the
+            information you and other users may provide in their profiles. The
+            app intends to promote socialising and meeting in real life through
+            personal or organised events.
           </p>
         </LegalSection>
 
@@ -87,8 +91,9 @@ export default function TermsPage() {
 
         <LegalSection title="9. Modifications to Service">
           <p>
-            We reserve the right to modify or discontinue our service at any
-            time. We will provide reasonable notice of any significant changes.
+            We reserve the right to modify or discontinue our services or any
+            features and related subscription or pricing models at any time. We
+            will provide reasonable notice for any significant changes.
           </p>
         </LegalSection>
 
@@ -100,7 +105,24 @@ export default function TermsPage() {
           </p>
         </LegalSection>
 
-        <LegalSection title="11. Contact Us">
+        <LegalSection title="11. Subscriptions">
+          <p>
+            Subscriptions are available on a recurring basis and provide access
+            to premium features as described at the time of purchase.
+          </p>
+        </LegalSection>
+
+        <LegalSection title="12. Refunds / Cancellations">
+          <p>
+            Subscriptions will auto renew unless cancelled 24 hours in advance.
+            One time payment services may not be cancelled and/or refunded.
+            There will be no pro-rata refunds for subscriptions upon
+            cancellations &mdash; however the user will have the full
+            functionality for the paid service during the subscription validity.
+          </p>
+        </LegalSection>
+
+        <LegalSection title="13. Contact Us">
           <p>
             For questions about these Terms of Service, contact us at:{" "}
             <a
