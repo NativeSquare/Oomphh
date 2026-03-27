@@ -28,7 +28,7 @@ export default function DownloadPage() {
 
           <div className="mt-16 flex flex-col items-center gap-8 sm:flex-row sm:justify-center sm:gap-12">
             <a
-              href="https://apps.apple.com/app/oomphh"
+              href="https://testflight.apple.com/join/p2vKqRSg"
               target="_blank"
               rel="noopener noreferrer"
               className="group flex h-14 w-full max-w-[260px] items-center gap-4 rounded-xl border border-border/60 bg-card px-6 shadow-sm transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 sm:w-auto sm:min-w-[220px]"
@@ -44,7 +44,7 @@ export default function DownloadPage() {
               </div>
             </a>
             <a
-              href="https://play.google.com/store/apps/details?id=com.oomphh.app"
+              href="https://play.google.com/apps/testing/com.oomphh.mobile"
               target="_blank"
               rel="noopener noreferrer"
               className="group flex h-14 w-full max-w-[260px] items-center gap-4 rounded-xl border border-border/60 bg-card px-6 shadow-sm transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 sm:w-auto sm:min-w-[220px]"
@@ -62,9 +62,9 @@ export default function DownloadPage() {
           </div>
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
-            App Store and Google Play links will be available when the
-            app launches.{" "}
-            <span className="text-foreground">Stay tuned.</span>
+            Available now on{" "}
+            <span className="text-foreground">iOS (TestFlight)</span> and{" "}
+            <span className="text-foreground">Android (Play Store)</span>.
           </p>
 
           <div className="mt-16 grid grid-cols-2 justify-items-center gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
@@ -93,10 +93,10 @@ export default function DownloadPage() {
 
           <div className="mt-16 rounded-2xl border border-border/60 bg-card/50 p-8 text-center">
             <h2 className="text-xl font-semibold text-foreground">
-              Coming soon to iOS and Android
+              Available on iOS and Android
             </h2>
             <p className="mt-2 text-muted-foreground">
-              OOmphh is in development. Follow along for launch updates.
+              OOmphh is in open beta. Download now and start connecting.
             </p>
           </div>
         </div>

@@ -2135,7 +2135,7 @@ export default function OomphLanding() {
             />
             <FAQItem
               question="When does OOmphh launch?"
-              answer="We're in open beta right now! Download OOmphh on TestFlight and start connecting — early adopters get premium features for free."
+              answer="We're in open beta right now! Download OOmphh on iOS (TestFlight) or Android (Play Store) and start connecting — early adopters get premium features for free."
             />
             <FAQItem
               question="Is OOmphh free to use?"
@@ -2224,7 +2224,7 @@ export default function OomphLanding() {
                 fontWeight: 300,
               }}
             >
-              Available now on iOS via TestFlight.
+              Available now on iOS and Android.
             </p>
           </div>
         </div>
