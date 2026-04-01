@@ -67,16 +67,6 @@ export function useSubscription() {
       (pkg) => pkg.identifier === id,
     ) ?? null;
 
-  if (__DEV__ && currentOffering) {
-    console.log(
-      "[Paywall] All available packages:",
-      currentOffering.availablePackages?.map((pkg) => ({
-        packageId: pkg.identifier,
-        productId: pkg.product.identifier,
-        price: pkg.product.priceString,
-      })),
-    );
-  }
 
   const premiumPackage = findPackage("premium_monthly");
   const unlimitedPackage = findPackage("unlimited_monthly");

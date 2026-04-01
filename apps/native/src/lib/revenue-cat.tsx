@@ -2,7 +2,6 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { Platform } from "react-native";
 import Purchases, {
   type CustomerInfo,
-  LOG_LEVEL,
   type PurchasesOffering,
 } from "react-native-purchases";
 
@@ -48,33 +47,14 @@ export function RevenueCatProvider({
       }
 
       try {
-        if (__DEV__) {
-          Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
-        }
-
         Purchases.configure({ apiKey: API_KEY });
 
         const info = await Purchases.getCustomerInfo();
         setCustomerInfo(info);
 
         const offerings = await Purchases.getOfferings();
-        if (__DEV__) {
-          console.log(
-            "[RevenueCat] Current offering:",
-            offerings.current?.identifier,
-          );
-          console.log(
-            "[RevenueCat] Available packages:",
-            offerings.current?.availablePackages?.map((p) => ({
-              identifier: p.identifier,
-              productId: p.product.identifier,
-              priceString: p.product.priceString,
-            })),
-          );
-        }
         setCurrentOffering(offerings.current);
       } catch (error) {
-        console.error("[RevenueCat] Initialization failed:", error);
       } finally {
         setIsReady(true);
       }

@@ -1,19 +1,15 @@
 import { EventCard } from "@/components/app/events/event-card";
+import { ConfirmBottomSheet } from "@/components/custom/confirm-bottom-sheet";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { api } from "@packages/backend/convex/_generated/api";
 import { Id } from "@packages/backend/convex/_generated/dataModel";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useMutation, useQuery } from "convex/react";
 import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 import React from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  ScrollView,
-  View,
-} from "react-native";
+import { ActivityIndicator, Alert, Pressable, ScrollView, View } from "react-native";
 
 function formatEventDate(timestamp: number): string {
   const date = new Date(timestamp);
@@ -38,26 +34,29 @@ function formatEventDate(timestamp: number): string {
 export default function MyEvents() {
   const events = useQuery(api.table.events.getMyOrganizedEvents);
   const deleteEvent = useMutation(api.table.events.deleteEvent);
+  const confirmRef = React.useRef<BottomSheetModal>(null);
+  const [pendingDelete, setPendingDelete] = React.useState<{
+    eventId: Id<"events">;
+    title: string;
+  } | null>(null);
 
   const handleEventPress = (eventId: string) => {
     router.push({ pathname: "/event-detail", params: { id: eventId } });
   };
 
   const handleDeletePress = (eventId: Id<"events">, title: string) => {
-    Alert.alert("Delete Event", `Are you sure you want to delete "${title}"?`, [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await deleteEvent({ eventId });
-          } catch (error: any) {
-            Alert.alert("Error", error.message ?? "Failed to delete event");
-          }
-        },
-      },
-    ]);
+    setPendingDelete({ eventId, title });
+    confirmRef.current?.present();
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!pendingDelete) return;
+    try {
+      await deleteEvent({ eventId: pendingDelete.eventId });
+    } catch (error: any) {
+      Alert.alert("Error", error.message ?? "Failed to delete event");
+    }
+    setPendingDelete(null);
   };
 
   const isLoading = events === undefined;
@@ -102,14 +101,25 @@ export default function MyEvents() {
                 imageUri={event.imageUrl ?? ""}
                 attendeeAvatars={event.attendeeAvatars}
                 totalAttendees={event.totalAttendees}
-                hasJoined={event.hasJoined}
                 onPress={() => handleEventPress(event._id)}
                 onJoinPress={() => handleDeletePress(event._id, event.title)}
+                actionLabel="Delete"
+                actionVariant="destructive"
               />
             ))}
           </View>
         )}
       </View>
+
+      <ConfirmBottomSheet
+        bottomSheetModalRef={confirmRef}
+        title="Delete Event"
+        description={`Are you sure you want to delete "${pendingDelete?.title}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        confirmVariant="destructive"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </ScrollView>
   );
 }

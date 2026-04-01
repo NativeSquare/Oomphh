@@ -15,6 +15,8 @@ export type EventCardProps = {
   hasJoined?: boolean;
   onPress?: () => void;
   onJoinPress?: () => void;
+  actionLabel?: string;
+  actionVariant?: "default" | "destructive";
 };
 
 export function EventCard({
@@ -27,6 +29,8 @@ export function EventCard({
   hasJoined,
   onPress,
   onJoinPress,
+  actionLabel,
+  actionVariant = "default",
 }: EventCardProps) {
   return (
     <Pressable
@@ -74,17 +78,23 @@ export function EventCard({
         <Pressable
           onPress={onJoinPress}
           className={`rounded-full px-5 py-1.5 active:opacity-70 ${
-            hasJoined
-              ? "bg-primary border border-primary"
-              : "border border-primary"
+            actionVariant === "destructive"
+              ? "border border-red-500"
+              : hasJoined
+                ? "bg-primary border border-primary"
+                : "border border-primary"
           }`}
         >
           <Text
             className={`text-sm font-medium ${
-              hasJoined ? "text-black" : "text-primary"
+              actionVariant === "destructive"
+                ? "text-red-500"
+                : hasJoined
+                  ? "text-black"
+                  : "text-primary"
             }`}
           >
-            {hasJoined ? "Joined" : "Join"}
+            {actionLabel ?? (hasJoined ? "Joined" : "Join")}
           </Text>
         </Pressable>
       </View>

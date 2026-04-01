@@ -167,7 +167,7 @@ export function LocationAutocompleteInput({
           editable={editable}
           autoCapitalize="none"
           autoCorrect={false}
-          className={showClear || isLoading ? "pr-9" : undefined}
+          className={`rounded-full ${showClear || isLoading ? "pr-9" : ""}`}
           onFocus={() => {
             isFocusedRef.current = true;
             if (predictions.length > 0) setShowDropdown(true);
