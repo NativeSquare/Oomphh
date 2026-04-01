@@ -528,7 +528,7 @@ export default function ChatDetail() {
           />
         )}
 
-        <View className={isInputFocused ? "" : "pb-safe"}>
+        <View className={isInputFocused && Platform.OS === "ios" ? "" : "pb-safe"}>
           <MessageInput
             value={message}
             onChangeText={setMessage}

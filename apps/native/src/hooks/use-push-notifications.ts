@@ -70,6 +70,9 @@ async function registerForPushNotifications(): Promise<string | null> {
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: "#FF231F7C",
+      sound: "default",
+      enableVibrate: true,
+      showBadge: true,
     });
   }
 
