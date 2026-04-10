@@ -1,11 +1,11 @@
 import { ProfilePictureCarousel } from "@/components/app/profile/profile-picture-carousel";
-import { BottomSheetModal } from "@/components/custom/bottom-sheet";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { THEME } from "@/lib/theme";
 import { formatHeight, formatWeight } from "@/utils/measurements";
 import { api } from "@packages/backend/convex/_generated/api";
-import { BottomSheetModal as GorhomBottomSheetModal } from "@gorhom/bottom-sheet";
+import GorhomBottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useQuery } from "convex/react";
 import { router } from "expo-router";
 import {
@@ -21,7 +21,8 @@ import {
   Scale,
   Users,
 } from "lucide-react-native";
-import React, { useEffect, useRef } from "react";
+import { useColorScheme } from "nativewind";
+import React, { useCallback, useRef } from "react";
 import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -45,8 +46,11 @@ function calculateAge(birthDate?: string | null): number | null {
 }
 
 export default function MyProfile() {
+  const { colorScheme } = useColorScheme();
+  const theme = THEME[colorScheme ?? "light"];
   const insets = useSafeAreaInsets();
-  const bottomSheetRef = useRef<GorhomBottomSheetModal>(null);
+  const bottomSheetRef = useRef<GorhomBottomSheet>(null);
+  const bottomSheetIndex = useRef(0);
   const user = useQuery(api.table.users.currentUser);
   const imageUrls = useQuery(api.storage.getImageUrls, {
     storageIds: user?.profilePictures ?? [],
@@ -56,13 +60,6 @@ export default function MyProfile() {
   const age = user?.birthDate ? calculateAge(user.birthDate) : null;
   const shouldShowAge = user?.privacy?.hideAge !== true && age !== null;
 
-  // Open bottom sheet by default when page loads
-  useEffect(() => {
-    if (user) {
-      bottomSheetRef.current?.present();
-    }
-  }, [user]);
-
   if (!user) {
     return (
       <View className="flex-1 items-center justify-center bg-background">
@@ -71,8 +68,16 @@ export default function MyProfile() {
     );
   }
 
+  const handleBottomSheetChange = useCallback((index: number) => {
+    bottomSheetIndex.current = index;
+  }, []);
+
   const handleCarouselPress = () => {
-    bottomSheetRef.current?.present();
+    if (bottomSheetIndex.current === -1) {
+      bottomSheetRef.current?.snapToIndex(0);
+    } else {
+      bottomSheetRef.current?.snapToIndex(1);
+    }
   };
 
   const handleEditPress = () => {
@@ -117,11 +122,29 @@ export default function MyProfile() {
       </Pressable>
 
       {/* Bottom Sheet with User Info */}
-      <BottomSheetModal
+      <GorhomBottomSheet
         ref={bottomSheetRef}
-        enableBackdrop={false}
         snapPoints={["20%", "90%"]}
+        index={0}
+        enablePanDownToClose
+        onChange={handleBottomSheetChange}
+        backgroundStyle={{
+          backgroundColor:
+            colorScheme === "dark" ? theme.input30 : theme.background,
+        }}
+        handleIndicatorStyle={{
+          backgroundColor: theme.secondary,
+          width: 40,
+          height: 5,
+        }}
+        handleStyle={{
+          backgroundColor:
+            colorScheme === "dark" ? theme.input30 : theme.input,
+          borderTopLeftRadius: 12,
+          borderTopRightRadius: 12,
+        }}
       >
+        <BottomSheetView style={{ paddingBottom: insets.bottom }}>
         <View className="px-6 py-4 gap-6">
           {/* Name */}
           <View className="gap-2">
@@ -296,7 +319,8 @@ export default function MyProfile() {
             </View>
           )}
         </View>
-      </BottomSheetModal>
+        </BottomSheetView>
+      </GorhomBottomSheet>
     </View>
   );
 }

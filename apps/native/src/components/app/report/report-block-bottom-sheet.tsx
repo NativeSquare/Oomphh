@@ -57,7 +57,7 @@ export function ReportBlockBottomSheet({
 
   return (
     <>
-      <BottomSheetModal ref={bottomSheetModalRef} snapPoints={["25%"]}>
+      <BottomSheetModal ref={bottomSheetModalRef} enableDynamicSizing>
         <View className="gap-2 px-4 pb-6 pt-3">
           <Text className="text-lg font-semibold text-foreground mb-2">
             Actions

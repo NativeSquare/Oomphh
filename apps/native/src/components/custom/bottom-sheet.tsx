@@ -12,6 +12,7 @@ interface BottomSheetModalProps {
   ref: React.ForwardedRef<GorhomBottomSheetModal>;
   children: React.ReactNode;
   enableBackdrop?: boolean;
+  enableDynamicSizing?: boolean;
   snapPoints?: (string | number)[];
 }
 
@@ -21,6 +22,7 @@ export function BottomSheetModal({
   ref,
   children,
   enableBackdrop = true,
+  enableDynamicSizing = false,
   snapPoints = ["50%", "90%"],
 }: BottomSheetModalProps) {
   const { colorScheme } = useColorScheme();
@@ -31,7 +33,9 @@ export function BottomSheetModal({
   return (
     <GorhomBottomSheetModal
       ref={ref}
-      snapPoints={snapPoints}
+      {...(enableDynamicSizing
+        ? { enableDynamicSizing: true }
+        : { snapPoints })}
       stackBehavior="replace"
       backgroundStyle={{
         backgroundColor:
