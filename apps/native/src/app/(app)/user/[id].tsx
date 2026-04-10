@@ -1,6 +1,5 @@
 import { ProfilePictureCarousel } from "@/components/app/profile/profile-picture-carousel";
 import { ReportBlockBottomSheet } from "@/components/app/report/report-block-bottom-sheet";
-import { BottomSheetModal } from "@/components/custom/bottom-sheet";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import {
@@ -10,6 +9,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Text } from "@/components/ui/text";
+import { THEME } from "@/lib/theme";
 import {
   formatDistance,
   formatHeight,
@@ -18,7 +18,10 @@ import {
 import { usePresence } from "@convex-dev/presence/react-native";
 import { api } from "@packages/backend/convex/_generated/api";
 import { Id } from "@packages/backend/convex/_generated/dataModel";
-import { BottomSheetModal as GorhomBottomSheetModal } from "@gorhom/bottom-sheet";
+import GorhomBottomSheet, {
+  BottomSheetModal as GorhomBottomSheetModal,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 import { useMutation, useQuery } from "convex/react";
 import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
@@ -37,7 +40,8 @@ import {
   Smile,
   Users,
 } from "lucide-react-native";
-import React, { useEffect, useRef } from "react";
+import { useColorScheme } from "nativewind";
+import React, { useCallback, useEffect, useRef } from "react";
 import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -64,8 +68,11 @@ const EMOJI_OPTIONS = ["🍸", "❤️‍🔥", "❌", "😈", "⚡"];
 
 export default function UserProfile() {
   const { id } = useLocalSearchParams<{ id: Id<"users"> }>();
+  const { colorScheme } = useColorScheme();
+  const theme = THEME[colorScheme ?? "light"];
   const insets = useSafeAreaInsets();
-  const bottomSheetRef = useRef<GorhomBottomSheetModal>(null);
+  const bottomSheetRef = useRef<GorhomBottomSheet>(null);
+  const bottomSheetIndex = useRef(0);
   const reportBlockRef = useRef<GorhomBottomSheetModal>(null);
   const currentUser = useQuery(api.table.users.currentUser);
   const user = useQuery(api.table.users.get, { id });
@@ -128,13 +135,6 @@ export default function UserProfile() {
     }
   }, [currentUser?._id, id, recordView]);
 
-  // Open bottom sheet by default when page loads
-  useEffect(() => {
-    if (user) {
-      bottomSheetRef.current?.present();
-    }
-  }, [user]);
-
   if (!user) {
     return (
       <View className="flex-1 items-center justify-center bg-background">
@@ -149,7 +149,7 @@ export default function UserProfile() {
       console.error("Cannot message yourself");
       return;
     }
-    bottomSheetRef.current?.dismiss();
+    bottomSheetRef.current?.snapToIndex(0);
     router.push(`/chat/${id}`);
   };
 
@@ -183,8 +183,16 @@ export default function UserProfile() {
     }
   };
 
+  const handleBottomSheetChange = useCallback((index: number) => {
+    bottomSheetIndex.current = index;
+  }, []);
+
   const handleCarouselPress = () => {
-    bottomSheetRef.current?.present();
+    if (bottomSheetIndex.current === -1) {
+      bottomSheetRef.current?.snapToIndex(0);
+    } else {
+      bottomSheetRef.current?.snapToIndex(1);
+    }
   };
 
   return (
@@ -277,11 +285,29 @@ export default function UserProfile() {
       </Pressable>
 
       {/* Bottom Sheet with User Info */}
-      <BottomSheetModal
+      <GorhomBottomSheet
         ref={bottomSheetRef}
-        enableBackdrop={false}
         snapPoints={["20%", "90%"]}
+        index={0}
+        enablePanDownToClose
+        onChange={handleBottomSheetChange}
+        backgroundStyle={{
+          backgroundColor:
+            colorScheme === "dark" ? theme.input30 : theme.background,
+        }}
+        handleIndicatorStyle={{
+          backgroundColor: theme.secondary,
+          width: 40,
+          height: 5,
+        }}
+        handleStyle={{
+          backgroundColor:
+            colorScheme === "dark" ? theme.input30 : theme.input,
+          borderTopLeftRadius: 12,
+          borderTopRightRadius: 12,
+        }}
       >
+        <BottomSheetView style={{ paddingBottom: insets.bottom }}>
         <View className="px-6 py-4 gap-6">
           {/* Distance */}
           {distance !== null && (
@@ -469,7 +495,8 @@ export default function UserProfile() {
             </View>
           )}
         </View>
-      </BottomSheetModal>
+        </BottomSheetView>
+      </GorhomBottomSheet>
 
       <ReportBlockBottomSheet
         bottomSheetModalRef={reportBlockRef}
