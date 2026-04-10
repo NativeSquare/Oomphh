@@ -29,12 +29,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Keyboard,
-  KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
   View,
 } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import ImageViewing from "react-native-image-viewing";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -49,6 +49,7 @@ export default function ChatDetail() {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [attachedImageUris, setAttachedImageUris] = useState<string[]>([]);
   const [isViewOnce, setIsViewOnce] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const { capabilities } = useSubscription();
   const { count: disappearingPhotosSent, increment: incrementDisappearingCount } =
     useDisappearingPhotoCount();
@@ -203,6 +204,7 @@ export default function ChatDetail() {
       return;
 
     setError(null);
+    setIsSending(true);
     try {
       // Upload images first if there are any attached
       let uploadedImageUrls: string[] | undefined;
@@ -230,6 +232,8 @@ export default function ChatDetail() {
     } catch (error) {
       setError(getConvexErrorMessage(error));
       console.error("Error sending message:", error);
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -455,7 +459,7 @@ export default function ChatDetail() {
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior="padding"
       >
         <ScrollView
           className="flex-1"
@@ -528,7 +532,7 @@ export default function ChatDetail() {
           />
         )}
 
-        <View className={isInputFocused && Platform.OS === "ios" ? "" : "pb-safe"}>
+        <View className={isInputFocused ? "" : "pb-safe"}>
           <MessageInput
             value={message}
             onChangeText={setMessage}
@@ -539,7 +543,7 @@ export default function ChatDetail() {
             onBlur={() => setIsInputFocused(false)}
             attachedImageUris={attachedImageUris}
             onRemoveImage={handleRemoveImage}
-            isLoading={isUploading}
+            isLoading={isSending}
             isViewOnce={isViewOnce}
             onToggleViewOnce={() => {
               if (!isViewOnce && !canSendDisappearingPhoto) {
