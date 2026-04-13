@@ -58,6 +58,7 @@ export default function ChatDetail() {
   const uploadMediaBottomSheetRef = useRef<BottomSheetModal>(null);
   const selectAlbumModalRef = useRef<BottomSheetModal>(null);
   const reportBlockRef = useRef<BottomSheetModal>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const otherUserId = id as Id<"users"> | undefined;
 
@@ -195,6 +196,15 @@ export default function ChatDetail() {
       );
     }
   }, [conversation?._id, markMessagesAsRead]);
+
+  // Auto-scroll to the latest message
+  useEffect(() => {
+    if (messages && messages.length > 0) {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: false });
+      }, 200);
+    }
+  }, [messages?.length]);
 
   // Use the other user's first sentences, or fallback to empty array
   const quickReplies = currentUser?.firstSentences ?? [];
@@ -462,6 +472,7 @@ export default function ChatDetail() {
         behavior="padding"
       >
         <ScrollView
+          ref={scrollViewRef}
           className="flex-1"
           contentContainerStyle={{
             flexGrow: 1,
