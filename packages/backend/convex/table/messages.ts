@@ -184,7 +184,7 @@ export const sendMessage = mutation({
       userId: args.otherUserId,
       title: senderName,
       body: preview,
-      data: { type: "message", conversationId: conversation._id },
+      data: { type: "message", conversationId: conversation._id, fromUserId: currentUserId },
       category: "messages",
     });
 
@@ -264,7 +264,7 @@ export const sendMessageByConversationId = mutation({
       userId: recipientUserId,
       title: senderName,
       body: preview,
-      data: { type: "message", conversationId: args.conversationId },
+      data: { type: "message", conversationId: args.conversationId, fromUserId: currentUserId },
       category: "messages",
     });
 
@@ -447,7 +447,7 @@ export const sendLocationMessage = mutation({
       userId: args.otherUserId,
       title: senderName,
       body: "Shared a location",
-      data: { type: "message", conversationId: conversation._id },
+      data: { type: "message", conversationId: conversation._id, fromUserId: currentUserId },
       category: "messages",
     });
 

@@ -17,6 +17,29 @@ Notifications.setNotificationHandler({
   }),
 });
 
+function handleNotificationResponse(
+  response: Notifications.NotificationResponse,
+) {
+  const data = response.notification.request.content.data;
+  if (!data?.type) return;
+
+  switch (data.type) {
+    case "message":
+      if (data.fromUserId) {
+        router.push(`/chat/${data.fromUserId}`);
+      }
+      break;
+    case "tap":
+      if (data.fromUserId) {
+        router.push(`/user/${data.fromUserId}`);
+      }
+      break;
+    case "storyLike":
+      router.push("/(app)/(tabs)/taps");
+      break;
+  }
+}
+
 export function usePushNotifications() {
   const recordToken = useMutation(api.pushNotifications.recordToken);
   const responseListener = useRef<Notifications.EventSubscription | null>(null);
@@ -30,27 +53,19 @@ export function usePushNotifications() {
       }
     });
 
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        const data = response.notification.request.content.data;
-        if (!data?.type) return;
+    // Handle the notification that launched the app from a killed state.
+    // By the time this hook mounts (after auth), the live listener has
+    // missed the response, so we retrieve it retroactively.
+    Notifications.getLastNotificationResponseAsync().then((response) => {
+      if (response) {
+        handleNotificationResponse(response);
+      }
+    });
 
-        switch (data.type) {
-          case "message":
-            if (data.conversationId) {
-              router.push(`/chat/${data.conversationId}`);
-            }
-            break;
-          case "tap":
-            if (data.fromUserId) {
-              router.push(`/user/${data.fromUserId}`);
-            }
-            break;
-          case "storyLike":
-            router.push("/(app)/(tabs)/taps");
-            break;
-        }
-      });
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener(
+        handleNotificationResponse,
+      );
 
     return () => {
       responseListener.current?.remove();
